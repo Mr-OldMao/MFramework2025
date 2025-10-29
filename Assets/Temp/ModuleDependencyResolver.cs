@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MFramework.Runtime;
+using UnityEngine;
 public class ModuleDependencyResolver
 {
     public List<Type> ResolveInitOrder(List<IGameModule> modules)
@@ -47,7 +48,17 @@ public class DependsOnAttribute : Attribute
 //[DependsOn(typeof(IEventManager))]
 public class UIManager : GameModuleBase, IUIManager
 {
+    public T GetPanel<T>(string panelName) where T : Component
+    {
+        throw new NotImplementedException();
+    }
+
     public void HidePanel<T>() where T : class
+    {
+        throw new NotImplementedException();
+    }
+
+    public void HidePanel(string panelName)
     {
         throw new NotImplementedException();
     }
@@ -58,6 +69,11 @@ public class UIManager : GameModuleBase, IUIManager
     }
 
     public void ShowPanel<T>() where T : class
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ShowPanel(string panelName)
     {
         throw new NotImplementedException();
     }

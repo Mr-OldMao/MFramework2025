@@ -1,29 +1,22 @@
-/// <summary>
-/// ÊÂ¼şÀàĞÍÃ¶¾Ù
+ï»¿/// <summary>
+/// äº‹ä»¶ç±»å‹æšä¸¾
 /// </summary>
 public enum GameEventType
 {
-    #region Test
-    // Íæ¼ÒÏà¹ØÊÂ¼ş
-    PlayerHealthChanged = 1001,
-    PlayerLevelUp = 1002,
-    PlayerDeath = 1003,
+    TestEvent = 0,
 
-    // ÎïÆ·Ïà¹ØÊÂ¼ş
-    ItemCollected = 2001,
-    ItemUsed = 2002,
-
-    // ³¡¾°Ïà¹ØÊÂ¼ş
-    SceneLoaded = 3001,
-    SceneUnloaded = 3002,
-
-    // UIÏà¹ØÊÂ¼ş
-    UIOpened = 4001,
-    UIClosed = 4002,
-
-    // ÓÎÏ·×´Ì¬ÊÂ¼ş
-    GamePaused = 5001,
-    GameResumed = 5002,
-    GameOver = 5003 
+    #region æ¡†æ¶å±‚äº‹ä»¶
+    /// <summary>
+    /// åœºæ™¯åŠ è½½å¼€å§‹
+    /// </summary>
+    SceneLoadStart = 500,
+    /// <summary>
+    /// åœºæ™¯åŠ è½½ä¸­
+    /// </summary>
+    SceneLoading = 501,
+    /// <summary>
+    /// åœºæ™¯åŠ è½½å®Œæˆ
+    /// </summary>
+    SceneLoaded = 502,
     #endregion
 }

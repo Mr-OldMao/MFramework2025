@@ -33,6 +33,9 @@ namespace MFramework.Runtime
 
         private async void InitializeFramework()
         {
+            // 第一步：提前初始化日志系统
+            InitializeLogSystemImmediately();
+
             // 显示启动界面
             ShowLaunchScreen();
 
@@ -57,7 +60,6 @@ namespace MFramework.Runtime
         // GameLauncher.cs - 详细初始化流程
         private async Task InitializeFrameworkStepByStep()
         {
-            frameworkManager = new FrameworkManager();
             var totalSteps = 4;
             var currentStep = 0;
 
@@ -105,16 +107,23 @@ namespace MFramework.Runtime
             //});
         }
 
-
+        private void InitializeLogSystemImmediately()
+        {
+            var logger = new LoggerModule();
+            frameworkManager = new FrameworkManager();
+            frameworkManager.RegisterModule<ILoggerModule>(logger);
+            logger.Initialize();
+            Debugger.Log("日志系统初始化完成", LogType.FrameCore);
+        }
 
         private void InitializeCoreModules()
         {
-            // 1. 日志系统（第一个初始化，用于后续模块的日志输出）
-            var logger = new LoggerModule();
-            //frameworkManager.RegisterModule<ILoggerModule>(logger);
-            //await logger.Initialize();
+            //// 1. 日志系统（第一个初始化，用于后续模块的日志输出）
+            //var logger = new LoggerModule();
+            ////frameworkManager.RegisterModule<ILoggerModule>(logger);
+            ////await logger.Initialize();
 
-            m_QueueGameModels.Enqueue(logger);
+            //m_QueueGameModels.Enqueue(logger);
 
             // 2. 事件系统（基础通信机制）
             var eventManager = new EventManager();

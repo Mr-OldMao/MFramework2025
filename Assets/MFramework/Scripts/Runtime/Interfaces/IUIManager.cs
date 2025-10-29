@@ -1,10 +1,14 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IUIManager : IGameModule , IUpdatableModule
+namespace MFramework.Runtime
 {
-    void ShowPanel<T>() where T : class;// TODO : IView;
+    public interface IUIManager : IGameModule
+    {
+        void ShowPanel(string panelName);
+        void HidePanel(string panelName);
+        T GetPanel<T>(string panelName) where T : UnityEngine.Component;
+    }
 
-    void HidePanel<T>() where T : class;// TODO : IView;
 }

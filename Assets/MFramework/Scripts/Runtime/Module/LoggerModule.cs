@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -7,7 +7,7 @@ namespace MFramework.Runtime
 {
     public class LoggerModule : GameModuleBase, ILoggerModule
     {
-        //TODO:´íÎóÉÏ±¨µÈ
+        //TODO:é”™è¯¯ä¸ŠæŠ¥ç­‰
 
         public void Log(string content, LogType logType = LogType.Default)
         {
