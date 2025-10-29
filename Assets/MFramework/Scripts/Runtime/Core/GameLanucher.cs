@@ -4,202 +4,205 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
-// GameLauncher.cs - 框架启动入口
-public class GameLauncher : MonoBehaviour
+namespace MFramework.Runtime
 {
-    [SerializeField] 
-    private FrameworkConfig frameworkConfig;
-
-    private static GameLauncher _instance;
-    private FrameworkManager frameworkManager;
-
-    private Queue<IGameModule> m_QueueGameModels = new Queue<IGameModule>();
-    private void Awake()
+    // GameLauncher.cs - 框架启动入口
+    public class GameLauncher : MonoBehaviour
     {
-        if (_instance != null)
+        [SerializeField]
+        private FrameworkConfig frameworkConfig;
+
+        private static GameLauncher _instance;
+        private FrameworkManager frameworkManager;
+
+        private Queue<IGameModule> m_QueueGameModels = new Queue<IGameModule>();
+        private void Awake()
         {
-            Destroy(gameObject);
-            return;
+            if (_instance != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            // 初始化框架
+            InitializeFramework();
         }
 
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        // 初始化框架
-        InitializeFramework();
-    }
-
-    private async void InitializeFramework()
-    {
-        // 显示启动界面
-        ShowLaunchScreen();
-
-        // 分阶段初始化框架
-        await InitializeFrameworkStepByStep();
-
-        // 框架启动完成，进入游戏
-        OnFrameworkInitialized();
-    }
-
-    public virtual void ShowLaunchScreen()
-    {
-        Debug.Log("显示框架启动前");
-    }
-
-    public virtual void OnFrameworkInitialized()
-    {
-        Debug.Log("显示框架启动完成");
-    }
-
-
-    // GameLauncher.cs - 详细初始化流程
-    private async Task InitializeFrameworkStepByStep()
-    {
-        frameworkManager = new FrameworkManager();
-        var totalSteps = 4;
-        var currentStep = 0;
-
-        // 严格按照依赖顺序初始化
-        m_QueueGameModels = new Queue<IGameModule>();
-
-        // 第1步：核心基础模块（必须最先初始化）
-        UpdateLaunchProgress(currentStep++, totalSteps, "初始化核心模块...");
-        InitializeCoreModules();
-
-        // 第2步：资源管理模块
-        UpdateLaunchProgress(currentStep++, totalSteps, "初始化资源模块...");
-        await InitializeResourceModules();
-
-        // 第3步：游戏功能模块
-        UpdateLaunchProgress(currentStep++, totalSteps, "初始化游戏模块...");
-        await InitializeGameplayModules();
-
-        // 第4步：高级功能模块
-        UpdateLaunchProgress(currentStep++, totalSteps, "初始化高级模块...");
-        await InitializeAdvancedModules();
-
-
-        while (m_QueueGameModels.Count > 0)
+        private async void InitializeFramework()
         {
-            var module = m_QueueGameModels.Dequeue();
-            //frameworkManager.RegisterModule(GetInterfaceType(module), module);
-            frameworkManager.RegisterModule(module);
-            await module.Initialize();
+            // 显示启动界面
+            ShowLaunchScreen();
+
+            // 分阶段初始化框架
+            await InitializeFrameworkStepByStep();
+
+            // 框架启动完成，进入游戏
+            OnFrameworkInitialized();
         }
 
-        UpdateLaunchProgress(totalSteps, totalSteps, "启动完成！");
+        public virtual void ShowLaunchScreen()
+        {
+            Debugger.Log("显示框架启动前");
+        }
+
+        public virtual void OnFrameworkInitialized()
+        {
+            Debugger.Log("显示框架启动完成");
+        }
+
+
+        // GameLauncher.cs - 详细初始化流程
+        private async Task InitializeFrameworkStepByStep()
+        {
+            frameworkManager = new FrameworkManager();
+            var totalSteps = 4;
+            var currentStep = 0;
+
+            // 严格按照依赖顺序初始化
+            m_QueueGameModels = new Queue<IGameModule>();
+
+            // 第1步：核心基础模块（必须最先初始化）
+            UpdateLaunchProgress(currentStep++, totalSteps, "初始化核心模块...");
+            InitializeCoreModules();
+
+            // 第2步：资源管理模块
+            UpdateLaunchProgress(currentStep++, totalSteps, "初始化资源模块...");
+            await InitializeResourceModules();
+
+            // 第3步：游戏功能模块
+            UpdateLaunchProgress(currentStep++, totalSteps, "初始化游戏模块...");
+            await InitializeGameplayModules();
+
+            // 第4步：高级功能模块
+            UpdateLaunchProgress(currentStep++, totalSteps, "初始化高级模块...");
+            await InitializeAdvancedModules();
+
+
+            while (m_QueueGameModels.Count > 0)
+            {
+                var module = m_QueueGameModels.Dequeue();
+                frameworkManager.RegisterModule(module);
+                await module.Initialize();
+            }
+
+            UpdateLaunchProgress(totalSteps, totalSteps, "启动完成！");
+        }
+
+
+
+
+        private void UpdateLaunchProgress(int current, int total, string message)
+        {
+            var progress = (float)current / total;
+            ////TODO 通知UI更新进度
+            //EventManager.Publish(new LaunchProgressEvent
+            //{
+            //    Progress = progress,
+            //    Message = message
+            //});
+        }
+
+
+
+        private void InitializeCoreModules()
+        {
+            // 1. 日志系统（第一个初始化，用于后续模块的日志输出）
+            var logger = new LoggerModule();
+            //frameworkManager.RegisterModule<ILoggerModule>(logger);
+            //await logger.Initialize();
+
+            m_QueueGameModels.Enqueue(logger);
+
+            // 2. 事件系统（基础通信机制）
+            var eventManager = new EventManager();
+            //frameworkManager.RegisterModule<IEventManager>(eventManager);
+            //await eventManager.Initialize();
+            m_QueueGameModels.Enqueue(eventManager);
+
+            //// 3. 配置管理系统
+            //var configManager = new ConfigManager();
+            //m_QueueGameModels.Enqueue(new ConfigManager());
+
+            //// 4. 对象池系统
+            //var poolManager = new PoolManager();
+            //m_QueueGameModels.Enqueue(new PoolManager());
+        }
+
+        private async Task InitializeResourceModules()
+        {
+            //// 5. 资源管理模块
+            //var resourceManager = new ResourceManager();
+            //frameworkManager.RegisterModule<IResourceManager>(resourceManager);
+            //await resourceManager.Initialize();
+
+            //// 6. 场景管理模块
+            //var sceneManager = new SceneManager();
+            //frameworkManager.RegisterModule<ISceneManager>(sceneManager);
+            //await sceneManager.Initialize();
+        }
+
+        private async Task InitializeGameplayModules()
+        {
+            //// 7. UI管理系统
+            //var uiManager = new UIManager();
+            //frameworkManager.RegisterModule<IUIManager>(uiManager);
+            //await uiManager.Initialize();
+
+            //// 8. 音频管理系统
+            //var audioManager = new AudioManager();
+            //frameworkManager.RegisterModule<IAudioManager>(audioManager);
+            //await audioManager.Initialize();
+
+            //// 9. 定时器系统
+            //var timerManager = new TimerManager();
+            //frameworkManager.RegisterModule<ITimerManager>(timerManager);
+            //await timerManager.Initialize();
+
+            //// 10. 状态机系统
+            //var stateMachineManager = new StateMachineManager();
+            //frameworkManager.RegisterModule<IStateMachineManager>(stateMachineManager);
+            //await stateMachineManager.Initialize();
+        }
+
+        private async Task InitializeAdvancedModules()
+        {
+            //// 11. 网络模块（可选）
+            //if (frameworkConfig.enableNetwork)
+            //{
+            //    var networkManager = new NetworkManager();
+            //    frameworkManager.RegisterModule<INetworkManager>(networkManager);
+            //    await networkManager.Initialize();
+            //}
+
+            //// 12. 热更新模块（可选）
+            //if (frameworkConfig.enableHotUpdate)
+            //{
+            //    var hotUpdateManager = new HotUpdateManager();
+            //    frameworkManager.RegisterModule<IHotUpdateManager>(hotUpdateManager);
+            //    await hotUpdateManager.Initialize();
+            //}
+
+            //// 13. 调试工具模块
+            //var debugManager = new DebugManager();
+            //frameworkManager.RegisterModule<IDebugManager>(debugManager);
+            //await debugManager.Initialize();
+        }
+
+        #region mono
+
+        private void Update()
+        {
+            frameworkManager.Update();
+        }
+
+        private void OnDestroy()
+        {
+            frameworkManager.OnDestroy();
+            frameworkManager = null;
+        }
+        #endregion
     }
-
-
-   
-
-    private void UpdateLaunchProgress(int current, int total, string message)
-    {
-        var progress = (float)current / total;
-        ////TODO 通知UI更新进度
-        //EventManager.Publish(new LaunchProgressEvent
-        //{
-        //    Progress = progress,
-        //    Message = message
-        //});
-    }
-
-
-
-    private void InitializeCoreModules()
-    {
-        // 1. 日志系统（第一个初始化，用于后续模块的日志输出）
-        var logger = new LoggerModule();
-        //frameworkManager.RegisterModule<ILoggerModule>(logger);
-        //await logger.Initialize();
-        m_QueueGameModels.Enqueue(logger);
-
-        // 2. 事件系统（基础通信机制）
-        var eventManager = new EventManager();
-        //frameworkManager.RegisterModule<IEventManager>(eventManager);
-        //await eventManager.Initialize();
-        m_QueueGameModels.Enqueue(eventManager);
-
-        //// 3. 配置管理系统
-        //var configManager = new ConfigManager();
-        //m_QueueGameModels.Enqueue(new ConfigManager());
-
-        //// 4. 对象池系统
-        //var poolManager = new PoolManager();
-        //m_QueueGameModels.Enqueue(new PoolManager());
-    }
-
-    private async Task InitializeResourceModules()
-    {
-        //// 5. 资源管理模块
-        //var resourceManager = new ResourceManager();
-        //frameworkManager.RegisterModule<IResourceManager>(resourceManager);
-        //await resourceManager.Initialize();
-
-        //// 6. 场景管理模块
-        //var sceneManager = new SceneManager();
-        //frameworkManager.RegisterModule<ISceneManager>(sceneManager);
-        //await sceneManager.Initialize();
-    }
-
-    private async Task InitializeGameplayModules()
-    {
-        //// 7. UI管理系统
-        //var uiManager = new UIManager();
-        //frameworkManager.RegisterModule<IUIManager>(uiManager);
-        //await uiManager.Initialize();
-
-        //// 8. 音频管理系统
-        //var audioManager = new AudioManager();
-        //frameworkManager.RegisterModule<IAudioManager>(audioManager);
-        //await audioManager.Initialize();
-
-        //// 9. 定时器系统
-        //var timerManager = new TimerManager();
-        //frameworkManager.RegisterModule<ITimerManager>(timerManager);
-        //await timerManager.Initialize();
-
-        //// 10. 状态机系统
-        //var stateMachineManager = new StateMachineManager();
-        //frameworkManager.RegisterModule<IStateMachineManager>(stateMachineManager);
-        //await stateMachineManager.Initialize();
-    }
-
-    private async Task InitializeAdvancedModules()
-    {
-        //// 11. 网络模块（可选）
-        //if (frameworkConfig.enableNetwork)
-        //{
-        //    var networkManager = new NetworkManager();
-        //    frameworkManager.RegisterModule<INetworkManager>(networkManager);
-        //    await networkManager.Initialize();
-        //}
-
-        //// 12. 热更新模块（可选）
-        //if (frameworkConfig.enableHotUpdate)
-        //{
-        //    var hotUpdateManager = new HotUpdateManager();
-        //    frameworkManager.RegisterModule<IHotUpdateManager>(hotUpdateManager);
-        //    await hotUpdateManager.Initialize();
-        //}
-
-        //// 13. 调试工具模块
-        //var debugManager = new DebugManager();
-        //frameworkManager.RegisterModule<IDebugManager>(debugManager);
-        //await debugManager.Initialize();
-    }
-
-    #region mono
-
-    private void Update()
-    {
-        frameworkManager.Update();
-    }
-
-    private void OnDestroy()
-    {
-        frameworkManager.OnDestroy();
-        frameworkManager = null;
-    }
-    #endregion
 }
