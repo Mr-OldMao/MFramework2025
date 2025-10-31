@@ -11,7 +11,6 @@ namespace MFramework.Runtime
         private readonly Dictionary<Type, IGameModule> _modules = new();
         private readonly List<IUpdatableModule> _updateModules = new();
 
-        // 服务定位器
         public static FrameworkManager Instance { get; private set; }
 
         public FrameworkManager()
@@ -53,8 +52,8 @@ namespace MFramework.Runtime
 
         public T GetModule<T>() where T : class, IGameModule
         {
-            _modules.TryGetValue(typeof(T), out var module);
-
+            var type = typeof(T);
+            _modules.TryGetValue(type, out var module);
             if (module != null)
             {
                 return module as T;
@@ -63,18 +62,11 @@ namespace MFramework.Runtime
             {
                 foreach (var item in _modules.Values)
                 {
-                    if (item.GetType() == typeof(T))
+                    if (item.GetType() == type)
                     {
                         return item as T;
                     }
                 }
-                //foreach (var kvp in _modules)
-                //{
-                //    if (typeof(T).IsAssignableFrom(kvp.Key))
-                //    {
-                //        return kvp.Value as T;
-                //    }
-                //}
             }
             return null;
         }
@@ -119,5 +111,5 @@ namespace MFramework.Runtime
             _updateModules.Clear();
             Instance = null;
         }
-    } 
+    }
 }
