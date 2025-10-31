@@ -12,11 +12,15 @@ public enum LogType
 {
     Default = 0,
     /// <summary>
+    /// 测试日志
+    /// </summary>
+    Test,
+    /// <summary>
     /// 框架普通日志
     /// </summary>
-    FrameNormal = 1,
+    FrameNormal,
     /// <summary>
     /// 框架重要日志
     /// </summary>
-    FrameCore = 2,
+    FrameCore,
 }
