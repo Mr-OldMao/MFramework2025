@@ -34,7 +34,7 @@ namespace MFramework.Runtime
         private async void InitializeFramework()
         {
             // 第一步：提前初始化日志系统
-            InitializeLogSystemImmediately();
+            await InitializeLogSystemImmediately();
 
             // 显示启动界面
             ShowLaunchScreen();
@@ -60,37 +60,33 @@ namespace MFramework.Runtime
         // GameLauncher.cs - 详细初始化流程
         private async Task InitializeFrameworkStepByStep()
         {
-            var totalSteps = 4;
-            var currentStep = 0;
-
             // 严格按照依赖顺序初始化
             m_QueueGameModels = new Queue<IGameModule>();
 
-            // 第1步：核心基础模块（必须最先初始化）
-            UpdateLaunchProgress(currentStep++, totalSteps, "初始化核心模块...");
+            // 第1步：核心基础模块
             InitializeCoreModules();
 
             // 第2步：资源管理模块
-            UpdateLaunchProgress(currentStep++, totalSteps, "初始化资源模块...");
             await InitializeResourceModules();
 
             // 第3步：游戏功能模块
-            UpdateLaunchProgress(currentStep++, totalSteps, "初始化游戏模块...");
             await InitializeGameplayModules();
 
             // 第4步：高级功能模块
-            UpdateLaunchProgress(currentStep++, totalSteps, "初始化高级模块...");
             await InitializeAdvancedModules();
 
+            var totalSteps = m_QueueGameModels.Count;
+            int currentStep = 0;
 
             while (m_QueueGameModels.Count > 0)
             {
                 var module = m_QueueGameModels.Dequeue();
                 frameworkManager.RegisterModule(module);
                 await module.Initialize();
+                UpdateLaunchProgress(++currentStep, totalSteps, $"初始化完成:{module}");
             }
 
-            UpdateLaunchProgress(totalSteps, totalSteps, "启动完成！");
+            UpdateLaunchProgress(totalSteps, totalSteps, "框架启动完成！");
         }
 
 
@@ -98,38 +94,33 @@ namespace MFramework.Runtime
 
         private void UpdateLaunchProgress(int current, int total, string message)
         {
-            var progress = (float)current / total;
+            var progress = ((float)current / total) * 100;
             ////TODO 通知UI更新进度
             //EventManager.Publish(new LaunchProgressEvent
             //{
             //    Progress = progress,
             //    Message = message
             //});
+            Debugger.Log($"初始化进度：{progress}% , {message}", LogType.FrameCore);
         }
 
-        private void InitializeLogSystemImmediately()
+        private async Task InitializeLogSystemImmediately()
         {
             var logger = new LoggerModule();
             frameworkManager = new FrameworkManager();
             frameworkManager.RegisterModule<ILoggerModule>(logger);
-            logger.Initialize();
-            Debugger.Log("日志系统初始化完成", LogType.FrameCore);
+            await logger.Initialize();
         }
 
         private void InitializeCoreModules()
         {
-            //// 1. 日志系统（第一个初始化，用于后续模块的日志输出）
-            //var logger = new LoggerModule();
-            ////frameworkManager.RegisterModule<ILoggerModule>(logger);
-            ////await logger.Initialize();
-
-            //m_QueueGameModels.Enqueue(logger);
-
             // 2. 事件系统（基础通信机制）
             var eventManager = new EventManager();
             //frameworkManager.RegisterModule<IEventManager>(eventManager);
             //await eventManager.Initialize();
             m_QueueGameModels.Enqueue(eventManager);
+
+            m_QueueGameModels.Enqueue(new ResourceManager());
 
             //// 3. 配置管理系统
             //var configManager = new ConfigManager();

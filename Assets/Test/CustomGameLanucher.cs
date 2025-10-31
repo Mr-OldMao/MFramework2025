@@ -15,7 +15,7 @@ public class CustomGameLanucher : GameLauncher
     {
         Debug.Log("显示框架启动完成MainCanvas界面");
 
-        TestFreamwork  testFreamwork  = new TestFreamwork();
+        TestEventManager  testFreamwork  = new TestEventManager();
         testFreamwork.Test();
     }
 
