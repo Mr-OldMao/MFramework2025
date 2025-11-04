@@ -8,381 +8,158 @@ using UnityEngine;
 namespace MFramework.Runtime
 {
     /// <summary>
-    /// 统一资源管理器 - 完整实现
+    /// 多功能资源管理器
+    /// 支持从Resources、AssetBundle、StreamingAssets、PersistentData和网络加载资源
+    /// 提供引用计数、缓存管理、进度回调和内存优化功能
     /// </summary>
-    public class ResourceManager : GameModuleBase, IResourceManager, IUpdatableModule
+    public class ResourceManager : GameModuleBase, IUpdatableModule
     {
-        #region 内部类定义
-        private class ResourceHandle
-        {
-            public object Asset { get; set; }
-            public int ReferenceCount { get; set; }
-            public DateTime LastAccessTime { get; set; }
-            public string Path { get; set; }
-            public ResourceSourceType SourceType { get; set; }
-            public ResourceFileType FileType { get; set; }
-            public long MemorySize { get; set; }
-            public AssetBundle AssetBundle { get; set; }
-        }
-
-        private class AssetBundleHandle
-        {
-            public AssetBundle Bundle { get; set; }
-            public int ReferenceCount { get; set; }
-            public DateTime LastAccessTime { get; set; }
-            public string BundlePath { get; set; }
-            public Dictionary<string, ResourceHandle> LoadedAssets { get; set; } = new Dictionary<string, ResourceHandle>();
-        }
-
+        #region 对外接口
         /// <summary>
-        /// 资源加载进度信息
+        /// 异步加载Unity资源
         /// </summary>
-        public class LoadProgress
+        public async Task<T> LoadAsync<T>(string path, ResourceSource source, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
-            /// <summary>
-            /// 资源路径或URL
-            /// </summary>
-            public string Path { get; set; }
-
-            /// <summary>
-            /// 加载进度（0-1）
-            /// </summary>
-            public float Progress { get; set; }
-
-            /// <summary>
-            /// 是否加载完成
-            /// </summary>
-            public bool IsDone { get; set; }
-
-            /// <summary>
-            /// 加载的资源对象（仅对UnityEngine.Object资源有效）
-            /// </summary>
-            public UnityEngine.Object Asset { get; set; }
-
-            /// <summary>
-            /// 加载的字节数据（仅对字节加载有效）
-            /// </summary>
-            public byte[] Bytes { get; set; }
-
-            /// <summary>
-            /// 加载的文本数据（仅对文本加载有效）
-            /// </summary>
-            public string Text { get; set; }
-
-            /// <summary>
-            /// 加载错误信息
-            /// </summary>
-            public Exception Error { get; set; }
-
-            /// <summary>
-            /// 当前加载状态描述
-            /// </summary>
-            public string Status { get; set; }
-
-            /// <summary>
-            /// 已加载字节数（对网络加载有效）
-            /// </summary>
-            public long LoadedBytes { get; set; }
-
-            /// <summary>
-            /// 总字节数（对网络加载有效）
-            /// </summary>
-            public long TotalBytes { get; set; }
-        }
-        #endregion
-
-        #region 字段定义
-        private readonly Dictionary<string, ResourceHandle> _resourceHandles = new Dictionary<string, ResourceHandle>();
-        private readonly Dictionary<string, AssetBundleHandle> _assetBundleHandles = new Dictionary<string, AssetBundleHandle>();
-        private readonly Dictionary<GameObject, (string path, ResourceSourceType sourceType)> _instanceToSourceMap = new Dictionary<GameObject, (string, ResourceSourceType)>();
-
-        private string _networkCacheDirectory;
-        private readonly object _lockObject = new object();
-        private readonly int _maxCacheCount = 100;
-        private readonly long _maxMemorySize = 512 * 1024 * 1024; // 512MB
-        private readonly float _cacheCleanupInterval = 30f;
-        private float _lastCleanupTime;
-        #endregion
-
-        #region 初始化
-        /// <summary>
-        /// 初始化资源管理器
-        /// </summary>
-        protected override async Task OnInitialize()
-        {
-            _networkCacheDirectory = Path.Combine(Application.persistentDataPath, "NetworkCache");
-            if (!Directory.Exists(_networkCacheDirectory))
+            if (string.IsNullOrEmpty(path))
             {
-                Directory.CreateDirectory(_networkCacheDirectory);
-            }
-
-            Debugger.Log($"资源管理器初始化完成，网络缓存目录: {_networkCacheDirectory}", LogType.FrameCore);
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 关闭资源管理器，清理所有资源
-        /// </summary>
-        protected override void OnShutdown()
-        {
-            lock (_lockObject)
-            {
-                foreach (var handle in _resourceHandles.Values)
-                {
-                    if (handle.Asset is UnityEngine.Object unityObj && handle.AssetBundle == null)
-                    {
-                        if (Application.isPlaying)
-                        {
-                            UnityEngine.Object.Destroy(unityObj);
-                        }
-                        else
-                        {
-                            UnityEngine.Object.DestroyImmediate(unityObj);
-                        }
-                    }
-                }
-                _resourceHandles.Clear();
-
-                foreach (var bundleHandle in _assetBundleHandles.Values)
-                {
-                    bundleHandle.Bundle.Unload(true);
-                }
-                _assetBundleHandles.Clear();
-            }
-
-            _instanceToSourceMap.Clear();
-            Resources.UnloadUnusedAssets();
-
-            Debugger.Log("资源管理器已关闭", LogType.FrameNormal);
-        }
-        #endregion
-
-        #region 核心加载接口实现
-        /// <summary>
-        /// 通用异步资源加载方法
-        /// </summary>
-        public async Task<T> LoadAssetAsync<T>(
-            string assetPath,
-            ResourceSourceType resourceSourceType,
-            ResourceFileType resourceFileType = ResourceFileType.UnityAsset,
-            Action<LoadProgress> onProgress = null)
-        {
-            try
-            {
-                // 根据资源文件类型选择不同的加载逻辑
-                switch (resourceFileType)
-                {
-                    case ResourceFileType.UnityAsset:
-                        return await LoadUnityAssetInternal<T>(assetPath, resourceSourceType, onProgress);
-
-                    case ResourceFileType.Txt:
-                        if (typeof(T) != typeof(string))
-                            throw new InvalidCastException($"Text资源必须使用string类型，当前类型: {typeof(T)}");
-                        var text = await LoadTextInternal(assetPath, resourceSourceType, onProgress);
-                        return (T)(object)text;
-
-                    case ResourceFileType.Json:
-                        var jsonText = await LoadTextInternal(assetPath, resourceSourceType, onProgress);
-                        return JsonUtility.FromJson<T>(jsonText);
-
-                    case ResourceFileType.Bytes:
-                        if (typeof(T) != typeof(byte[]))
-                            throw new InvalidCastException($"Bytes资源必须使用byte[]类型，当前类型: {typeof(T)}");
-                        var bytes = await LoadBytesInternal(assetPath, resourceSourceType, onProgress);
-                        return (T)(object)bytes;
-
-                    case ResourceFileType.AB:
-                        throw new ArgumentException("AB类型资源请使用LoadBundleAssetAsync方法");
-
-                    default:
-                        throw new ArgumentException($"不支持的资源文件类型: {resourceFileType}");
-                }
-            }
-            catch (Exception e)
-            {
-                Debugger.LogError($"资源加载失败: {assetPath}, 来源: {resourceSourceType}, 类型: {resourceFileType}, 错误: {e.Message}", LogType.FrameCore);
-                return default(T);
-            }
-        }
-
-        /// <summary>
-        /// 同步资源加载方法
-        /// </summary>
-        public T LoadAssetSync<T>(
-            string assetPath,
-            ResourceSourceType resourceSourceType,
-            ResourceFileType resourceFileType = ResourceFileType.UnityAsset)
-        {
-            try
-            {
-                // 同步加载只支持部分类型
-                switch (resourceFileType)
-                {
-                    case ResourceFileType.UnityAsset when resourceSourceType == ResourceSourceType.Resources:
-                        if (typeof(UnityEngine.Object).IsAssignableFrom(typeof(T)))
-                        {
-                            var asset = Resources.Load(assetPath, typeof(T));
-                            return (T)(object)asset;
-                        }
-                        break;
-
-                    case ResourceFileType.Txt when resourceSourceType == ResourceSourceType.Resources:
-                        var textAsset = Resources.Load<TextAsset>(assetPath);
-                        if (textAsset != null && typeof(T) == typeof(string))
-                            return (T)(object)textAsset.text;
-                        break;
-
-                    case ResourceFileType.Bytes when resourceSourceType == ResourceSourceType.Resources:
-                        var bytesAsset = Resources.Load<TextAsset>(assetPath);
-                        if (bytesAsset != null && typeof(T) == typeof(byte[]))
-                            return (T)(object)bytesAsset.bytes;
-                        break;
-                }
-
-                throw new NotSupportedException($"同步加载不支持此组合: 来源={resourceSourceType}, 类型={resourceFileType}");
-            }
-            catch (Exception e)
-            {
-                Debugger.LogError($"同步资源加载失败: {assetPath}, 错误: {e.Message}", LogType.FrameCore);
-                return default(T);
-            }
-        }
-        #endregion
-
-        #region 智能快捷方法实现
-        /// <summary>
-        /// 智能加载Unity资源（自动推断文件类型）
-        /// </summary>
-        public async Task<T> LoadAsync<T>(string assetPath, ResourceSourceType resourceSourceType) where T : UnityEngine.Object
-        {
-            return await LoadAssetAsync<T>(assetPath, resourceSourceType, ResourceFileType.UnityAsset);
-        }
-
-        /// <summary>
-        /// 智能加载文本
-        /// </summary>
-        public async Task<string> LoadTextAsync(string assetPath, ResourceSourceType resourceSourceType)
-        {
-            return await LoadAssetAsync<string>(assetPath, resourceSourceType, ResourceFileType.Txt);
-        }
-
-        /// <summary>
-        /// 智能加载JSON
-        /// </summary>
-        public async Task<T> LoadJsonAsync<T>(string assetPath, ResourceSourceType resourceSourceType)
-        {
-            return await LoadAssetAsync<T>(assetPath, resourceSourceType, ResourceFileType.Json);
-        }
-
-        /// <summary>
-        /// 智能加载二进制
-        /// </summary>
-        public async Task<byte[]> LoadBytesAsync(string assetPath, ResourceSourceType resourceSourceType)
-        {
-            return await LoadAssetAsync<byte[]>(assetPath, resourceSourceType, ResourceFileType.Bytes);
-        }
-        #endregion
-
-        #region 极简快捷方法实现
-        /// <summary>
-        /// 从Resources加载资源（最常用）
-        /// </summary>
-        public async Task<T> LoadResourceAsync<T>(string assetPath) where T : UnityEngine.Object
-        {
-            return await LoadAsync<T>(assetPath, ResourceSourceType.Resources);
-        }
-
-        /// <summary>
-        /// 从StreamingAssets加载文本配置
-        /// </summary>
-        public async Task<string> LoadConfigTextAsync(string configPath)
-        {
-            return await LoadTextAsync(configPath, ResourceSourceType.StreamingAssets);
-        }
-
-        /// <summary>
-        /// 从PersistentData加载用户数据
-        /// </summary>
-        public async Task<T> LoadUserDataAsync<T>(string dataPath)
-        {
-            return await LoadJsonAsync<T>(dataPath, ResourceSourceType.PersistentData);
-        }
-
-        /// <summary>
-        /// 从网络加载图片
-        /// </summary>
-        public async Task<Texture2D> LoadNetImageAsync(string url)
-        {
-            return await LoadAsync<Texture2D>(url, ResourceSourceType.Network);
-        }
-
-        /// <summary>
-        /// 从AssetBundle加载资源
-        /// </summary>
-        public async Task<T> LoadBundleAssetAsync<T>(string bundleName, string assetPath) where T : UnityEngine.Object
-        {
-            return await LoadAssetBundleAssetAsync<T>(bundleName, assetPath);
-        }
-        #endregion
-
-        #region 实例化快捷方法实现
-        /// <summary>
-        /// 实例化预制体（从Resources）
-        /// </summary>
-        public async Task<GameObject> InstantiateAsync(string assetPath, Transform parent = null)
-        {
-            var prefab = await LoadResourceAsync<GameObject>(assetPath);
-            if (prefab == null)
-            {
-                Debugger.LogError($"实例化失败，预制体加载失败: {assetPath}", LogType.FrameCore);
+                Debugger.LogError("资源路径为空", LogType.FrameCore);
                 return null;
             }
 
-            var instance = UnityEngine.Object.Instantiate(prefab, parent);
-            _instanceToSourceMap[instance] = (assetPath, ResourceSourceType.Resources);
-
-            Debugger.Log($"实例化成功: {assetPath}", LogType.FrameNormal);
-            return instance;
-        }
-
-        /// <summary>
-        /// 实例化预制体到指定位置
-        /// </summary>
-        public async Task<GameObject> InstantiateAsync(string assetPath, Vector3 position, Quaternion rotation, Transform parent = null)
-        {
-            var prefab = await LoadResourceAsync<GameObject>(assetPath);
-            if (prefab == null)
+            return source switch
             {
-                Debugger.LogError($"实例化失败，预制体加载失败: {assetPath}", LogType.FrameCore);
-                return null;
-            }
-
-            var instance = UnityEngine.Object.Instantiate(prefab, position, rotation, parent);
-            _instanceToSourceMap[instance] = (assetPath, ResourceSourceType.Resources);
-
-            Debugger.Log($"实例化成功: {assetPath} 位置: {position}", LogType.FrameNormal);
-            return instance;
+                ResourceSource.Resources => await LoadFromResourcesAsync<T>(path, onProgress),
+                // ResourceSource.AssetBundle => await LoadFromAssetBundleAsync<T>(path, "", onProgress),
+                ResourceSource.StreamingAssets => await LoadFromStreamingAssetsAsync<T>(path, onProgress),
+                ResourceSource.PersistentData => await LoadFromPersistentDataAsync<T>(path, onProgress),
+                ResourceSource.Network => await LoadFromNetworkAsync<T>(path, onProgress),
+                _ => throw new ArgumentException($"不支持的资源来源: {source}")
+            };
         }
-        #endregion
 
-        #region AssetBundle管理实现
+        #region 文本与字节流加载
+
         /// <summary>
-        /// 加载AssetBundle资源
+        /// 异步加载字节数据
         /// </summary>
-        public async Task<T> LoadAssetBundleAssetAsync<T>(
-            string bundlePath,
-            string assetPath,
-            Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        public async Task<byte[]> LoadBytesAsync(string path, ResourceSource source, Action<LoadProgress> onProgress = null)
         {
             var progress = new LoadProgress
             {
-                Path = $"{bundlePath}/{assetPath}",
+                Path = path,
+                Status = "开始加载字节数据"
+            };
+
+            try
+            {
+                byte[] result = null;
+
+                switch (source)
+                {
+                    case ResourceSource.StreamingAssets:
+                        var streamingPath = Path.Combine(Application.streamingAssetsPath, path);
+                        result = await ReadFileBytesAsync(streamingPath, progress, onProgress);
+                        break;
+
+                    case ResourceSource.PersistentData:
+                        var persistentPath = Path.Combine(Application.persistentDataPath, path);
+                        result = await ReadFileBytesAsync(persistentPath, progress, onProgress);
+                        break;
+
+                    case ResourceSource.Network:
+                        result = await DownloadBytesAsync(path, progress, onProgress);
+                        break;
+
+                    case ResourceSource.Resources:
+                        result = await LoadBytesFromResourcesAsync(path, progress, onProgress);
+                        break;
+
+                    default:
+                        throw new ArgumentException($"不支持的资源来源: {source}");
+                }
+
+                progress.Progress = 1f;
+                progress.IsDone = true;
+                progress.Status = "字节数据加载完成";
+                progress.Bytes = result;
+                onProgress?.Invoke(progress);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                progress.Error = e;
+                progress.IsDone = true;
+                progress.Status = $"字节数据加载失败: {e.Message}";
+                onProgress?.Invoke(progress);
+
+                Debugger.LogError($"LoadBytesAsync 失败: {path}, 来源: {source}, 错误: {e.Message}", LogType.FrameCore);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 异步加载文本数据
+        /// </summary>
+        public async Task<string> LoadTextAsync(string path, ResourceSource source, Action<LoadProgress> onProgress = null)
+        {
+            var progress = new LoadProgress
+            {
+                Path = path,
+                Status = "开始加载文本数据"
+            };
+
+            try
+            {
+                var bytes = await LoadBytesAsync(path, source, (byteProgress) =>
+                {
+                    // 转换字节加载进度为文本加载进度
+                    progress.Progress = byteProgress.Progress;
+                    progress.Status = byteProgress.Status;
+                    onProgress?.Invoke(progress);
+                });
+
+                if (bytes == null) return null;
+
+                progress.Progress = 1f;
+                progress.IsDone = true;
+                progress.Status = "文本数据加载完成";
+
+                var text = System.Text.Encoding.UTF8.GetString(bytes);
+                progress.Text = text;
+                onProgress?.Invoke(progress);
+
+                return text;
+            }
+            catch (Exception e)
+            {
+                progress.Error = e;
+                progress.IsDone = true;
+                progress.Status = $"文本数据加载失败: {e.Message}";
+                onProgress?.Invoke(progress);
+
+                Debugger.LogError($"LoadTextAsync 失败: {path}, 来源: {source}, 错误: {e.Message}", LogType.FrameCore);
+                return null;
+            }
+        }
+        #endregion
+
+        #region AssetBundle资源加载
+        /// <summary>
+        /// 从AssetBundle异步加载资源
+        /// </summary>
+        public async Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource source, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        {
+            var progress = new LoadProgress
+            {
+                Path = !string.IsNullOrEmpty(assetPath) ? $"{bundlePath}/{assetPath}" : $"{bundlePath}",
                 Status = "开始加载AssetBundle资源"
             };
 
-            var bundle = await LoadAssetBundleAsync(bundlePath, true, (bundleProgress) =>
+            var bundle = await LoadAssetBundleAsync(bundlePath, assetPath, source, (bundleProgress) =>
             {
-                progress.Progress = bundleProgress.Progress * 0.5f;
+                // 转换AssetBundle加载进度为资源加载进度
+                progress.Progress = bundleProgress.Progress * 0.5f; // AssetBundle加载占50%
                 progress.Status = $"加载AssetBundle: {bundleProgress.Progress:P}";
                 onProgress?.Invoke(progress);
             });
@@ -393,23 +170,49 @@ namespace MFramework.Runtime
 
             lock (_lockObject)
             {
+                // 检查AB包内资源的缓存
                 if (_assetBundleHandles.TryGetValue(bundlePath, out var bundleHandle) &&
                     bundleHandle.LoadedAssets.TryGetValue(assetPath, out var assetHandle))
                 {
                     assetHandle.ReferenceCount++;
                     assetHandle.LastAccessTime = DateTime.Now;
-                    return assetHandle.Asset as T;
+                    if (typeof(T) == typeof(AssetBundle))
+                    {
+                        return assetHandle.AssetBundle as T;
+                    }
+                    else
+                    {
+                        return assetHandle.Asset as T;
+                    }
                 }
             }
 
             try
             {
                 var assetRequest = bundle.LoadAssetAsync<T>(assetPath);
+                var assetRequest2 = bundle.LoadAssetAsync(assetPath);
+                var assetRequest3 = bundle.LoadAllAssetsAsync();
 
+
+                // 资源加载进度（占50%）
                 while (!assetRequest.isDone)
                 {
                     progress.Progress = 0.5f + assetRequest.progress * 0.5f;
-                    progress.Status = $"加载AssetBundle资源: {assetRequest.progress:P}";
+                    progress.Status = $"加载AssetBundle资源1: {assetRequest.progress:P}";
+                    onProgress?.Invoke(progress);
+                    await Task.Yield();
+                }
+                while (!assetRequest2.isDone)
+                {
+                    progress.Progress = 0.5f + assetRequest.progress * 0.5f;
+                    progress.Status = $"加载AssetBundle资源2: {assetRequest.progress:P}";
+                    onProgress?.Invoke(progress);
+                    await Task.Yield();
+                }
+                while (!assetRequest3.isDone)
+                {
+                    progress.Progress = 0.5f + assetRequest.progress * 0.5f;
+                    progress.Status = $"加载AssetBundle资源3: {assetRequest.progress:P}";
                     onProgress?.Invoke(progress);
                     await Task.Yield();
                 }
@@ -431,8 +234,7 @@ namespace MFramework.Runtime
                     ReferenceCount = 1,
                     LastAccessTime = DateTime.Now,
                     Path = cacheKey,
-                    SourceType = ResourceSourceType.AssetBundle,
-                    FileType = ResourceFileType.UnityAsset,
+                    Source = source,
                     MemorySize = EstimateMemorySize(assetRequest.asset),
                     AssetBundle = bundle
                 };
@@ -461,20 +263,29 @@ namespace MFramework.Runtime
         }
 
         /// <summary>
-        /// 加载AssetBundle
+        /// 异步加载AssetBundle
         /// </summary>
-        public async Task<AssetBundle> LoadAssetBundleAsync(
-            string bundlePath,
-            bool fromStreamingAssets = true,
-            Action<LoadProgress> onProgress = null)
+        public async Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, string assetPath, ResourceSource source, Action<LoadProgress> onProgress = null)
         {
-            var fullPath = fromStreamingAssets ?
-                Path.Combine(Application.streamingAssetsPath, bundlePath) :
-                bundlePath;
-
+            string fullPath = string.Empty;
+            switch (source)
+            {
+                case ResourceSource.Resources:
+                    fullPath = Path.Combine(Application.dataPath, $"Resources/{bundlePath}/{assetPath}");
+                    break;
+                case ResourceSource.StreamingAssets:
+                    fullPath = Path.Combine(Application.streamingAssetsPath, $"{bundlePath}/{assetPath}");
+                    break;
+                case ResourceSource.PersistentData:
+                    fullPath = Path.Combine(Application.persistentDataPath, $"{bundlePath}/{assetPath}");
+                    break;
+                default:
+                    Debugger.LogError($"不支持的资源源: {source}", LogType.FrameCore);
+                    break;
+            }
             var progress = new LoadProgress
             {
-                Path = bundlePath,
+                Path = fullPath,
                 Status = "开始加载AssetBundle"
             };
 
@@ -507,7 +318,7 @@ namespace MFramework.Runtime
 
                 if (bundleRequest.assetBundle == null)
                 {
-                    throw new Exception($"AssetBundle加载失败: {bundlePath}");
+                    throw new Exception($"AssetBundle加载失败: {fullPath}");
                 }
 
                 var newHandle = new AssetBundleHandle
@@ -515,15 +326,25 @@ namespace MFramework.Runtime
                     Bundle = bundleRequest.assetBundle,
                     ReferenceCount = 1,
                     LastAccessTime = DateTime.Now,
-                    BundlePath = bundlePath
+                    BundlePath = bundlePath,
+                    LoadedAssets = new Dictionary<string, ResourceHandle>()
                 };
-
+                newHandle.LoadedAssets.Add(assetPath, new ResourceHandle
+                {
+                    Asset = null,
+                    ReferenceCount = 0,
+                    LastAccessTime = DateTime.Now,
+                    Path = assetPath,
+                    AssetBundle = bundleRequest.assetBundle,
+                    MemorySize = EstimateMemorySize(bundleRequest.assetBundle),
+                    Source = source
+                });
                 lock (_lockObject)
                 {
                     _assetBundleHandles[bundlePath] = newHandle;
                 }
 
-                Debugger.Log($"AssetBundle加载成功: {bundlePath}", LogType.FrameNormal);
+                Debugger.Log($"AssetBundle加载成功: {fullPath}", LogType.FrameNormal);
                 return bundleRequest.assetBundle;
             }
             catch (Exception e)
@@ -533,7 +354,7 @@ namespace MFramework.Runtime
                 progress.Status = $"AssetBundle加载失败: {e.Message}";
                 onProgress?.Invoke(progress);
 
-                Debugger.LogError($"AssetBundle加载异常 {bundlePath}: {e.Message}", LogType.FrameCore);
+                Debugger.LogError($"AssetBundle加载异常 {fullPath}: {e.Message}", LogType.FrameCore);
                 return null;
             }
         }
@@ -560,20 +381,28 @@ namespace MFramework.Runtime
         }
         #endregion
 
-        #region 网络资源管理实现
+        #region 网络资源加载
+
         /// <summary>
-        /// 下载文件到本地
+        /// 从网络异步加载资源
         /// </summary>
-        public async Task DownloadFileAsync(
-            string url,
-            string localPath,
-            Action<LoadProgress> onProgress = null)
+        public async Task<T> LoadFromNetworkAsync<T>(string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             var progress = new LoadProgress
             {
                 Path = url,
-                Status = "开始下载文件"
+                Status = "开始下载网络资源"
             };
+
+            // 检查本地缓存
+            var cachedPath = GetCachedFilePath(url);
+            if (File.Exists(cachedPath))
+            {
+                Debugger.Log($"使用缓存资源: {url}", LogType.FrameNormal);
+                progress.Status = "使用缓存资源";
+                onProgress?.Invoke(progress);
+                return await LoadFromPersistentDataAsync<T>(cachedPath, onProgress);
+            }
 
             try
             {
@@ -584,8 +413,9 @@ namespace MFramework.Runtime
                     while (!operation.isDone)
                     {
                         progress.Progress = operation.progress;
-                        progress.Status = $"下载文件: {progress.Progress:P}";
+                        progress.Status = $"下载资源: {progress.Progress:P}";
 
+                        // 更新字节信息
                         if (webRequest.downloadHandler != null)
                         {
                             progress.LoadedBytes = (long)webRequest.downloadedBytes;
@@ -601,6 +431,72 @@ namespace MFramework.Runtime
 
                     if (webRequest.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
                     {
+                        throw new Exception($"网络资源加载失败: {webRequest.error}");
+                    }
+
+                    // 保存到缓存
+                    var data = webRequest.downloadHandler.data;
+                    await File.WriteAllBytesAsync(cachedPath, data);
+
+                    progress.Status = "网络资源下载完成";
+                    progress.Bytes = data;
+                    onProgress?.Invoke(progress);
+
+                    Debugger.Log($"网络资源下载完成: {url}", LogType.FrameNormal);
+
+                    // 根据类型加载资源
+                    return await LoadDownloadedResource<T>(data, url, onProgress);
+                }
+            }
+            catch (Exception e)
+            {
+                progress.Error = e;
+                progress.IsDone = true;
+                progress.Status = $"网络资源加载失败: {e.Message}";
+                onProgress?.Invoke(progress);
+
+                Debugger.LogError($"网络资源加载异常 {url}: {e.Message}", LogType.FrameCore);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 异步下载文件到本地
+        /// </summary>
+        public async Task DownloadFileAsync(string url, string localPath, Action<LoadProgress> onProgress = null)
+        {
+            var progress = new LoadProgress
+            {
+                Path = url,
+                Status = "开始下载文件"
+            };
+
+            try
+            {
+                using (var webRequest = UnityEngine.Networking.UnityWebRequest.Get(url))
+                {
+                    var operation = webRequest.SendWebRequest();
+                    while (!operation.isDone)
+                    {
+                        progress.Progress = operation.progress;
+                        progress.Status = $"Download，Progress: {progress.Progress:P}";
+
+                        if (webRequest.downloadHandler != null)
+                        {
+                            progress.LoadedBytes = (long)webRequest.downloadedBytes;
+                            if (webRequest.downloadHandler.data != null)
+                            {
+                                progress.TotalBytes = (long)webRequest.downloadHandler.data.Length;
+                            }
+                        }
+                        onProgress?.Invoke(progress);
+                        await Task.Yield();
+                    }
+                    progress.Progress = 1f;
+                    progress.IsDone = true;
+
+                    if (webRequest.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
+                    {
                         throw new Exception($"文件下载失败: {webRequest.error}");
                     }
 
@@ -609,9 +505,7 @@ namespace MFramework.Runtime
                     {
                         Directory.CreateDirectory(directory);
                     }
-
                     await File.WriteAllBytesAsync(localPath, webRequest.downloadHandler.data);
-
                     progress.Status = "文件下载完成";
                     progress.Bytes = webRequest.downloadHandler.data;
                     onProgress?.Invoke(progress);
@@ -640,13 +534,49 @@ namespace MFramework.Runtime
         }
         #endregion
 
-        #region 资源卸载管理实现
+        #region 实例化管理
         /// <summary>
-        /// 卸载资源
+        /// 异步实例化游戏对象
         /// </summary>
-        public void Unload(string assetPath, ResourceSourceType resourceSourceType)
+        public async Task<GameObject> InstantiateAsync(string path, ResourceSource source = ResourceSource.Resources, Transform parent = null, Action<LoadProgress> onProgress = null)
         {
-            var cacheKey = $"{resourceSourceType.ToString().ToLower()}://{assetPath}";
+            var prefab = await LoadAsync<GameObject>(path, source, onProgress);
+            if (prefab == null)
+            {
+                Debugger.LogError($"实例化失败，预制体加载失败: {path}", LogType.FrameCore);
+                return null;
+            }
+
+            var instance = UnityEngine.Object.Instantiate(prefab, parent);
+            _instanceToSourceMap[instance] = (path, source);
+            return instance;
+        }
+
+        /// <summary>
+        /// 异步实例化游戏对象到指定位置和旋转
+        /// </summary>
+        public async Task<GameObject> InstantiateAsync(string path, Vector3 position, Quaternion rotation, Transform parent = null, Action<LoadProgress> onProgress = null)
+        {
+            var prefab = await LoadAsync<GameObject>(path, ResourceSource.Resources, onProgress);
+            if (prefab == null)
+            {
+                Debugger.LogError($"实例化失败，预制体加载失败: {path}", LogType.FrameCore);
+                return null;
+            }
+
+            var instance = UnityEngine.Object.Instantiate(prefab, position, rotation, parent);
+            _instanceToSourceMap[instance] = (path, ResourceSource.Resources);
+            return instance;
+        }
+        #endregion
+
+        #region 资源卸载管理
+        /// <summary>
+        /// 卸载指定资源
+        /// </summary>
+        public void Unload(string path, ResourceSource source)
+        {
+            var cacheKey = $"{source.ToString().ToLower()}://{path}";
 
             lock (_lockObject)
             {
@@ -657,16 +587,9 @@ namespace MFramework.Runtime
 
                     if (handle.ReferenceCount <= 0)
                     {
-                        Debugger.Log($"资源引用计数为0，等待自动清理: {assetPath}", LogType.FrameNormal);
+                        // 延迟卸载，避免频繁加载卸载
+                        // 实际卸载在清理时进行
                     }
-                    else
-                    {
-                        Debugger.Log($"资源引用计数减少: {assetPath} -> {handle.ReferenceCount}", LogType.FrameNormal);
-                    }
-                }
-                else
-                {
-                    Debugger.LogWarning($"尝试卸载未加载的资源: {assetPath}", LogType.FrameNormal);
                 }
             }
         }
@@ -678,22 +601,9 @@ namespace MFramework.Runtime
         {
             if (_instanceToSourceMap.TryGetValue(instance, out var sourceInfo))
             {
-                if (Application.isPlaying)
-                {
-                    UnityEngine.Object.Destroy(instance);
-                }
-                else
-                {
-                    UnityEngine.Object.DestroyImmediate(instance);
-                }
+                UnityEngine.Object.Destroy(instance);
                 _instanceToSourceMap.Remove(instance);
-                Unload(sourceInfo.path, sourceInfo.sourceType);
-
-                Debugger.Log($"游戏对象实例已卸载: {sourceInfo.path}", LogType.FrameNormal);
-            }
-            else
-            {
-                Debugger.LogWarning($"尝试卸载未注册的游戏对象实例", LogType.FrameNormal);
+                Unload(sourceInfo.path, sourceInfo.source);
             }
         }
 
@@ -702,27 +612,17 @@ namespace MFramework.Runtime
         /// </summary>
         public void UnloadUnusedAssets()
         {
-            int unloadedCount = 0;
-
             lock (_lockObject)
             {
                 // 清理未使用的资源
                 var toRemove = _resourceHandles.Where(kvp => kvp.Value.ReferenceCount <= 0).ToList();
                 foreach (var kvp in toRemove)
                 {
-                    if (kvp.Value.Asset is UnityEngine.Object unityObj && kvp.Value.AssetBundle == null)
+                    if (kvp.Value.AssetBundle == null)
                     {
-                        if (Application.isPlaying)
-                        {
-                            UnityEngine.Object.Destroy(unityObj);
-                        }
-                        else
-                        {
-                            UnityEngine.Object.DestroyImmediate(unityObj);
-                        }
+                        UnityEngine.Object.Destroy(kvp.Value.Asset);
                     }
                     _resourceHandles.Remove(kvp.Key);
-                    unloadedCount++;
                 }
 
                 // 清理未使用的AssetBundle
@@ -731,62 +631,46 @@ namespace MFramework.Runtime
                 {
                     kvp.Value.Bundle.Unload(true);
                     _assetBundleHandles.Remove(kvp.Key);
-                    unloadedCount++;
                 }
             }
 
             Resources.UnloadUnusedAssets();
-
-            if (unloadedCount > 0)
-            {
-                Debugger.Log($"强制清理完成，卸载了 {unloadedCount} 个未使用资源", LogType.FrameNormal);
-            }
-            else
-            {
-                Debugger.Log("没有需要清理的未使用资源", LogType.FrameNormal);
-            }
+            Debugger.Log("未使用资源清理完成", LogType.FrameNormal);
         }
         #endregion
 
-        #region 预加载和批量操作实现
+        #region 预加载和批量操作
         /// <summary>
         /// 预加载多个资源
         /// </summary>
-        public async Task PreloadAsync(
-            List<string> assetPaths,
-            ResourceSourceType resourceSourceType = ResourceSourceType.Resources,
-            Action<LoadProgress> onProgress = null)
+        public async Task PreloadAsync(List<string> paths, Action<LoadProgress> onProgress = null)
         {
             var progress = new LoadProgress
             {
                 Status = "开始预加载资源"
             };
 
-            Debugger.Log($"开始预加载 {assetPaths.Count} 个资源", LogType.FrameNormal);
+            Debugger.Log($"开始预加载 {paths.Count} 个资源", LogType.FrameNormal);
 
             var loadTasks = new List<Task>();
             int completedCount = 0;
 
-            foreach (var path in assetPaths)
+            foreach (var path in paths)
             {
-                var task = LoadAssetAsync<UnityEngine.Object>(
-                    path,
-                    resourceSourceType,
-                    ResourceFileType.UnityAsset,
-                    (itemProgress) =>
-                    {
-                        // 计算总体进度
-                        float individualProgress = itemProgress.IsDone ? 1f : itemProgress.Progress;
-                        float totalProgress = (float)(completedCount + individualProgress) / assetPaths.Count;
+                var task = LoadAsync<UnityEngine.Object>(path, ResourceSource.Resources, (itemProgress) =>
+                {
+                    // 计算总体进度
+                    float individualProgress = itemProgress.IsDone ? 1f : itemProgress.Progress;
+                    float totalProgress = (float)(completedCount + individualProgress) / paths.Count;
 
-                        progress.Progress = totalProgress;
-                        progress.Status = $"预加载进度: {completedCount}/{assetPaths.Count} ({totalProgress:P}) - {path}";
-                        onProgress?.Invoke(progress);
-                    }).ContinueWith(t =>
-                    {
-                        completedCount++;
-                        return t;
-                    });
+                    progress.Progress = totalProgress;
+                    progress.Status = $"预加载进度: {completedCount}/{paths.Count} ({totalProgress:P}) - {path}";
+                    onProgress?.Invoke(progress);
+                }).ContinueWith(t =>
+                {
+                    completedCount++;
+                    return t;
+                });
 
                 loadTasks.Add(task);
             }
@@ -798,138 +682,378 @@ namespace MFramework.Runtime
             progress.Status = "预加载完成";
             onProgress?.Invoke(progress);
 
-            Debugger.Log($"预加载完成: {assetPaths.Count} 个资源", LogType.FrameNormal);
+            Debugger.Log("预加载完成", LogType.FrameNormal);
         }
         #endregion
 
-        #region 缓存管理实现
+        #region 缓存管理
         /// <summary>
         /// 清理指定来源的缓存
         /// </summary>
-        public void ClearCache(ResourceSourceType resourceSourceType)
+        public void ClearCache(ResourceSource source)
         {
-            int clearedCount = 0;
-
             lock (_lockObject)
             {
-                var toRemove = _resourceHandles.Where(kvp => kvp.Value.SourceType == resourceSourceType).ToList();
+                var toRemove = _resourceHandles.Where(kvp => kvp.Value.Source == source).ToList();
                 foreach (var kvp in toRemove)
                 {
-                    if (kvp.Value.Asset is UnityEngine.Object unityObj && kvp.Value.AssetBundle == null)
+                    if (kvp.Value.AssetBundle == null)
                     {
-                        if (Application.isPlaying)
-                        {
-                            UnityEngine.Object.Destroy(unityObj);
-                        }
-                        else
-                        {
-                            UnityEngine.Object.DestroyImmediate(unityObj);
-                        }
+                        UnityEngine.Object.Destroy(kvp.Value.Asset);
                     }
                     _resourceHandles.Remove(kvp.Key);
-                    clearedCount++;
                 }
             }
 
-            if (resourceSourceType == ResourceSourceType.Network)
+            if (source == ResourceSource.Network)
             {
                 // 清理网络缓存文件
                 if (Directory.Exists(_networkCacheDirectory))
                 {
-                    var files = Directory.GetFiles(_networkCacheDirectory);
-                    foreach (var file in files)
-                    {
-                        File.Delete(file);
-                    }
-                    clearedCount += files.Length;
-                    Debugger.Log($"清理了 {files.Length} 个网络缓存文件", LogType.FrameNormal);
+                    Directory.Delete(_networkCacheDirectory, true);
+                    Directory.CreateDirectory(_networkCacheDirectory);
                 }
             }
-
-            Debugger.Log($"清理了 {clearedCount} 个 {resourceSourceType} 缓存资源", LogType.FrameNormal);
         }
 
         /// <summary>
-        /// 获取缓存大小
+        /// 获取指定来源的缓存大小
         /// </summary>
-        public long GetCacheSize(ResourceSourceType resourceSourceType)
+        public long GetCacheSize(ResourceSource source)
         {
             lock (_lockObject)
             {
                 return _resourceHandles.Values
-                    .Where(h => h.SourceType == resourceSourceType)
+                    .Where(h => h.Source == source)
                     .Sum(h => h.MemorySize);
             }
         }
         #endregion
 
-        #region 内部加载实现
-        private async Task<T> LoadUnityAssetInternal<T>(
-            string assetPath,
-            ResourceSourceType resourceSourceType,
-            Action<LoadProgress> onProgress = null)
+        #region Log
+
+        /// <summary>
+        /// 打印资源状态信息
+        /// </summary>
+        public void PrintResourceStatus()
         {
-            var cacheKey = $"{resourceSourceType.ToString().ToLower()}://{assetPath}";
+            int totalResources = _resourceHandles.Count;
+            int usedResources = _resourceHandles.Count(kvp => kvp.Value.ReferenceCount > 0);
+            long totalMemory = _resourceHandles.Values.Sum(h => h.MemorySize);
+
+            Debugger.Log($"资源状态: 总数{totalResources}, 使用中{usedResources}, 内存{totalMemory / 1024 / 1024}MB", LogType.FrameNormal);
+        }
+        #endregion
+
+        #endregion
+
+
+        #region 内部类定义
+        /// <summary>
+        /// 资源句柄，用于资源引用计数和生命周期管理
+        /// </summary>
+        private class ResourceHandle
+        {
+            public UnityEngine.Object Asset { get; set; }
+            public int ReferenceCount { get; set; }
+            public DateTime LastAccessTime { get; set; }
+            public string Path { get; set; }
+            public ResourceSource Source { get; set; }
+            public long MemorySize { get; set; }
+            public AssetBundle AssetBundle { get; set; }
+        }
+
+        /// <summary>
+        /// AssetBundle句柄，管理AssetBundle的加载和引用
+        /// </summary>
+        private class AssetBundleHandle
+        {
+            public AssetBundle Bundle { get; set; }
+            public int ReferenceCount { get; set; }
+            public DateTime LastAccessTime { get; set; }
+            public string BundlePath { get; set; }
+            public Dictionary<string, ResourceHandle> LoadedAssets { get; set; } = new();
+        }
+        #endregion
+
+        #region 字段定义
+        private readonly Dictionary<string, ResourceHandle> _resourceHandles = new();
+        private readonly Dictionary<string, AssetBundleHandle> _assetBundleHandles = new();
+        private readonly Dictionary<GameObject, (string path, ResourceSource source)> _instanceToSourceMap = new();
+
+        private string _networkCacheDirectory;
+        private readonly object _lockObject = new object();
+        private readonly int _maxCacheCount = 100;
+        private readonly long _maxMemorySize = 512 * 1024 * 1024;
+        private readonly float _cacheCleanupInterval = 30f;
+        private float _lastCleanupTime;
+        #endregion
+
+        #region 初始化
+        /// <summary>
+        /// 初始化资源管理器
+        /// </summary>
+        protected override async Task OnInitialize()
+        {
+            // 创建网络缓存目录
+            _networkCacheDirectory = Path.Combine(Application.persistentDataPath, "NetworkCache");
+            if (!Directory.Exists(_networkCacheDirectory))
+            {
+                Directory.CreateDirectory(_networkCacheDirectory);
+            }
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 关闭资源管理器，清理所有资源
+        /// </summary>
+        protected override void OnShutdown()
+        {
+            // 清理所有资源
+            foreach (var handle in _resourceHandles.Values)
+            {
+                if (handle.AssetBundle == null)
+                {
+                    UnityEngine.Object.Destroy(handle.Asset);
+                }
+            }
+            _resourceHandles.Clear();
+
+            // 清理AssetBundle
+            foreach (var bundleHandle in _assetBundleHandles.Values)
+            {
+                bundleHandle.Bundle.Unload(true);
+            }
+            _assetBundleHandles.Clear();
+
+            _instanceToSourceMap.Clear();
+
+            Resources.UnloadUnusedAssets();
+            Debugger.Log("资源管理器已关闭", LogType.FrameNormal);
+        }
+        #endregion
+
+
+        #region Resources文件夹资源加载
+        /// <summary>
+        /// 从Resources文件夹异步加载资源
+        /// </summary>
+        private async Task<T> LoadFromResourcesAsync<T>(string path, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        {
+            var cacheKey = $"resources://{path}";
 
             lock (_lockObject)
             {
-                if (_resourceHandles.TryGetValue(cacheKey, out var handle) && handle.Asset is T)
+                if (_resourceHandles.TryGetValue(cacheKey, out var handle))
                 {
                     handle.ReferenceCount++;
                     handle.LastAccessTime = DateTime.Now;
-                    return (T)handle.Asset;
+                    return handle.Asset as T;
                 }
             }
 
             var progress = new LoadProgress
             {
-                Path = assetPath,
-                Status = $"开始加载{resourceSourceType}资源"
+                Path = path,
+                Status = "开始加载Resources资源"
             };
 
             try
             {
-                object result = null;
-
-                switch (resourceSourceType)
+                var resourceRequest = Resources.LoadAsync<T>(path);
+                // 进度更新循环
+                while (!resourceRequest.isDone)
                 {
-                    case ResourceSourceType.Resources:
-                        result = await LoadFromResourcesAsync<T>(assetPath, progress, onProgress);
-                        break;
-
-                    case ResourceSourceType.StreamingAssets:
-                        result = await LoadFromStreamingAssetsAsync<T>(assetPath, progress, onProgress);
-                        break;
-
-                    case ResourceSourceType.PersistentData:
-                        result = await LoadFromPersistentDataAsync<T>(assetPath, progress, onProgress);
-                        break;
-
-                    case ResourceSourceType.Network:
-                        result = await LoadFromNetworkAsync<T>(assetPath, progress, onProgress);
-                        break;
-
-                    case ResourceSourceType.AssetBundle:
-                        throw new ArgumentException("AssetBundle资源请使用LoadBundleAssetAsync方法");
-
-                    case ResourceSourceType.Addressables:
-                        throw new NotSupportedException("Addressables暂未实现");
-
-                    default:
-                        throw new ArgumentException($"不支持的资源来源类型: {resourceSourceType}");
+                    progress.Progress = resourceRequest.progress;
+                    progress.Status = $"加载Resources资源: {progress.Progress:P}";
+                    onProgress?.Invoke(progress);
+                    await Task.Yield();
                 }
 
-                if (result != null)
+                progress.Progress = 1f;
+                progress.IsDone = true;
+                progress.Asset = resourceRequest.asset;
+                progress.Status = "Resources资源加载完成";
+                onProgress?.Invoke(progress);
+
+                if (resourceRequest.asset == null)
+                {
+                    throw new Exception($"Resources资源不存在: {path}");
+                }
+
+                var newHandle = new ResourceHandle
+                {
+                    Asset = resourceRequest.asset,
+                    ReferenceCount = 1,
+                    LastAccessTime = DateTime.Now,
+                    Path = cacheKey,
+                    Source = ResourceSource.Resources,
+                    MemorySize = EstimateMemorySize(resourceRequest.asset)
+                };
+
+                lock (_lockObject)
+                {
+                    _resourceHandles[cacheKey] = newHandle;
+                }
+
+                return resourceRequest.asset as T;
+            }
+            catch (Exception e)
+            {
+                progress.Error = e;
+                progress.IsDone = true;
+                progress.Status = $"Resources资源加载失败: {e.Message}";
+                onProgress?.Invoke(progress);
+
+                Debugger.LogError($"Resources资源加载失败 {path}: {e.Message}", LogType.FrameCore);
+                return null;
+            }
+        }
+        #endregion
+
+        #region 网络资源加载
+
+        private async Task<T> LoadDownloadedResource<T>(byte[] data, string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        {
+            var progress = new LoadProgress
+            {
+                Path = url,
+                Status = "处理下载的资源"
+            };
+
+            try
+            {
+                // 根据类型创建资源
+                if (typeof(T) == typeof(Texture2D))
+                {
+                    progress.Status = "创建Texture2D";
+                    onProgress?.Invoke(progress);
+
+                    var texture = new Texture2D(2, 2);
+                    texture.LoadImage(data);
+                    return texture as T;
+                }
+                else if (typeof(T) == typeof(AudioClip))
+                {
+                    progress.Status = "创建AudioClip";
+                    onProgress?.Invoke(progress);
+
+                    // 这里需要根据音频格式处理，简化实现
+                    return null;
+                }
+                else if (typeof(T) == typeof(TextAsset))
+                {
+                    progress.Status = "创建TextAsset";
+                    onProgress?.Invoke(progress);
+
+                    var text = System.Text.Encoding.UTF8.GetString(data);
+                    var textAsset = new TextAsset(text);
+                    return textAsset as T;
+                }
+
+                throw new Exception($"不支持的下载资源类型: {typeof(T)}");
+            }
+            catch (Exception e)
+            {
+                progress.Error = e;
+                progress.IsDone = true;
+                progress.Status = $"资源处理失败: {e.Message}";
+                onProgress?.Invoke(progress);
+
+                Debugger.LogError($"下载资源处理异常: {e.Message}", LogType.FrameCore);
+                return null;
+            }
+        }
+
+        private string GetCachedFilePath(string url)
+        {
+            var fileName = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(url))
+                .Replace("/", "_")
+                .Replace("+", "-")
+                .Replace("=", "");
+            return Path.Combine(_networkCacheDirectory, fileName);
+        }
+        #endregion
+
+        #region StreamingAssets和PersistentData资源加载
+        private async Task<T> LoadFromStreamingAssetsAsync<T>(string path, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        {
+            var fullPath = Path.Combine(Application.streamingAssetsPath, path);
+            return await LoadFromFileAsync<T>(fullPath, ResourceSource.StreamingAssets, onProgress);
+        }
+
+        private async Task<T> LoadFromPersistentDataAsync<T>(string path, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        {
+            var fullPath = Path.Combine(Application.persistentDataPath, path);
+            return await LoadFromFileAsync<T>(fullPath, ResourceSource.PersistentData, onProgress);
+        }
+
+        private async Task<T> LoadFromFileAsync<T>(string fullPath, ResourceSource source, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        {
+            var progress = new LoadProgress
+            {
+                Path = fullPath,
+                Status = "开始读取文件"
+            };
+
+            if (!File.Exists(fullPath))
+            {
+                progress.Error = new Exception($"文件不存在: {fullPath}");
+                progress.IsDone = true;
+                progress.Status = "文件不存在";
+                onProgress?.Invoke(progress);
+
+                Debugger.LogError($"文件不存在: {fullPath}", LogType.FrameCore);
+                return null;
+            }
+
+            var cacheKey = $"{source.ToString().ToLower()}://{fullPath}";
+
+            lock (_lockObject)
+            {
+                if (_resourceHandles.TryGetValue(cacheKey, out var handle))
+                {
+                    handle.ReferenceCount++;
+                    handle.LastAccessTime = DateTime.Now;
+                    return handle.Asset as T;
+                }
+            }
+
+            try
+            {
+                progress.Status = "读取文件数据";
+                onProgress?.Invoke(progress);
+
+                var bytes = await File.ReadAllBytesAsync(fullPath);
+
+                progress.Progress = 0.5f;
+                progress.Status = "处理文件数据";
+                onProgress?.Invoke(progress);
+
+                var resource = await LoadDownloadedResource<T>(bytes, fullPath, (resourceProgress) =>
+                {
+                    // 合并进度：文件读取50% + 资源处理50%
+                    progress.Progress = 0.5f + resourceProgress.Progress * 0.5f;
+                    progress.Status = resourceProgress.Status;
+                    onProgress?.Invoke(progress);
+                });
+
+                progress.Progress = 1f;
+                progress.IsDone = true;
+                progress.Status = "文件加载完成";
+                progress.Asset = resource;
+                onProgress?.Invoke(progress);
+
+                if (resource != null)
                 {
                     var newHandle = new ResourceHandle
                     {
-                        Asset = result,
+                        Asset = resource,
                         ReferenceCount = 1,
                         LastAccessTime = DateTime.Now,
                         Path = cacheKey,
-                        SourceType = resourceSourceType,
-                        FileType = ResourceFileType.UnityAsset,
-                        MemorySize = EstimateMemorySize(result as UnityEngine.Object)
+                        Source = source,
+                        MemorySize = EstimateMemorySize(resource)
                     };
 
                     lock (_lockObject)
@@ -938,153 +1062,48 @@ namespace MFramework.Runtime
                     }
                 }
 
-                return (T)result;
+                return resource;
             }
             catch (Exception e)
             {
                 progress.Error = e;
                 progress.IsDone = true;
-                progress.Status = $"资源加载失败: {e.Message}";
+                progress.Status = $"文件加载失败: {e.Message}";
                 onProgress?.Invoke(progress);
 
-                Debugger.LogError($"{resourceSourceType}资源加载失败 {assetPath}: {e.Message}", LogType.FrameCore);
-                return default(T);
-            }
-        }
-
-        private async Task<string> LoadTextInternal(
-            string assetPath,
-            ResourceSourceType resourceSourceType,
-            Action<LoadProgress> onProgress = null)
-        {
-            var progress = new LoadProgress
-            {
-                Path = assetPath,
-                Status = $"开始加载{resourceSourceType}文本"
-            };
-
-            try
-            {
-                string result = null;
-
-                switch (resourceSourceType)
-                {
-                    case ResourceSourceType.Resources:
-                        var textAsset = await LoadFromResourcesAsync<TextAsset>(assetPath, progress, onProgress);
-                        result = textAsset?.text;
-                        break;
-
-                    case ResourceSourceType.StreamingAssets:
-                        var streamingPath = Path.Combine(Application.streamingAssetsPath, assetPath);
-                        if (File.Exists(streamingPath))
-                            result = await File.ReadAllTextAsync(streamingPath);
-                        break;
-
-                    case ResourceSourceType.PersistentData:
-                        var persistentPath = Path.Combine(Application.persistentDataPath, assetPath);
-                        if (File.Exists(persistentPath))
-                            result = await File.ReadAllTextAsync(persistentPath);
-                        break;
-
-                    case ResourceSourceType.Network:
-                        var bytes = await LoadBytesFromNetworkAsync(assetPath, progress, onProgress);
-                        result = bytes != null ? System.Text.Encoding.UTF8.GetString(bytes) : null;
-                        break;
-
-                    default:
-                        throw new ArgumentException($"文本加载不支持此来源: {resourceSourceType}");
-                }
-
-                progress.Progress = 1f;
-                progress.IsDone = true;
-                progress.Status = "文本加载完成";
-                progress.Text = result;
-                onProgress?.Invoke(progress);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                progress.Error = e;
-                progress.IsDone = true;
-                progress.Status = $"文本加载失败: {e.Message}";
-                onProgress?.Invoke(progress);
-
-                Debugger.LogError($"文本加载失败 {assetPath}: {e.Message}", LogType.FrameCore);
-                return null;
-            }
-        }
-
-        private async Task<byte[]> LoadBytesInternal(
-            string assetPath,
-            ResourceSourceType resourceSourceType,
-            Action<LoadProgress> onProgress = null)
-        {
-            var progress = new LoadProgress
-            {
-                Path = assetPath,
-                Status = $"开始加载{resourceSourceType}字节数据"
-            };
-
-            try
-            {
-                byte[] result = null;
-
-                switch (resourceSourceType)
-                {
-                    case ResourceSourceType.Resources:
-                        var textAsset = await LoadFromResourcesAsync<TextAsset>(assetPath, progress, onProgress);
-                        result = textAsset?.bytes;
-                        break;
-
-                    case ResourceSourceType.StreamingAssets:
-                        var streamingPath = Path.Combine(Application.streamingAssetsPath, assetPath);
-                        if (File.Exists(streamingPath))
-                            result = await File.ReadAllBytesAsync(streamingPath);
-                        break;
-
-                    case ResourceSourceType.PersistentData:
-                        var persistentPath = Path.Combine(Application.persistentDataPath, assetPath);
-                        if (File.Exists(persistentPath))
-                            result = await File.ReadAllBytesAsync(persistentPath);
-                        break;
-
-                    case ResourceSourceType.Network:
-                        result = await LoadBytesFromNetworkAsync(assetPath, progress, onProgress);
-                        break;
-
-                    default:
-                        throw new ArgumentException($"字节加载不支持此来源: {resourceSourceType}");
-                }
-
-                progress.Progress = 1f;
-                progress.IsDone = true;
-                progress.Status = "字节数据加载完成";
-                progress.Bytes = result;
-                onProgress?.Invoke(progress);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                progress.Error = e;
-                progress.IsDone = true;
-                progress.Status = $"字节数据加载失败: {e.Message}";
-                onProgress?.Invoke(progress);
-
-                Debugger.LogError($"字节数据加载失败 {assetPath}: {e.Message}", LogType.FrameCore);
+                Debugger.LogError($"文件加载异常 {fullPath}: {e.Message}", LogType.FrameCore);
                 return null;
             }
         }
         #endregion
 
-        #region 具体来源加载实现
-        private async Task<T> LoadFromResourcesAsync<T>(
-            string assetPath,
-            LoadProgress progress,
-            Action<LoadProgress> onProgress) where T : UnityEngine.Object
+        #region 字节和文本加载
+
+        private async Task<byte[]> ReadFileBytesAsync(string filePath, LoadProgress progress, Action<LoadProgress> onProgress)
         {
-            var resourceRequest = Resources.LoadAsync<T>(assetPath);
+            if (!File.Exists(filePath))
+            {
+                throw new Exception($"文件不存在: {filePath}");
+            }
+
+            progress.Status = "读取文件字节";
+            onProgress?.Invoke(progress);
+
+            var bytes = await File.ReadAllBytesAsync(filePath);
+
+            progress.Progress = 1f;
+            progress.Status = "文件读取完成";
+            onProgress?.Invoke(progress);
+
+            return bytes;
+        }
+
+        private async Task<byte[]> LoadBytesFromResourcesAsync(string path, LoadProgress progress, Action<LoadProgress> onProgress)
+        {
+            progress.Status = "加载Resources字节资源";
+            onProgress?.Invoke(progress);
+
+            var resourceRequest = Resources.LoadAsync<TextAsset>(path);
 
             while (!resourceRequest.isDone)
             {
@@ -1094,124 +1113,29 @@ namespace MFramework.Runtime
                 await Task.Yield();
             }
 
-            progress.Progress = 1f;
-            progress.IsDone = true;
-            progress.Asset = resourceRequest.asset;
-            progress.Status = "Resources资源加载完成";
-            onProgress?.Invoke(progress);
-
             if (resourceRequest.asset == null)
             {
-                throw new Exception($"Resources资源不存在: {assetPath}");
+                throw new Exception($"Resources字节资源不存在: {path}");
             }
 
-            return resourceRequest.asset as T;
-        }
-
-        private async Task<T> LoadFromStreamingAssetsAsync<T>(
-            string assetPath,
-            LoadProgress progress,
-            Action<LoadProgress> onProgress) where T : UnityEngine.Object
-        {
-            var fullPath = Path.Combine(Application.streamingAssetsPath, assetPath);
-            return await LoadFromFileAsync<T>(fullPath, progress, onProgress);
-        }
-
-        private async Task<T> LoadFromPersistentDataAsync<T>(
-            string assetPath,
-            LoadProgress progress,
-            Action<LoadProgress> onProgress) where T : UnityEngine.Object
-        {
-            var fullPath = Path.Combine(Application.persistentDataPath, assetPath);
-            return await LoadFromFileAsync<T>(fullPath, progress, onProgress);
-        }
-
-        private async Task<T> LoadFromFileAsync<T>(
-            string fullPath,
-            LoadProgress progress,
-            Action<LoadProgress> onProgress) where T : UnityEngine.Object
-        {
-            if (!File.Exists(fullPath))
+            var textAsset = resourceRequest.asset as TextAsset;
+            if (textAsset == null)
             {
-                throw new Exception($"文件不存在: {fullPath}");
+                throw new Exception($"Resources资源不是TextAsset: {path}");
             }
 
-            progress.Status = "读取文件数据";
+            progress.Progress = 1f;
+            progress.Status = "Resources字节资源加载完成";
             onProgress?.Invoke(progress);
 
-            var bytes = await File.ReadAllBytesAsync(fullPath);
+            return textAsset.bytes;
+        }
 
-            progress.Progress = 0.5f;
-            progress.Status = "处理文件数据";
+        private async Task<byte[]> DownloadBytesAsync(string url, LoadProgress progress, Action<LoadProgress> onProgress)
+        {
+            progress.Status = "开始下载字节数据";
             onProgress?.Invoke(progress);
 
-            // 根据类型创建Unity对象
-            if (typeof(T) == typeof(Texture2D))
-            {
-                var texture = new Texture2D(2, 2);
-                texture.LoadImage(bytes);
-                return texture as T;
-            }
-            else if (typeof(T) == typeof(AudioClip))
-            {
-                // 简化实现，实际项目需要根据音频格式处理
-                return null;
-            }
-            else if (typeof(T) == typeof(TextAsset))
-            {
-                var text = System.Text.Encoding.UTF8.GetString(bytes);
-                var textAsset = new TextAsset(text);
-                return textAsset as T;
-            }
-
-            throw new Exception($"不支持的Unity资源类型: {typeof(T)}");
-        }
-
-        private async Task<T> LoadFromNetworkAsync<T>(
-            string url,
-            LoadProgress progress,
-            Action<LoadProgress> onProgress) where T : UnityEngine.Object
-        {
-            // 检查缓存
-            var cachedPath = GetCachedFilePath(url);
-            if (File.Exists(cachedPath))
-            {
-                Debugger.Log($"使用缓存资源: {url}", LogType.FrameNormal);
-                progress.Status = "使用缓存资源";
-                onProgress?.Invoke(progress);
-                return await LoadFromPersistentDataAsync<T>(cachedPath, progress, onProgress);
-            }
-
-            var bytes = await LoadBytesFromNetworkAsync(url, progress, onProgress);
-            if (bytes == null) return null;
-
-            // 根据类型创建Unity对象
-            if (typeof(T) == typeof(Texture2D))
-            {
-                var texture = new Texture2D(2, 2);
-                texture.LoadImage(bytes);
-                return texture as T;
-            }
-            else if (typeof(T) == typeof(AudioClip))
-            {
-                // 简化实现
-                return null;
-            }
-            else if (typeof(T) == typeof(TextAsset))
-            {
-                var text = System.Text.Encoding.UTF8.GetString(bytes);
-                var textAsset = new TextAsset(text);
-                return textAsset as T;
-            }
-
-            throw new Exception($"不支持的Unity资源类型: {typeof(T)}");
-        }
-
-        private async Task<byte[]> LoadBytesFromNetworkAsync(
-            string url,
-            LoadProgress progress,
-            Action<LoadProgress> onProgress)
-        {
             using (var webRequest = UnityEngine.Networking.UnityWebRequest.Get(url))
             {
                 var operation = webRequest.SendWebRequest();
@@ -1219,7 +1143,7 @@ namespace MFramework.Runtime
                 while (!operation.isDone)
                 {
                     progress.Progress = operation.progress;
-                    progress.Status = $"下载资源: {progress.Progress:P}";
+                    progress.Status = $"下载字节数据: {progress.Progress:P}";
 
                     if (webRequest.downloadHandler != null)
                     {
@@ -1231,30 +1155,22 @@ namespace MFramework.Runtime
                     await Task.Yield();
                 }
 
-                progress.Progress = 1f;
-                progress.IsDone = true;
-
                 if (webRequest.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
                 {
-                    throw new Exception($"网络资源加载失败: {webRequest.error}");
+                    throw new Exception($"字节下载失败: {webRequest.error}");
                 }
 
-                var data = webRequest.downloadHandler.data;
-
-                // 保存到缓存
-                var cachedPath = GetCachedFilePath(url);
-                await File.WriteAllBytesAsync(cachedPath, data);
-
-                progress.Status = "网络资源下载完成";
-                progress.Bytes = data;
+                progress.Progress = 1f;
+                progress.Status = "字节数据下载完成";
                 onProgress?.Invoke(progress);
 
-                return data;
+                return webRequest.downloadHandler.data;
             }
         }
         #endregion
 
-        #region 工具方法和生命周期
+
+        #region 生命周期管理
         /// <summary>
         /// 每帧更新
         /// </summary>
@@ -1300,16 +1216,9 @@ namespace MFramework.Runtime
                 {
                     if (_resourceHandles.TryGetValue(path, out var handle))
                     {
-                        if (handle.Asset is UnityEngine.Object unityObj && handle.AssetBundle == null)
+                        if (handle.AssetBundle == null)
                         {
-                            if (Application.isPlaying)
-                            {
-                                UnityEngine.Object.Destroy(unityObj);
-                            }
-                            else
-                            {
-                                UnityEngine.Object.DestroyImmediate(unityObj);
-                            }
+                            UnityEngine.Object.Destroy(handle.Asset);
                         }
                         _resourceHandles.Remove(path);
                     }
@@ -1337,52 +1246,24 @@ namespace MFramework.Runtime
                 {
                     if (_resourceHandles.TryGetValue(path, out var handle))
                     {
-                        if (handle.Asset is UnityEngine.Object unityObj && handle.AssetBundle == null)
+                        if (handle.AssetBundle == null)
                         {
-                            if (Application.isPlaying)
-                            {
-                                UnityEngine.Object.Destroy(unityObj);
-                            }
-                            else
-                            {
-                                UnityEngine.Object.DestroyImmediate(unityObj);
-                            }
+                            UnityEngine.Object.Destroy(handle.Asset);
                         }
                         _resourceHandles.Remove(path);
                     }
                 }
             }
         }
+        #endregion
 
+        #region 工具方法
         private long EstimateMemorySize(UnityEngine.Object obj)
         {
-            if (obj == null) return 0;
-
             if (obj is Texture2D texture) return texture.width * texture.height * 4;
             if (obj is Mesh mesh) return (mesh.vertices.Length * 12) + (mesh.triangles.Length * 4);
             if (obj is AudioClip audio) return (long)(audio.samples * audio.channels * 4);
             return 1024; // 默认1KB
-        }
-
-        private string GetCachedFilePath(string url)
-        {
-            var fileName = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(url))
-                .Replace("/", "_")
-                .Replace("+", "-")
-                .Replace("=", "");
-            return Path.Combine(_networkCacheDirectory, fileName);
-        }
-
-        /// <summary>
-        /// 打印资源状态信息
-        /// </summary>
-        public void PrintResourceStatus()
-        {
-            int totalResources = _resourceHandles.Count;
-            int usedResources = _resourceHandles.Count(kvp => kvp.Value.ReferenceCount > 0);
-            long totalMemory = _resourceHandles.Values.Sum(h => h.MemorySize);
-
-            Debugger.Log($"资源状态: 总数{totalResources}, 使用中{usedResources}, 内存{totalMemory / 1024 / 1024}MB", LogType.FrameNormal);
         }
         #endregion
     }

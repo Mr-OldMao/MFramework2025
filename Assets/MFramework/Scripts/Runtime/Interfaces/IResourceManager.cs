@@ -2,151 +2,187 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-
 namespace MFramework.Runtime
 {
     /// <summary>
-    /// 统一资源管理器接口 - 简洁API设计
+    /// 资源管理器接口
+    /// 提供多来源资源加载、卸载和管理功能
     /// </summary>
     public interface IResourceManager : IGameModule
     {
-        #region 核心加载接口（最简设计）
+
+        #region 通用异步加载接口
         /// <summary>
         /// 通用异步资源加载方法
         /// </summary>
-        Task<T> LoadAssetAsync<T>(
-            string assetPath,
-            ResourceSourceType resourceSourceType,
-            ResourceFileType resourceFileType = ResourceFileType.UnityAsset,
-            Action<LoadProgress> onProgress = null);
-
-        /// <summary>
-        /// 同步资源加载方法（谨慎使用）
-        /// </summary>
-        T LoadAssetSync<T>(
-            string assetPath,
-            ResourceSourceType resourceSourceType,
-            ResourceFileType resourceFileType = ResourceFileType.UnityAsset);
+        /// <typeparam name="T">资源类型（GameObject, Texture2D, AudioClip等）</typeparam>
+        /// <param name="path">资源路径</param>
+        /// <param name="source">资源来源</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>加载的资源对象，失败返回null</returns>
+        Task<T> LoadAsync<T>(string path, ResourceSource source = ResourceSource.Resources, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
         #endregion
 
-        #region 智能快捷方法（无需指定文件类型）
+        #region 指定来源的加载接口
         /// <summary>
-        /// 智能加载Unity资源（自动推断文件类型）
+        /// 从Resources文件夹异步加载资源
         /// </summary>
-        Task<T> LoadAsync<T>(string assetPath, ResourceSourceType resourceSourceType) where T : UnityEngine.Object;
+        /// <typeparam name="T">资源类型</typeparam>
+        /// <param name="path">Resources文件夹下的相对路径</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>加载的资源对象</returns>
+        Task<T> LoadFromResourcesAsync<T>(string path, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
 
         /// <summary>
-        /// 智能加载文本
+        /// 从AssetBundle异步加载资源
         /// </summary>
-        Task<string> LoadTextAsync(string assetPath, ResourceSourceType resourceSourceType);
+        /// <typeparam name="T">资源类型</typeparam>
+        /// <param name="bundlePath">AssetBundle文件路径</param>
+        /// <param name="assetPath">AssetBundle内的资源路径</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>加载的资源对象</returns>
+        Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
 
         /// <summary>
-        /// 智能加载JSON
+        /// 从网络异步加载资源
         /// </summary>
-        Task<T> LoadJsonAsync<T>(string assetPath, ResourceSourceType resourceSourceType);
-
-        /// <summary>
-        /// 智能加载二进制
-        /// </summary>
-        Task<byte[]> LoadBytesAsync(string assetPath, ResourceSourceType resourceSourceType);
+        /// <typeparam name="T">资源类型（Texture2D, AudioClip, TextAsset）</typeparam>
+        /// <param name="url">资源URL地址</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>加载的资源对象</returns>
+        Task<T> LoadFromNetworkAsync<T>(string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
         #endregion
 
-        #region 极简快捷方法（预设常用来源）
+        #region 字节和文本加载接口
         /// <summary>
-        /// 从Resources加载资源（最常用）
+        /// 异步加载字节数据
         /// </summary>
-        Task<T> LoadResourceAsync<T>(string assetPath) where T : UnityEngine.Object;
+        /// <param name="path">资源路径或URL</param>
+        /// <param name="source">资源来源</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>字节数组，失败返回null</returns>
+        Task<byte[]> LoadBytesAsync(string path, ResourceSource source, Action<LoadProgress> onProgress = null);
 
         /// <summary>
-        /// 从StreamingAssets加载文本配置
+        /// 异步加载文本数据
         /// </summary>
-        Task<string> LoadConfigTextAsync(string configPath);
-
-        /// <summary>
-        /// 从PersistentData加载用户数据
-        /// </summary>
-        Task<T> LoadUserDataAsync<T>(string dataPath);
-
-        /// <summary>
-        /// 从网络加载图片
-        /// </summary>
-        Task<Texture2D> LoadNetImageAsync(string url);
-
-        /// <summary>
-        /// 从AssetBundle加载资源
-        /// </summary>
-        Task<T> LoadBundleAssetAsync<T>(string bundleName, string assetPath) where T : UnityEngine.Object;
+        /// <param name="path">资源路径或URL</param>
+        /// <param name="source">资源来源</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>文本内容，失败返回null</returns>
+        Task<string> LoadTextAsync(string path, ResourceSource source, Action<LoadProgress> onProgress = null);
         #endregion
 
-        #region 实例化快捷方法
+        #region AssetBundle管理
         /// <summary>
-        /// 实例化预制体（从Resources）
+        /// 异步加载AssetBundle
         /// </summary>
-        Task<GameObject> InstantiateAsync(string assetPath, Transform parent = null);
+        /// <param name="bundlePath">AssetBundle文件路径</param>
+        /// <param name="fromStreamingAssets">是否从StreamingAssets加载</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>AssetBundle对象，失败返回null</returns>
+        Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, bool fromStreamingAssets = true, Action<LoadProgress> onProgress = null);
 
         /// <summary>
-        /// 实例化预制体到指定位置
+        /// 卸载AssetBundle
         /// </summary>
-        Task<GameObject> InstantiateAsync(string assetPath, Vector3 position, Quaternion rotation, Transform parent = null);
+        /// <param name="bundlePath">AssetBundle文件路径</param>
+        /// <param name="unloadAllObjects">是否卸载所有包含的对象</param>
+        void UnloadAssetBundle(string bundlePath, bool unloadAllObjects = false);
         #endregion
 
-        #region 资源管理
-        void Unload(string assetPath, ResourceSourceType resourceSourceType);
+        #region 网络资源管理
+        /// <summary>
+        /// 异步下载文件到本地
+        /// </summary>
+        /// <param name="url">文件URL地址</param>
+        /// <param name="localPath">本地保存路径</param>
+        /// <param name="onProgress">下载进度回调（可选）</param>
+        /// <returns>下载任务</returns>
+        Task DownloadFileAsync(string url, string localPath, Action<LoadProgress> onProgress = null);
+
+        /// <summary>
+        /// 检查文件是否已缓存
+        /// </summary>
+        /// <param name="url">文件URL地址</param>
+        /// <returns>true表示文件已缓存</returns>
+        Task<bool> IsFileCached(string url);
+        #endregion
+
+        #region 实例化管理
+        /// <summary>
+        /// 异步实例化游戏对象
+        /// </summary>
+        /// <param name="path">预制体路径</param>
+        /// <param name="source">资源来源</param>
+        /// <param name="parent">父级变换（可选）</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>实例化的游戏对象</returns>
+        Task<GameObject> InstantiateAsync(string path, ResourceSource source = ResourceSource.Resources, Transform parent = null, Action<LoadProgress> onProgress = null);
+
+        /// <summary>
+        /// 异步实例化游戏对象到指定位置和旋转
+        /// </summary>
+        /// <param name="path">预制体路径</param>
+        /// <param name="position">世界坐标位置</param>
+        /// <param name="rotation">世界坐标旋转</param>
+        /// <param name="parent">父级变换（可选）</param>
+        /// <param name="onProgress">加载进度回调（可选）</param>
+        /// <returns>实例化的游戏对象</returns>
+        Task<GameObject> InstantiateAsync(string path, Vector3 position, Quaternion rotation, Transform parent = null, Action<LoadProgress> onProgress = null);
+
+        /// <summary>
+        /// 同步实例化游戏对象
+        /// </summary>
+        /// <param name="path">预制体路径</param>
+        /// <param name="parent">父级变换（可选）</param>
+        /// <returns>实例化的游戏对象</returns>
+        GameObject InstantiateSync(string path, Transform parent = null);
+        #endregion
+
+        #region 资源卸载管理
+        /// <summary>
+        /// 卸载指定资源
+        /// </summary>
+        /// <param name="path">资源路径</param>
+        /// <param name="source">资源来源</param>
+        void Unload(string path, ResourceSource source);
+
+        /// <summary>
+        /// 卸载游戏对象实例
+        /// </summary>
+        /// <param name="instance">要卸载的游戏对象实例</param>
         void Unload(GameObject instance);
+
+        /// <summary>
+        /// 强制清理所有未使用的资源
+        /// </summary>
         void UnloadUnusedAssets();
         #endregion
-    }
 
-    /// <summary>
-    /// 资源文件类型
-    /// </summary>
-    public enum ResourceFileType
-    {
-        /// <summary>Unity资源（预制体、纹理、音频等）</summary>
-        UnityAsset,
-        /// <summary>文本文件</summary>
-        Txt,
-        /// <summary>JSON文件</summary>
-        Json,
-        /// <summary>二进制文件</summary>
-        Bytes,
-        /// <summary>AssetBundle文件</summary>
-        AB
-    }
+        #region 预加载和批量操作
+        /// <summary>
+        /// 预加载多个资源
+        /// </summary>
+        /// <param name="paths">资源路径列表</param>
+        /// <param name="onProgress">总体加载进度回调（可选）</param>
+        /// <returns>预加载任务</returns>
+        Task PreloadAsync(List<string> paths, Action<LoadProgress> onProgress = null);
+        #endregion
 
-    /// <summary>
-    /// 资源来源类型
-    /// </summary>
-    public enum ResourceSourceType
-    {
-        /// <summary>Unity Resources文件夹</summary>
-        Resources,
-        /// <summary>AssetBundle包 - 热更新资源</summary>
-        AssetBundle,
-        /// <summary>StreamingAssets文件夹 - 只读配置数据</summary>
-        StreamingAssets,
-        /// <summary>PersistentDataPath文件夹 - 可读写用户数据</summary>
-        PersistentData,
-        /// <summary>网络资源 - 实时下载资源</summary>
-        Network,
-        /// <summary>Addressable系统</summary>
-        Addressables
-    }
+        #region 缓存管理
+        /// <summary>
+        /// 清理指定来源的缓存
+        /// </summary>
+        /// <param name="source">要清理的缓存来源</param>
+        void ClearCache(ResourceSource source);
 
-    /// <summary>
-    /// 加载进度信息
-    /// </summary>
-    public class LoadProgress
-    {
-        public string Path { get; set; }
-        public float Progress { get; set; }
-        public bool IsDone { get; set; }
-        public UnityEngine.Object Asset { get; set; }
-        public byte[] Bytes { get; set; }
-        public string Text { get; set; }
-        public Exception Error { get; set; }
-        public string Status { get; set; }
-        public long LoadedBytes { get; set; }
-        public long TotalBytes { get; set; }
+        /// <summary>
+        /// 获取指定来源的缓存大小（字节）
+        /// </summary>
+        /// <param name="source">缓存来源</param>
+        /// <returns>缓存大小（字节）</returns>
+        long GetCacheSize(ResourceSource source);
+        #endregion
     }
 }

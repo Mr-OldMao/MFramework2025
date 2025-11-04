@@ -1,0 +1,13 @@
+ManifestFileVersion: 0
+CRC: 1579057436
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: test/uipaneltestmain
+      Dependencies: {}
+    Info_1:
+      Name: test/uipaneltestsub1
+      Dependencies: {}
+    Info_2:
+      Name: test/uipaneltestsub2
+      Dependencies: {}

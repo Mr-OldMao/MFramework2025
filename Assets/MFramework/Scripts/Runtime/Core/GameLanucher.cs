@@ -9,8 +9,8 @@ namespace MFramework.Runtime
     // GameLauncher.cs - 框架启动入口
     public class GameLauncher : MonoBehaviour
     {
-        [SerializeField]
-        private FrameworkConfig frameworkConfig;
+        //[SerializeField]
+        //private FrameworkConfig frameworkConfig;
 
         private static GameLauncher _instance;
         private FrameworkManager frameworkManager;
