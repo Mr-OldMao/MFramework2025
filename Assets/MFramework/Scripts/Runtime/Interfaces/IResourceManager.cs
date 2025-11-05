@@ -41,7 +41,7 @@ namespace MFramework.Runtime
         /// <param name="assetPath">AssetBundle内的资源路径</param>
         /// <param name="onProgress">加载进度回调（可选）</param>
         /// <returns>加载的资源对象</returns>
-        Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
+        Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
 
         /// <summary>
         /// 从网络异步加载资源
@@ -78,10 +78,9 @@ namespace MFramework.Runtime
         /// 异步加载AssetBundle
         /// </summary>
         /// <param name="bundlePath">AssetBundle文件路径</param>
-        /// <param name="fromStreamingAssets">是否从StreamingAssets加载</param>
         /// <param name="onProgress">加载进度回调（可选）</param>
         /// <returns>AssetBundle对象，失败返回null</returns>
-        Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, bool fromStreamingAssets = true, Action<LoadProgress> onProgress = null);
+        Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null);
 
         /// <summary>
         /// 卸载AssetBundle
@@ -131,13 +130,6 @@ namespace MFramework.Runtime
         /// <returns>实例化的游戏对象</returns>
         Task<GameObject> InstantiateAsync(string path, Vector3 position, Quaternion rotation, Transform parent = null, Action<LoadProgress> onProgress = null);
 
-        /// <summary>
-        /// 同步实例化游戏对象
-        /// </summary>
-        /// <param name="path">预制体路径</param>
-        /// <param name="parent">父级变换（可选）</param>
-        /// <returns>实例化的游戏对象</returns>
-        GameObject InstantiateSync(string path, Transform parent = null);
         #endregion
 
         #region 资源卸载管理

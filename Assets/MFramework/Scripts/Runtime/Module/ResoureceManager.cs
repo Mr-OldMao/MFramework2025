@@ -12,7 +12,7 @@ namespace MFramework.Runtime
     /// 支持从Resources、AssetBundle、StreamingAssets、PersistentData和网络加载资源
     /// 提供引用计数、缓存管理、进度回调和内存优化功能
     /// </summary>
-    public class ResourceManager : GameModuleBase, IUpdatableModule
+    public class ResourceManager : GameModuleBase, IUpdatableModule , IResourceManager
     {
         #region 对外接口
         /// <summary>
@@ -148,7 +148,7 @@ namespace MFramework.Runtime
         /// <summary>
         /// 从AssetBundle异步加载资源
         /// </summary>
-        public async Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource source, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        public async  Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             var progress = new LoadProgress
             {
@@ -156,7 +156,7 @@ namespace MFramework.Runtime
                 Status = "开始加载AssetBundle资源"
             };
 
-            var bundle = await LoadAssetBundleAsync(bundlePath, assetPath, source, (bundleProgress) =>
+            var bundle = await LoadAssetBundleAsync(bundlePath, assetPath, resourceSource, (bundleProgress) =>
             {
                 // 转换AssetBundle加载进度为资源加载进度
                 progress.Progress = bundleProgress.Progress * 0.5f; // AssetBundle加载占50%
@@ -234,7 +234,7 @@ namespace MFramework.Runtime
                     ReferenceCount = 1,
                     LastAccessTime = DateTime.Now,
                     Path = cacheKey,
-                    Source = source,
+                    Source = resourceSource,
                     MemorySize = EstimateMemorySize(assetRequest.asset),
                     AssetBundle = bundle
                 };
@@ -265,10 +265,10 @@ namespace MFramework.Runtime
         /// <summary>
         /// 异步加载AssetBundle
         /// </summary>
-        public async Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, string assetPath, ResourceSource source, Action<LoadProgress> onProgress = null)
+        public async Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null)
         {
             string fullPath = string.Empty;
-            switch (source)
+            switch (resourceSource)
             {
                 case ResourceSource.Resources:
                     fullPath = Path.Combine(Application.dataPath, $"Resources/{bundlePath}/{assetPath}");
@@ -280,7 +280,7 @@ namespace MFramework.Runtime
                     fullPath = Path.Combine(Application.persistentDataPath, $"{bundlePath}/{assetPath}");
                     break;
                 default:
-                    Debugger.LogError($"不支持的资源源: {source}", LogType.FrameCore);
+                    Debugger.LogError($"不支持的资源源: {resourceSource}", LogType.FrameCore);
                     break;
             }
             var progress = new LoadProgress
@@ -337,7 +337,7 @@ namespace MFramework.Runtime
                     Path = assetPath,
                     AssetBundle = bundleRequest.assetBundle,
                     MemorySize = EstimateMemorySize(bundleRequest.assetBundle),
-                    Source = source
+                    Source = resourceSource
                 });
                 lock (_lockObject)
                 {
@@ -783,7 +783,7 @@ namespace MFramework.Runtime
 
         private string _networkCacheDirectory;
         private readonly object _lockObject = new object();
-        private readonly int _maxCacheCount = 100;
+        //private readonly int _maxCacheCount = 100;
         private readonly long _maxMemorySize = 512 * 1024 * 1024;
         private readonly float _cacheCleanupInterval = 30f;
         private float _lastCleanupTime;
@@ -838,7 +838,7 @@ namespace MFramework.Runtime
         /// <summary>
         /// 从Resources文件夹异步加载资源
         /// </summary>
-        private async Task<T> LoadFromResourcesAsync<T>(string path, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        public async Task<T> LoadFromResourcesAsync<T>(string path, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             var cacheKey = $"resources://{path}";
 
@@ -961,8 +961,11 @@ namespace MFramework.Runtime
                 onProgress?.Invoke(progress);
 
                 Debugger.LogError($"下载资源处理异常: {e.Message}", LogType.FrameCore);
+                await Task.CompletedTask;
+
                 return null;
             }
+
         }
 
         private string GetCachedFilePath(string url)

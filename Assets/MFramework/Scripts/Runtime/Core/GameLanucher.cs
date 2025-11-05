@@ -142,6 +142,8 @@ namespace MFramework.Runtime
             //var sceneManager = new SceneManager();
             //frameworkManager.RegisterModule<ISceneManager>(sceneManager);
             //await sceneManager.Initialize();
+
+            await Task.CompletedTask;
         }
 
         private async Task InitializeGameplayModules()
@@ -165,6 +167,7 @@ namespace MFramework.Runtime
             //var stateMachineManager = new StateMachineManager();
             //frameworkManager.RegisterModule<IStateMachineManager>(stateMachineManager);
             //await stateMachineManager.Initialize();
+            await Task.CompletedTask;
         }
 
         private async Task InitializeAdvancedModules()
@@ -189,6 +192,7 @@ namespace MFramework.Runtime
             //var debugManager = new DebugManager();
             //frameworkManager.RegisterModule<IDebugManager>(debugManager);
             //await debugManager.Initialize();
+            await Task.CompletedTask;
         }
 
         #region mono
