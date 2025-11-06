@@ -120,7 +120,7 @@ namespace MFramework.Runtime
             //await eventManager.Initialize();
             m_QueueGameModels.Enqueue(eventManager);
 
-            m_QueueGameModels.Enqueue(new ResourceManager());
+            m_QueueGameModels.Enqueue(new ResourcesManager());
 
             //// 3. 配置管理系统
             //var configManager = new ConfigManager();

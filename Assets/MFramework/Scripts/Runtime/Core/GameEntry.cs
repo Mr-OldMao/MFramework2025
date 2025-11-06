@@ -10,7 +10,7 @@ namespace MFramework.Runtime
         public static EventManager Event => Framework?.GetModule<EventManager>();
 
         // 其他模块（按需添加）
-        public static ResourceManager Resource => Framework?.GetModule<ResourceManager>();
+        public static ResourcesManager Resource => Framework?.GetModule<ResourcesManager>();
         public static IUIManager UI => Framework?.GetModule<IUIManager>();
         public static IAudioManager Audio => Framework?.GetModule<IAudioManager>();
         public static ISceneManager Scene => Framework?.GetModule<ISceneManager>();

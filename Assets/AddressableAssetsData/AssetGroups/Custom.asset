@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Default Local Group
+  m_Name: Custom
   m_EditorClassIdentifier: 
-  m_GroupName: Default Local Group
+  m_GroupName: Custom
   m_Data:
     m_SerializedData: []
-  m_GUID: f4cf9ef38f4920d488b88fe3619c61bb
+  m_GUID: 65c71d12bada8e54aaca724399b51590
   m_SerializeEntries:
-  - m_GUID: d52cd74bdc18fdd4ea538ae05b968f94
-    m_Address: Assets/Download/scene/testScene.unity
+  - m_GUID: 895c91b0af2a26c4e895dc1126afa9fb
+    m_Address: Assets/Download
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -26,5 +26,5 @@ MonoBehaviour:
   m_Settings: {fileID: 11400000, guid: f9eedc0ec5636de40b2b87bf4eb58a5b, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: a42244b37dbd2d04abaf1cce9097a892, type: 2}
-    - {fileID: 11400000, guid: a8a0e20a7a6b69c419afec681349c49c, type: 2}
+    - {fileID: 11400000, guid: 02fc28e8b7125c74c8f3c4a5e155fa1e, type: 2}
+    - {fileID: 11400000, guid: 99325a7af9cf88c459cb02bebe3819da, type: 2}
