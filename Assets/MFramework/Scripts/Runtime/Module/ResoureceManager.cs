@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace MFramework.Runtime
 {
@@ -12,12 +13,19 @@ namespace MFramework.Runtime
     /// 支持从Resources、AssetBundle、StreamingAssets、PersistentData和网络加载资源
     /// 提供引用计数、缓存管理、进度回调和内存优化功能
     /// </summary>
-    public class ResourceManager : GameModuleBase, IUpdatableModule , IResourceManager
+    public class ResourceManager : GameModuleBase, IUpdatableModule, IResourceManager
     {
         #region 对外接口
+
         /// <summary>
         /// 异步加载Unity资源
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path">资源相对路径。Resources不用加后缀名，StreamingAssets、PersistentData需要加后缀名</param>
+        /// <param name="source">不支持从StreamingAssets、PersistentData加载部分Unity资源，包括但是不限于.audioClip,.prefab</param>
+        /// <param name="onProgress"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<T> LoadAsync<T>(string path, ResourceSource source, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             if (string.IsNullOrEmpty(path))
@@ -25,11 +33,19 @@ namespace MFramework.Runtime
                 Debugger.LogError("资源路径为空", LogType.FrameCore);
                 return null;
             }
+            if (source == ResourceSource.StreamingAssets || source == ResourceSource.PersistentData)
+            {
+                if (path.Split('.').Length == 1)
+                {
+                    Debugger.LogError($"source:{source},需要加后缀名", LogType.FrameCore);
+                    return null;
+                }
+            }
+
 
             return source switch
             {
                 ResourceSource.Resources => await LoadFromResourcesAsync<T>(path, onProgress),
-                // ResourceSource.AssetBundle => await LoadFromAssetBundleAsync<T>(path, "", onProgress),
                 ResourceSource.StreamingAssets => await LoadFromStreamingAssetsAsync<T>(path, onProgress),
                 ResourceSource.PersistentData => await LoadFromPersistentDataAsync<T>(path, onProgress),
                 ResourceSource.Network => await LoadFromNetworkAsync<T>(path, onProgress),
@@ -44,6 +60,15 @@ namespace MFramework.Runtime
         /// </summary>
         public async Task<byte[]> LoadBytesAsync(string path, ResourceSource source, Action<LoadProgress> onProgress = null)
         {
+            if (source == ResourceSource.StreamingAssets || source == ResourceSource.PersistentData)
+            {
+                if (path.Split('.').Length == 1)
+                {
+                    Debugger.LogError($"source:{source},需要加后缀名", LogType.FrameCore);
+                    return null;
+                }
+            }
+
             var progress = new LoadProgress
             {
                 Path = path,
@@ -82,6 +107,7 @@ namespace MFramework.Runtime
                 progress.IsDone = true;
                 progress.Status = "字节数据加载完成";
                 progress.Bytes = result;
+
                 onProgress?.Invoke(progress);
 
                 return result;
@@ -103,6 +129,15 @@ namespace MFramework.Runtime
         /// </summary>
         public async Task<string> LoadTextAsync(string path, ResourceSource source, Action<LoadProgress> onProgress = null)
         {
+            if (source == ResourceSource.StreamingAssets || source == ResourceSource.PersistentData)
+            {
+                if (path.Split('.').Length == 1)
+                {
+                    Debugger.LogError($"source:{source},需要加后缀名", LogType.FrameCore);
+                    return null;
+                }
+            }
+
             var progress = new LoadProgress
             {
                 Path = path,
@@ -145,18 +180,21 @@ namespace MFramework.Runtime
         #endregion
 
         #region AssetBundle资源加载
+
+
+
         /// <summary>
         /// 从AssetBundle异步加载资源
         /// </summary>
-        public async  Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        public async Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             var progress = new LoadProgress
             {
-                Path = !string.IsNullOrEmpty(assetPath) ? $"{bundlePath}/{assetPath}" : $"{bundlePath}",
+                Path = $"{bundlePath}/{assetPath}",
                 Status = "开始加载AssetBundle资源"
             };
 
-            var bundle = await LoadAssetBundleAsync(bundlePath, assetPath, resourceSource, (bundleProgress) =>
+            var bundle = await LoadAssetBundleAsync<T>(bundlePath, assetPath, resourceSource, (bundleProgress) =>
             {
                 // 转换AssetBundle加载进度为资源加载进度
                 progress.Progress = bundleProgress.Progress * 0.5f; // AssetBundle加载占50%
@@ -171,48 +209,51 @@ namespace MFramework.Runtime
             lock (_lockObject)
             {
                 // 检查AB包内资源的缓存
-                if (_assetBundleHandles.TryGetValue(bundlePath, out var bundleHandle) &&
-                    bundleHandle.LoadedAssets.TryGetValue(assetPath, out var assetHandle))
+                if (_assetBundleHandles.TryGetValue(bundlePath, out var bundleHandle))
                 {
-                    assetHandle.ReferenceCount++;
-                    assetHandle.LastAccessTime = DateTime.Now;
                     if (typeof(T) == typeof(AssetBundle))
                     {
-                        return assetHandle.AssetBundle as T;
+                        return bundleHandle.Bundle as T;
                     }
                     else
                     {
-                        return assetHandle.Asset as T;
+                        if (bundleHandle.LoadedAssets.TryGetValue(assetPath, out var assetHandle))
+                        {
+
+                            assetHandle.ReferenceCount++;
+                            assetHandle.LastAccessTime = DateTime.Now;
+                            return assetHandle.Asset as T;
+                        }
                     }
                 }
+
+
+                //// 检查AB包内资源的缓存
+                //if (_assetBundleHandles.TryGetValue(bundlePath, out var bundleHandle) &&
+                //    bundleHandle.LoadedAssets.TryGetValue(assetPath, out var assetHandle))
+                //{
+                //    assetHandle.ReferenceCount++;
+                //    assetHandle.LastAccessTime = DateTime.Now;
+                //    if (typeof(T) == typeof(AssetBundle))
+                //    {
+                //        return assetHandle.AssetBundle as T;
+                //    }
+                //    else
+                //    {
+                //        return assetHandle.Asset as T;
+                //    }
+                //}
             }
 
             try
             {
                 var assetRequest = bundle.LoadAssetAsync<T>(assetPath);
-                var assetRequest2 = bundle.LoadAssetAsync(assetPath);
-                var assetRequest3 = bundle.LoadAllAssetsAsync();
-
 
                 // 资源加载进度（占50%）
                 while (!assetRequest.isDone)
                 {
                     progress.Progress = 0.5f + assetRequest.progress * 0.5f;
                     progress.Status = $"加载AssetBundle资源1: {assetRequest.progress:P}";
-                    onProgress?.Invoke(progress);
-                    await Task.Yield();
-                }
-                while (!assetRequest2.isDone)
-                {
-                    progress.Progress = 0.5f + assetRequest.progress * 0.5f;
-                    progress.Status = $"加载AssetBundle资源2: {assetRequest.progress:P}";
-                    onProgress?.Invoke(progress);
-                    await Task.Yield();
-                }
-                while (!assetRequest3.isDone)
-                {
-                    progress.Progress = 0.5f + assetRequest.progress * 0.5f;
-                    progress.Status = $"加载AssetBundle资源3: {assetRequest.progress:P}";
                     onProgress?.Invoke(progress);
                     await Task.Yield();
                 }
@@ -243,7 +284,7 @@ namespace MFramework.Runtime
                 {
                     if (_assetBundleHandles.TryGetValue(bundlePath, out var bundleHandle))
                     {
-                        bundleHandle.LoadedAssets[assetPath] = newAssetHandle;
+                        bundleHandle.LoadedAssets[bundlePath] = newAssetHandle;
                     }
                     _resourceHandles[cacheKey] = newAssetHandle;
                 }
@@ -265,19 +306,19 @@ namespace MFramework.Runtime
         /// <summary>
         /// 异步加载AssetBundle
         /// </summary>
-        public async Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null)
+        public async Task<AssetBundle> LoadAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             string fullPath = string.Empty;
             switch (resourceSource)
             {
                 case ResourceSource.Resources:
-                    fullPath = Path.Combine(Application.dataPath, $"Resources/{bundlePath}/{assetPath}");
+                    fullPath = Path.Combine(Application.dataPath, $"Resources/{bundlePath}");
                     break;
                 case ResourceSource.StreamingAssets:
-                    fullPath = Path.Combine(Application.streamingAssetsPath, $"{bundlePath}/{assetPath}");
+                    fullPath = Path.Combine(Application.streamingAssetsPath, $"{bundlePath}");
                     break;
                 case ResourceSource.PersistentData:
-                    fullPath = Path.Combine(Application.persistentDataPath, $"{bundlePath}/{assetPath}");
+                    fullPath = Path.Combine(Application.persistentDataPath, $"{bundlePath}");
                     break;
                 default:
                     Debugger.LogError($"不支持的资源源: {resourceSource}", LogType.FrameCore);
@@ -327,9 +368,10 @@ namespace MFramework.Runtime
                     ReferenceCount = 1,
                     LastAccessTime = DateTime.Now,
                     BundlePath = bundlePath,
+                    FilePath = $"{bundlePath}/{assetPath}",
                     LoadedAssets = new Dictionary<string, ResourceHandle>()
                 };
-                newHandle.LoadedAssets.Add(assetPath, new ResourceHandle
+                ResourceHandle resourceHandle = new ResourceHandle
                 {
                     Asset = null,
                     ReferenceCount = 0,
@@ -338,7 +380,21 @@ namespace MFramework.Runtime
                     AssetBundle = bundleRequest.assetBundle,
                     MemorySize = EstimateMemorySize(bundleRequest.assetBundle),
                     Source = resourceSource
-                });
+                };
+                if (!string.IsNullOrEmpty(assetPath))
+                {
+                    var assetRequest = bundleRequest.assetBundle.LoadAssetAsync<T>(assetPath);
+                    //等待异步加载资源完成
+                    while (!assetRequest.isDone)
+                    {
+                        progress.Progress = assetRequest.progress;
+                        await Task.Yield();
+                    }
+                    resourceHandle.Asset = assetRequest.asset;
+                }
+                newHandle.LoadedAssets.Add(bundlePath, resourceHandle);
+
+
                 lock (_lockObject)
                 {
                     _assetBundleHandles[bundlePath] = newHandle;
@@ -362,7 +418,7 @@ namespace MFramework.Runtime
         /// <summary>
         /// 卸载AssetBundle
         /// </summary>
-        public void UnloadAssetBundle(string bundlePath, bool unloadAllObjects = false)
+        public void UnloadAssetBundle(string bundlePath, string assetPath, bool unloadAllObjects = false)
         {
             lock (_lockObject)
             {
@@ -386,7 +442,7 @@ namespace MFramework.Runtime
         /// <summary>
         /// 从网络异步加载资源
         /// </summary>
-        public async Task<T> LoadFromNetworkAsync<T>(string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
+        private async Task<T> LoadFromNetworkAsync<T>(string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             var progress = new LoadProgress
             {
@@ -406,8 +462,29 @@ namespace MFramework.Runtime
 
             try
             {
-                using (var webRequest = UnityEngine.Networking.UnityWebRequest.Get(url))
+                using (var webRequest = UnityWebRequest.Get(url))
                 {
+                    var type = typeof(T);
+                    #region 判定T 资源类型
+                    //图片文件
+                    if (type == typeof(Texture2D) || type == typeof(Sprite))
+                    {
+                        webRequest.downloadHandler = new DownloadHandlerTexture(true);
+                    }
+                    //音频文件
+                    else if (type == typeof(DownloadHandlerAudioClip) || type == typeof(AudioClip))
+                    {
+                        //Debug.Log("解析URL音频资源 默认音频类型为WAV，如需更改需在此设置");
+                        //request.downloadHandler = new DownloadHandlerAudioClip(url, AudioType.MPEG);
+                        webRequest.downloadHandler = new DownloadHandlerAudioClip(url, AudioType.WAV);
+                    }
+                    //本地文本文件
+                    else if (type == typeof(string))
+                    {
+
+                    }
+
+                    #endregion
                     var operation = webRequest.SendWebRequest();
 
                     while (!operation.isDone)
@@ -442,10 +519,48 @@ namespace MFramework.Runtime
                     progress.Bytes = data;
                     onProgress?.Invoke(progress);
 
-                    Debugger.Log($"网络资源下载完成: {url}", LogType.FrameNormal);
 
                     // 根据类型加载资源
-                    return await LoadDownloadedResource<T>(data, url, onProgress);
+                    // return await LoadDownloadedResource<T>(data, url, onProgress);
+                    T changeType = null;
+                    #region 获取资源实体
+                    //判定T 资源类型
+                    if (type == typeof(Texture2D) || type == typeof(Sprite))//图片资源
+                    {
+                        //获取资源
+                        DownloadHandlerTexture downloadHandlerTexture = (DownloadHandlerTexture)webRequest.downloadHandler;
+                        if (type == typeof(Texture2D))
+                        {
+                            //强转为资源类型
+                            changeType = downloadHandlerTexture.texture as T;
+                        }
+                        else if (type == typeof(Sprite))
+                        {
+                            Sprite sprite = Sprite.Create(downloadHandlerTexture.texture, new Rect(0, 0, downloadHandlerTexture.texture.width, downloadHandlerTexture.texture.height), new Vector2(0.5f, 0.5f));
+                            changeType = sprite as T;
+                        }
+
+                    }
+                    else if (type == typeof(DownloadHandlerAudioClip) || type == typeof(AudioClip))//音频资源
+                    {
+                        DownloadHandlerAudioClip audioClip = (DownloadHandlerAudioClip)webRequest.downloadHandler;
+                        if (type == typeof(DownloadHandlerAudioClip))
+                        {
+                            changeType = audioClip as T;
+                        }
+                        else if (type == typeof(AudioClip))
+                        {
+                            changeType = audioClip.audioClip as T;
+                        }
+                    }
+                    else if (type == typeof(string))//文本资源
+                    {
+                        string txt = webRequest.downloadHandler.text;
+                        changeType = txt as T;
+                    }
+                    Debugger.Log($"网络资源下载完成: {url}", LogType.FrameNormal);
+                    return changeType;
+                    #endregion
                 }
             }
             catch (Exception e)
@@ -473,7 +588,7 @@ namespace MFramework.Runtime
 
             try
             {
-                using (var webRequest = UnityEngine.Networking.UnityWebRequest.Get(url))
+                using (var webRequest = UnityWebRequest.Get(url))
                 {
                     var operation = webRequest.SendWebRequest();
                     while (!operation.isDone)
@@ -495,7 +610,7 @@ namespace MFramework.Runtime
                     progress.Progress = 1f;
                     progress.IsDone = true;
 
-                    if (webRequest.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
+                    if (webRequest.result != UnityWebRequest.Result.Success)
                     {
                         throw new Exception($"文件下载失败: {webRequest.error}");
                     }
@@ -510,7 +625,7 @@ namespace MFramework.Runtime
                     progress.Bytes = webRequest.downloadHandler.data;
                     onProgress?.Invoke(progress);
 
-                    Debugger.Log($"文件下载完成: {url} -> {localPath}", LogType.FrameNormal);
+                    Debugger.Log($"文件下载完成，url: {url} ，localPath： {localPath}", LogType.FrameNormal);
                 }
             }
             catch (Exception e)
@@ -772,12 +887,16 @@ namespace MFramework.Runtime
             public int ReferenceCount { get; set; }
             public DateTime LastAccessTime { get; set; }
             public string BundlePath { get; set; }
+            public string FilePath { get; set; }
             public Dictionary<string, ResourceHandle> LoadedAssets { get; set; } = new();
         }
         #endregion
 
         #region 字段定义
         private readonly Dictionary<string, ResourceHandle> _resourceHandles = new();
+        /// <summary>
+        /// key: FilePath
+        /// </summary>
         private readonly Dictionary<string, AssetBundleHandle> _assetBundleHandles = new();
         private readonly Dictionary<GameObject, (string path, ResourceSource source)> _instanceToSourceMap = new();
 
@@ -913,6 +1032,14 @@ namespace MFramework.Runtime
 
         #region 网络资源加载
 
+        /// <summary>
+        ///  TODO后面改为UnityWebReques 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="url"></param>
+        /// <param name="onProgress"></param>
+        /// <returns></returns>
         private async Task<T> LoadDownloadedResource<T>(byte[] data, string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object
         {
             var progress = new LoadProgress
@@ -924,7 +1051,7 @@ namespace MFramework.Runtime
             try
             {
                 // 根据类型创建资源
-                if (typeof(T) == typeof(Texture2D))
+                if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
                 {
                     progress.Status = "创建Texture2D";
                     onProgress?.Invoke(progress);
@@ -932,14 +1059,6 @@ namespace MFramework.Runtime
                     var texture = new Texture2D(2, 2);
                     texture.LoadImage(data);
                     return texture as T;
-                }
-                else if (typeof(T) == typeof(AudioClip))
-                {
-                    progress.Status = "创建AudioClip";
-                    onProgress?.Invoke(progress);
-
-                    // 这里需要根据音频格式处理，简化实现
-                    return null;
                 }
                 else if (typeof(T) == typeof(TextAsset))
                 {
@@ -950,8 +1069,23 @@ namespace MFramework.Runtime
                     var textAsset = new TextAsset(text);
                     return textAsset as T;
                 }
+                //else if (typeof(T) == typeof(AudioClip))
+                //{
+                //    return null;
+                //}
+                //else if (typeof(T) == typeof(GameObject))
+                //{
+                //    progress.Status = "创建GameObject";
+                //    onProgress?.Invoke(progress);
 
-                throw new Exception($"不支持的下载资源类型: {typeof(T)}");
+                //    // 这里需要根据Prefab格式处理，简化实现
+                //    return null;
+                //}
+                else
+                {
+                    Debugger.LogError($"暂不支持的下载资源类型,{typeof(T)}", LogType.FrameCore);
+                    throw new Exception($"不支持的下载资源类型，{typeof(T)}");
+                }
             }
             catch (Exception e)
             {
@@ -965,7 +1099,6 @@ namespace MFramework.Runtime
 
                 return null;
             }
-
         }
 
         private string GetCachedFilePath(string url)

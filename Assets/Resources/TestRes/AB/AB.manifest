@@ -1,13 +1,10 @@
 ManifestFileVersion: 0
-CRC: 1579057436
+CRC: 4048299860
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: test/uipaneltestmain
+      Name: file_uipaneltestmain
       Dependencies: {}
     Info_1:
-      Name: test/uipaneltestsub1
-      Dependencies: {}
-    Info_2:
-      Name: test/uipaneltestsub2
+      Name: folder_uiprefab
       Dependencies: {}

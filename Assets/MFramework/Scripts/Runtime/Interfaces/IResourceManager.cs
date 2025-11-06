@@ -43,14 +43,14 @@ namespace MFramework.Runtime
         /// <returns>加载的资源对象</returns>
         Task<T> LoadFromAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
 
-        /// <summary>
-        /// 从网络异步加载资源
-        /// </summary>
-        /// <typeparam name="T">资源类型（Texture2D, AudioClip, TextAsset）</typeparam>
-        /// <param name="url">资源URL地址</param>
-        /// <param name="onProgress">加载进度回调（可选）</param>
-        /// <returns>加载的资源对象</returns>
-        Task<T> LoadFromNetworkAsync<T>(string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
+        ///// <summary>
+        ///// 从网络异步加载资源
+        ///// </summary>
+        ///// <typeparam name="T">资源类型（Texture2D, AudioClip, TextAsset）</typeparam>
+        ///// <param name="url">资源URL地址</param>
+        ///// <param name="onProgress">加载进度回调（可选）</param>
+        ///// <returns>加载的资源对象</returns>
+        //Task<T> LoadFromNetworkAsync<T>(string url, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
         #endregion
 
         #region 字节和文本加载接口
@@ -80,14 +80,14 @@ namespace MFramework.Runtime
         /// <param name="bundlePath">AssetBundle文件路径</param>
         /// <param name="onProgress">加载进度回调（可选）</param>
         /// <returns>AssetBundle对象，失败返回null</returns>
-        Task<AssetBundle> LoadAssetBundleAsync(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null);
+        Task<AssetBundle> LoadAssetBundleAsync<T>(string bundlePath, string assetPath, ResourceSource resourceSource, Action<LoadProgress> onProgress = null) where T : UnityEngine.Object;
 
         /// <summary>
         /// 卸载AssetBundle
         /// </summary>
         /// <param name="bundlePath">AssetBundle文件路径</param>
         /// <param name="unloadAllObjects">是否卸载所有包含的对象</param>
-        void UnloadAssetBundle(string bundlePath, bool unloadAllObjects = false);
+        void UnloadAssetBundle(string bundlePath,string assetPath, bool unloadAllObjects = false);
         #endregion
 
         #region 网络资源管理
