@@ -38,7 +38,9 @@ namespace MFramework.Runtime
         private string plane = "Assets/Download/texture/atlas/plane.spriteatlas";
 
 
-
+        /// <summary>
+        /// 需要导入测试资源TestResourcesManagerAssets.unitypackage，并标记Addressable
+        /// </summary>
         private async void Start()
         {
             await Task.Delay(3000);
@@ -46,6 +48,8 @@ namespace MFramework.Runtime
             await TestLoadResType();
 
             await TestLoadAltas();
+
+            //await TestUnloadAssets();
 
             //TODO 自动卸载资源
         }
@@ -175,5 +179,31 @@ namespace MFramework.Runtime
             var UIPanelItem1 = await GameEntry.Resource.LoadAssetAsync<GameObject>(UIPanelItem);
             Instantiate(UIPanelItem1);
         }
-    } 
+
+
+        /// <summary>
+        /// 测试卸载资源
+        /// </summary>
+        /// <returns></returns>
+        private async Task TestUnloadAssets()
+        {
+            List<GameObject> res = new List<GameObject>();
+            var go1 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
+            var go2 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
+            var go3 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
+            var go4 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var go = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
+                res.Add(go);
+            }
+
+            while (res.Count > 0)
+            {
+                await Task.Delay(1000);
+                GameEntry.Resource.ReleaseInstance(res[0]);
+            }
+        }
+    }
 }

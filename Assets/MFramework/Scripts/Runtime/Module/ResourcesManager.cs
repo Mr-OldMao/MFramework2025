@@ -1,5 +1,4 @@
-﻿using MFramework.Runtime;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -151,44 +150,6 @@ namespace MFramework.Runtime
         public async Task<List<T>> PreloadAssetsAsync<T>(List<string> addresses, bool isAutoAddSuffix = true) where T : Object
         {
             return await LoadAssetsAsync<T>(addresses, null, null, isAutoAddSuffix);
-
-            //if (addresses == null || addresses.Count == 0) return default;
-
-            //try
-            //{
-            //    var tasks = new List<Task<T>>();
-            //    for (int i = 0; i < addresses.Count; i++)
-            //    {
-            //        string address = addresses[i];
-            //        if (isAutoAddSuffix)
-            //        {
-            //            address = ProcessAssetAddress<T>(address);
-            //        }
-            //        if (!m_AssetHandles.ContainsKey(address) || !m_AssetHandles[address].IsValid())
-            //        {
-            //            tasks.Add(LoadAssetAsync<T>(address, false));
-            //        }
-            //    }
-
-            //    Debugger.Log($"开始预加载资源，目标加载个数： {addresses.Count},实际加载个数：{tasks.Count}", LogType.FrameNormal);
-
-            //    if (tasks.Count > 0)
-            //    {
-            //        var res = await Task.WhenAll(tasks);
-            //        Debugger.Log($"所有资源都已经预加载完成,count:{tasks.Count}", LogType.FrameNormal);
-            //        return res.ToList();
-            //    }
-            //    else
-            //    {
-            //        Debugger.Log("所有资源都已经预加载完成", LogType.FrameNormal);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.LogError($"PreloadAssetsAsync Exception: {ex.Message}");
-            //}
-
-            //return default;
         }
 
         public async void PreloadAssetsAsync<T>(List<string> addresses, Action<List<T>> allCompletedCallback, bool isAutoAddSuffix = true) where T : Object
@@ -254,6 +215,35 @@ namespace MFramework.Runtime
             }
         }
 
+        #endregion
+
+        #region 实例化
+        public async Task<GameObject> InstantiateAsset(string address, bool isAutoAddSuffix = true)
+        {
+            if (isAutoAddSuffix)
+            {
+                address = ProcessAssetAddress<GameObject>(address);
+            }
+            var res = Addressables.InstantiateAsync(address);
+            await res.Task;
+
+            //if (m_AssetHandles.ContainsKey(address))
+            //{
+            //    m_AssetHandles.Remove(address);
+            //}
+            //m_AssetHandles.Add(address, res);
+            return res.Result;
+        }
+
+        public bool ReleaseInstance(GameObject go)
+        {
+            return Addressables.ReleaseInstance(go);
+        }
+
+        public bool ReleaseInstance(AsyncOperationHandle handle)
+        {
+            return Addressables.ReleaseInstance(handle);
+        }
         #endregion
 
 
@@ -370,6 +360,23 @@ namespace MFramework.Runtime
 
 
         #region 其他
+        public AsyncOperationHandle GetAssetHandle<T>(string address, bool isAutoAddSuffix = true) where T : Object
+        {
+            if (isAutoAddSuffix)
+            {
+                address = ProcessAssetAddress<T>(address);
+            }
+            if (m_AssetHandles.ContainsKey(address))
+            {
+                return m_AssetHandles[address];
+            }
+            else
+            {
+                Debugger.LogError($"Addressable handle not found for address: {address}", LogType.FrameCore);
+                return default;
+            }
+        }
+
         /// <summary>
         /// 获取资源加载状态
         /// </summary>
@@ -501,6 +508,11 @@ namespace MFramework.Runtime
         }
         #endregion
 
+
+        #region 定时自动释放资源 TODO
+
+        #endregion
+
         #region Frame
 
         /// <summary>
@@ -521,5 +533,5 @@ namespace MFramework.Runtime
             ReleaseAllAssets();
         }
         #endregion
-    } 
+    }
 }
