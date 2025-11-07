@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: f4cf9ef38f4920d488b88fe3619c61bb
   m_currentHash:
     serializedVersion: 2
-    Hash: f04097351f01534bd0379680d69d9498
+    Hash: 79129ec4b9d0e59e5c8defb56e5497a8
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -106,5 +106,6 @@ MonoBehaviour:
     m_HostingServiceInfos: []
     m_Settings: {fileID: 11400000}
     m_NextInstanceId: 0
-    m_RegisteredServiceTypeRefs: []
+    m_RegisteredServiceTypeRefs:
+    - UnityEditor.AddressableAssets.HostingServices.HttpHostingService, Unity.Addressables.Editor
     m_PingTimeoutInMilliseconds: 5000

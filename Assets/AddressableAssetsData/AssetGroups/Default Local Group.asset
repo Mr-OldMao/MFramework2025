@@ -17,8 +17,8 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: f4cf9ef38f4920d488b88fe3619c61bb
   m_SerializeEntries:
-  - m_GUID: d52cd74bdc18fdd4ea538ae05b968f94
-    m_Address: Assets/Download/scene/testScene.unity
+  - m_GUID: 895c91b0af2a26c4e895dc1126afa9fb
+    m_Address: Assets/Download
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
