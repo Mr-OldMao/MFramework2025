@@ -1,14 +1,18 @@
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MFramework.Runtime
 {
     public interface IUIManager : IGameModule
     {
-        void ShowPanel(string panelName);
-        void HidePanel(string panelName);
-        T GetPanel<T>(string panelName) where T : UnityEngine.Component;
+        Task<T> OpenView<T>(object data = null) where T : UIBase;
+        void CloseView<T>() where T : UIBase;
+        void CloseView(IUIView view);
+        T GetView<T>() where T : UIBase;
+        void CloseAll();
     }
 
 }

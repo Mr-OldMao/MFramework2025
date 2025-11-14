@@ -1,4 +1,4 @@
-﻿// GameEntry.cs - 框架全局静态入口
+// GameEntry.cs - 框架全局静态入口
 namespace MFramework.Runtime
 {
     public static class GameEntry
@@ -11,7 +11,7 @@ namespace MFramework.Runtime
 
         // 其他模块（按需添加）
         public static ResourcesManager Resource => Framework?.GetModule<ResourcesManager>();
-        public static IUIManager UI => Framework?.GetModule<IUIManager>();
+        public static UIManager UI => Framework?.GetModule<UIManager>();
         public static IAudioManager Audio => Framework?.GetModule<IAudioManager>();
         public static ISceneManager Scene => Framework?.GetModule<ISceneManager>();
         public static ITimerManager Timer => Framework?.GetModule<ITimerManager>();

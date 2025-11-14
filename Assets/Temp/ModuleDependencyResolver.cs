@@ -1,4 +1,4 @@
-﻿// 自动处理模块依赖关系
+// 自动处理模块依赖关系
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,49 +43,49 @@ public class DependsOnAttribute : Attribute
     }
 }
 
-// 使用示例
-[DependsOn(typeof(ILoggerModule))]
-//[DependsOn(typeof(IEventManager))]
-public class UIManager : GameModuleBase, IUIManager
-{
-    public T GetPanel<T>(string panelName) where T : Component
-    {
-        throw new NotImplementedException();
-    }
+//// 使用示例
+//[DependsOn(typeof(ILoggerModule))]
+////[DependsOn(typeof(IEventManager))]
+//public class UIManager : GameModuleBase, IUIManager
+//{
+//    public T GetPanel<T>(string panelName) where T : Component
+//    {
+//        throw new NotImplementedException();
+//    }
 
-    public void HidePanel<T>() where T : class
-    {
-        throw new NotImplementedException();
-    }
+//    public void HidePanel<T>() where T : class
+//    {
+//        throw new NotImplementedException();
+//    }
 
-    public void HidePanel(string panelName)
-    {
-        throw new NotImplementedException();
-    }
+//    public void HidePanel(string panelName)
+//    {
+//        throw new NotImplementedException();
+//    }
 
-    public void OnUpdate(float deltaTime)
-    {
-        throw new NotImplementedException();
-    }
+//    public void OnUpdate(float deltaTime)
+//    {
+//        throw new NotImplementedException();
+//    }
 
-    public void ShowPanel<T>() where T : class
-    {
-        throw new NotImplementedException();
-    }
+//    public void ShowPanel<T>() where T : class
+//    {
+//        throw new NotImplementedException();
+//    }
 
-    public void ShowPanel(string panelName)
-    {
-        throw new NotImplementedException();
-    }
+//    public void ShowPanel(string panelName)
+//    {
+//        throw new NotImplementedException();
+//    }
 
-    // UI管理器依赖日志和事件系统
-    protected override Task OnInitialize()
-    {
-        throw new NotImplementedException();
-    }
+//    // UI管理器依赖日志和事件系统
+//    protected override Task OnInitialize()
+//    {
+//        throw new NotImplementedException();
+//    }
 
-    protected override void OnShutdown()
-    {
-        throw new NotImplementedException();
-    }
-}
+//    protected override void OnShutdown()
+//    {
+//        throw new NotImplementedException();
+//    }
+//}

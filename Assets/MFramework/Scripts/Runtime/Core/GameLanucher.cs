@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -121,6 +121,8 @@ namespace MFramework.Runtime
             m_QueueGameModels.Enqueue(eventManager);
 
             m_QueueGameModels.Enqueue(new ResourcesManager());
+
+            m_QueueGameModels.Enqueue(new UIManager());
 
             //// 3. 配置管理系统
             //var configManager = new ConfigManager();
