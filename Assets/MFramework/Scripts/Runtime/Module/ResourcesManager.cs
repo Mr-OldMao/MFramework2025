@@ -251,9 +251,9 @@ namespace MFramework.Runtime
         /// <summary>
         /// 卸载资源
         /// </summary>
-        public void ReleaseAsset(Object asset)
+        public bool ReleaseAsset(Object asset)
         {
-            if (asset == null) return;
+            if (asset == null) return false;
 
             try
             {
@@ -273,20 +273,22 @@ namespace MFramework.Runtime
                 if (keyToRemove != null)
                 {
                     m_AssetHandles.Remove(keyToRemove);
+                    return true;
                 }
             }
             catch (Exception ex)
             {
                 Debug.LogError($"ReleaseAsset Exception: {ex.Message}");
             }
+            return false;
         }
 
         /// <summary>
         /// 卸载资源（通过地址）
         /// </summary>
-        public void ReleaseAsset(string address)
+        public bool ReleaseAsset(string address)
         {
-            if (string.IsNullOrEmpty(address)) return;
+            if (string.IsNullOrEmpty(address)) return false;
 
             try
             {
@@ -295,6 +297,7 @@ namespace MFramework.Runtime
                     var handle = m_AssetHandles[address];
                     Addressables.Release(handle);
                     m_AssetHandles.Remove(address);
+                    return true;
                 }
                 else
                 {
@@ -305,30 +308,30 @@ namespace MFramework.Runtime
             {
                 Debug.LogError($"ReleaseAsset Exception: {address}, Error: {ex.Message}");
             }
+            return false;
         }
 
         /// <summary>
         /// 卸载资源（通过地址）
         /// </summary>
-        public void ReleaseAsset<T>(string address, bool isAutoAddSuffix = true) where T : Object
+        public bool ReleaseAsset<T>(string address, bool isAutoAddSuffix = true) where T : Object
         {
-            if (string.IsNullOrEmpty(address)) return;
+            if (string.IsNullOrEmpty(address)) return false;
 
             if (isAutoAddSuffix)
             {
                 address = ProcessAssetAddress<T>(address);
             }
-            ReleaseAsset(address);
+           return ReleaseAsset(address);
         }
 
         /// <summary>
         /// 清理所有资源
         /// </summary>
-        public void ReleaseAllAssets()
+        public bool ReleaseAllAssets()
         {
             try
             {
-                // 释放所有资源句柄
                 foreach (var handle in m_AssetHandles.Values)
                 {
                     if (handle.IsValid())
@@ -336,8 +339,6 @@ namespace MFramework.Runtime
                         Addressables.Release(handle);
                     }
                 }
-
-                // 释放所有场景句柄
                 foreach (var handle in m_SceneHandles.Values)
                 {
                     if (handle.IsValid())
@@ -350,11 +351,13 @@ namespace MFramework.Runtime
                 m_SceneHandles.Clear();
 
                 Debug.Log("ResourcesManager cleared all resources");
+                return true;
             }
             catch (Exception ex)
             {
                 Debug.LogError($"Clear Exception: {ex.Message}");
             }
+            return false;
         }
         #endregion
 

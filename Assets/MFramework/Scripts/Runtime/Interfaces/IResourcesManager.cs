@@ -17,16 +17,16 @@ namespace MFramework.Runtime
 
         Task LoadSceneAsync(string sceneAddress);
 
-        void ReleaseAsset(Object asset);
+        bool ReleaseAsset(Object asset);
 
-        void ReleaseAsset(string address);
+        bool ReleaseAsset(string address);
 
-        void ReleaseAsset<T>(string address, bool isAutoAddSuffix = true) where T : Object;
+        bool ReleaseAsset<T>(string address, bool isAutoAddSuffix = true) where T : Object;
 
         Task<List<T>> PreloadAssetsAsync<T>(List<string> addresses, bool isAutoAddSuffix = true) where T : Object;
 
         bool IsAssetLoaded(string address);
 
-        void ReleaseAllAssets();
+        bool ReleaseAllAssets();
     } 
 }

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.U2D;
 using UnityEngine.UI;
@@ -47,7 +48,7 @@ namespace MFramework.Runtime
 
             await TestLoadResType();
 
-            await TestLoadAltas();
+            //await TestLoadAltas();
 
             //await TestUnloadAssets();
 
@@ -180,6 +181,26 @@ namespace MFramework.Runtime
             Instantiate(UIPanelItem1);
         }
 
+        /// <summary>
+        /// 测试实例化、反实例化
+        /// </summary>
+        /// <returns></returns>
+        private async Task TestInstance()
+        {
+            List<GameObject> res = new List<GameObject>();
+            for (int i = 0; i < 10; i++)
+            {
+                var go0 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
+                res.Add(go0);
+            }
+
+            while (res.Count > 0)
+            {
+                await Task.Delay(1000);
+                GameEntry.Resource.ReleaseInstance(res[0]);
+                res.Remove(res[0]);
+            }
+        }
 
         /// <summary>
         /// 测试卸载资源
@@ -187,23 +208,50 @@ namespace MFramework.Runtime
         /// <returns></returns>
         private async Task TestUnloadAssets()
         {
-            List<GameObject> res = new List<GameObject>();
-            var go1 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
-            var go2 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
-            var go3 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
-            var go4 = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
+            GameObject go = null;
 
-            for (int i = 0; i < 10; i++)
+            Debugger.Log("time1:" + System.DateTime.Now.ToString());
+            for (int i = 0; i < 1000000; i++)
             {
-                var go = await GameEntry.Resource.InstantiateAsset(Entity_Cube);
-                res.Add(go);
+                await GameEntry.Resource.LoadAssetAsync<GameObject>(Entity_Sphere);
             }
+            Debugger.Log("time2:" + System.DateTime.Now.ToString());
 
-            while (res.Count > 0)
+            for (int i = 0; i < 1000000; i++)
             {
-                await Task.Delay(1000);
-                GameEntry.Resource.ReleaseInstance(res[0]);
+                await Addressables.LoadAssetAsync<GameObject>(Entity_Sphere).Task;
             }
+            Debugger.Log("time3:" + System.DateTime.Now.ToString());
+
+
+            //Debugger.Log("time1:" + System.DateTime.Now.ToString());
+
+            //for (int i = 0; i < 10000; i++)
+            //{
+            //    go = await GameEntry.Resource.LoadAssetAsync<GameObject>(Entity_Sphere);
+            //    Instantiate(go);
+            //}
+            //Debugger.Log("time2:" + System.DateTime.Now.ToString());
+
+            //for (int i = 0; i < 10000; i++)
+            //{
+            //    go = await Addressables.InstantiateAsync(Entity_Sphere).Task;
+            //}
+            //Debugger.Log("time3:" + System.DateTime.Now.ToString());
+
+
+
+            //Debugger.Log("time1:" + System.DateTime.Now.ToString());
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    go = await GameEntry.Resource.LoadAssetAsync<GameObject>(UIPanelMain);
+            //    Instantiate (go);
+            //}
+            //Debugger.Log("time2:" + System.DateTime.Now.ToString());
+
+            //await Task.Delay(1000);
+            //GameEntry.Resource.ReleaseAsset<GameObject>(UIPanelMain);
+            //var t = GameEntry.Resource.GetAssetHandle<GameObject>(UIPanelMain);            
         }
     }
 }
