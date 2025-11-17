@@ -7,11 +7,11 @@ namespace MFramework.Runtime
 
         // 核心模块快捷访问
         //public static ILoggerModule Logger => Framework?.GetModule<ILoggerModule>();
-        public static EventManager Event => Framework?.GetModule<EventManager>();
+        public static EventManager Event => Framework?.GetModule<IEventManager>() as EventManager;
 
         // 其他模块（按需添加）
-        public static ResourcesManager Resource => Framework?.GetModule<ResourcesManager>();
-        public static UIManager UI => Framework?.GetModule<UIManager>();
+        public static ResourcesManager Resource => Framework?.GetModule<IResourcesManager>() as ResourcesManager;
+        public static UIManager UI =>  Framework?.GetModule<IUIManager>() as UIManager;
         public static IAudioManager Audio => Framework?.GetModule<IAudioManager>();
         public static ISceneManager Scene => Framework?.GetModule<ISceneManager>();
         public static ITimerManager Timer => Framework?.GetModule<ITimerManager>();

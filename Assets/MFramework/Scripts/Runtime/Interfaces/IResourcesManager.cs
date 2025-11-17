@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace MFramework.Runtime
 {
-    public interface IResourcesManager
+    public interface IResourcesManager : IGameModule
     {
         Task<T> LoadAssetAsync<T>(string address, bool isAutoAddSuffix = true) where T : Object;
 

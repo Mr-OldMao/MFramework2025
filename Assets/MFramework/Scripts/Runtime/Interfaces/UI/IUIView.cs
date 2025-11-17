@@ -1,19 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
-using static MFramework.Runtime.UIBase;
+using static MFramework.Runtime.UIViewBase;
 
 namespace MFramework.Runtime
 {
     public interface IUIView : IGameModule
     {
-        string ViewName { get; }
+        UIStateProgressType StateProgress { get; }
         UILayerType Layer { get; }
         bool IsActive { get; }
 
-        void Show(object data = null);
-        void Hide();
-        void Close();
+        Task Show(object showData = null, object showBeforeData = null);
+        Task Hide(object hideData = null, object hideBoforeData = null);
+        void DestoryUI();
     }
 }

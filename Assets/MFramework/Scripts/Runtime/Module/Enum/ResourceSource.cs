@@ -3,120 +3,120 @@ using System;
 namespace MFramework.Runtime
 {
     /// <summary>
-    /// ×ÊÔ´¼ÓÔØ½ø¶ÈĞÅÏ¢
+    /// èµ„æºåŠ è½½è¿›åº¦ä¿¡æ¯
     /// </summary>
     public class LoadProgress
     {
         /// <summary>
-        /// ×ÊÔ´Â·¾¶»òURL
+        /// èµ„æºè·¯å¾„æˆ–URL
         /// </summary>
         public string Path { get; set; }
 
         /// <summary>
-        /// ¼ÓÔØ½ø¶È£¨0-1£©
+        /// åŠ è½½è¿›åº¦ï¼ˆ0-1ï¼‰
         /// </summary>
         public float Progress { get; set; }
 
         /// <summary>
-        /// ÊÇ·ñ¼ÓÔØÍê³É
+        /// æ˜¯å¦åŠ è½½å®Œæˆ
         /// </summary>
         public bool IsDone { get; set; }
 
         /// <summary>
-        /// ¼ÓÔØµÄ×ÊÔ´¶ÔÏó£¨½ö¶ÔUnityEngine.Object×ÊÔ´ÓĞĞ§£©
+        /// åŠ è½½çš„èµ„æºå¯¹è±¡ï¼ˆä»…å¯¹UnityEngine.Objectèµ„æºæœ‰æ•ˆï¼‰
         /// </summary>
         public UnityEngine.Object Asset { get; set; }
 
         /// <summary>
-        /// ¼ÓÔØµÄ×Ö½ÚÊı¾İ£¨½ö¶Ô×Ö½Ú¼ÓÔØÓĞĞ§£©
+        /// åŠ è½½çš„å­—èŠ‚æ•°æ®ï¼ˆä»…å¯¹å­—èŠ‚åŠ è½½æœ‰æ•ˆï¼‰
         /// </summary>
         public byte[] Bytes { get; set; }
 
         /// <summary>
-        /// ¼ÓÔØµÄÎÄ±¾Êı¾İ£¨½ö¶ÔÎÄ±¾¼ÓÔØÓĞĞ§£©
+        /// åŠ è½½çš„æ–‡æœ¬æ•°æ®ï¼ˆä»…å¯¹æ–‡æœ¬åŠ è½½æœ‰æ•ˆï¼‰
         /// </summary>
         public string Text { get; set; }
 
         /// <summary>
-        /// ¼ÓÔØ´íÎóĞÅÏ¢
+        /// åŠ è½½é”™è¯¯ä¿¡æ¯
         /// </summary>
         public Exception Error { get; set; }
 
         /// <summary>
-        /// µ±Ç°¼ÓÔØ×´Ì¬ÃèÊö
+        /// å½“å‰åŠ è½½çŠ¶æ€æè¿°
         /// </summary>
         public string Status { get; set; }
 
         /// <summary>
-        /// ÒÑ¼ÓÔØ×Ö½ÚÊı£¨¶ÔÍøÂç¼ÓÔØÓĞĞ§£©
+        /// å·²åŠ è½½å­—èŠ‚æ•°ï¼ˆå¯¹ç½‘ç»œåŠ è½½æœ‰æ•ˆï¼‰
         /// </summary>
         public long LoadedBytes { get; set; }
 
         /// <summary>
-        /// ×Ü×Ö½ÚÊı£¨¶ÔÍøÂç¼ÓÔØÓĞĞ§£©
+        /// æ€»å­—èŠ‚æ•°ï¼ˆå¯¹ç½‘ç»œåŠ è½½æœ‰æ•ˆï¼‰
         /// </summary>
         public long TotalBytes { get; set; }
     }
     /// <summary>
-    /// ×ÊÔ´ÎÄ¼şÀàĞÍÃ¶¾Ù
+    /// èµ„æºæ–‡ä»¶ç±»å‹æšä¸¾
     /// </summary>
     public enum ResourceFileType
     {
         /// <summary>
-        /// ÎÄ±¾ÎÄ¼ş
+        /// æ–‡æœ¬æ–‡ä»¶
         /// </summary>
         Txt,
 
         /// <summary>
-        /// JSONÎÄ¼ş
+        /// JSONæ–‡ä»¶
         /// </summary>
         Json,
 
         /// <summary>
-        /// ¶ş½øÖÆÎÄ¼ş
+        /// äºŒè¿›åˆ¶æ–‡ä»¶
         /// </summary>
         Bytes,
 
         /// <summary>
-        /// AssetBundle°ü
+        /// AssetBundleåŒ…
         /// </summary>
         AB,
 
         /// <summary>
-        /// Unity×ÊÔ´£¨Ô¤ÖÆÌå¡¢ÎÆÀí¡¢ÒôÆµµÈ£©
+        /// Unityèµ„æºï¼ˆé¢„åˆ¶ä½“ã€çº¹ç†ã€éŸ³é¢‘ç­‰ï¼‰
         /// </summary>
         UnityAsset
     }
 
 
     /// <summary>
-    /// ×ÊÔ´À´Ô´Ã¶¾Ù
-    /// ¶¨Òå×ÊÔ´¼ÓÔØµÄ²»Í¬À´Ô´
+    /// èµ„æºæ¥æºæšä¸¾
+    /// å®šä¹‰èµ„æºåŠ è½½çš„ä¸åŒæ¥æº
     /// </summary>
     public enum ResourceSource
     {
         /// <summary>
-        /// ResourcesÎÄ¼ş¼Ğ - ÄÚÖÃ×ÊÔ´£¬´ò°üÊ±°üº¬
+        /// Resourcesæ–‡ä»¶å¤¹ - å†…ç½®èµ„æºï¼Œæ‰“åŒ…æ—¶åŒ…å«
         /// </summary>
         Resources,
         ///// <summary>
-        ///// AssetBundle°ü - ÈÈ¸üĞÂ×ÊÔ´£¬¿É´Ó·şÎñÆ÷ÏÂÔØ
+        ///// AssetBundleåŒ… - çƒ­æ›´æ–°èµ„æºï¼Œå¯ä»æœåŠ¡å™¨ä¸‹è½½
         ///// </summary>
         //AssetBundle,
         /// <summary>
-        /// StreamingAssetsÎÄ¼ş¼Ğ - Ö»¶ÁÊı¾İ£¬ÅäÖÃÎÄ¼şºÍ³õÊ¼×ÊÔ´
+        /// StreamingAssetsæ–‡ä»¶å¤¹ - åªè¯»æ•°æ®ï¼Œé…ç½®æ–‡ä»¶å’Œåˆå§‹èµ„æº
         /// </summary>
         StreamingAssets,
         /// <summary>
-        /// PersistentDataPathÎÄ¼ş¼Ğ - ¿É¶ÁĞ´Êı¾İ£¬ÓÃ»§Êı¾İºÍ»º´æ
+        /// PersistentDataPathæ–‡ä»¶å¤¹ - å¯è¯»å†™æ•°æ®ï¼Œç”¨æˆ·æ•°æ®å’Œç¼“å­˜
         /// </summary>
         PersistentData,
         /// <summary>
-        /// ÍøÂç×ÊÔ´ - ÊµÊ±ÏÂÔØµÄÍ¼Æ¬¡¢ÒôÆµ¡¢ÅäÖÃÎÄ¼şµÈ
+        /// ç½‘ç»œèµ„æº - å®æ—¶ä¸‹è½½çš„å›¾ç‰‡ã€éŸ³é¢‘ã€é…ç½®æ–‡ä»¶ç­‰
         /// </summary>
         Network,
         ///// <summary>
-        ///// AddressableÏµÍ³ - UnityµÄ¿ÉÑ°Ö·×ÊÔ´ÏµÍ³£¨¿ÉÑ¡£©
+        ///// Addressableç³»ç»Ÿ - Unityçš„å¯å¯»å€èµ„æºç³»ç»Ÿï¼ˆå¯é€‰ï¼‰
         ///// </summary>
         //Addressables
     }

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static MFramework.Runtime.UIBase;
+using static MFramework.Runtime.UIViewBase;
 
 namespace MFramework.Runtime
 {
     public class UIManager : GameModuleBase, IUIManager
     {
         private Transform m_UIRoot;
-        private Dictionary<Type, UIBase> m_ActiveViews = new Dictionary<Type, UIBase>();
+        private Dictionary<Type, UIViewBase> m_ActiveViews = new Dictionary<Type, UIViewBase>();
         private Dictionary<string, GameObject> m_ViewPrefabs = new Dictionary<string, GameObject>();
         private Dictionary<UILayerType, Transform> m_LayerContainer = new Dictionary<UILayerType, Transform>();
         public override int Priority => 30;
@@ -66,14 +66,26 @@ namespace MFramework.Runtime
             await Task.CompletedTask;
         }
 
-        public async Task<T> OpenView<T>(object data = null) where T : UIBase
+        public void ShowView<T>(object showData = null, object showBeforeData = null) where T : UIViewBase
+        {
+            ShowViewAsync<T>(showData, showBeforeData);
+        }
+
+        public async Task<T> ShowViewAsync<T>(object showData = null, object showBeforeData = null) where T : UIViewBase
         {
             var viewType = typeof(T);
 
             if (m_ActiveViews.TryGetValue(viewType, out var existingView))
             {
-                existingView.Show(data);
-                return existingView as T;
+                if (existingView !=null)
+                {
+                    await existingView.Show(showData, showBeforeData);
+                    return existingView as T;
+                }
+                else
+                {
+                    m_ActiveViews.Remove(viewType);
+                }
             }
 
             var viewName = GetViewName(viewType);
@@ -81,42 +93,61 @@ namespace MFramework.Runtime
             if (view != null)
             {
                 m_ActiveViews[viewType] = view;
-                view.Show(data);
+                await view.Show(showData, showBeforeData);
             }
 
             return view as T;
         }
 
-        private async Task<T> CreateView<T>(string viewName) where T : UIBase
+        public void HideView<T>(object showData = null, object showBeforeData = null) where T : UIViewBase
         {
-            var prefab = await LoadViewPrefab(viewName);
+            HideViewAsync<T>(showData, showBeforeData);
+        }
+
+        public async Task HideViewAsync<T>(object hideData = null, object hideBoforeData = null) where T : UIViewBase
+        {
+            var viewType = typeof(T);
+
+            if (m_ActiveViews.TryGetValue(viewType, out var existingView))
+            {
+                await existingView.Hide(hideData, hideBoforeData);
+            }
+            else
+            {
+                Debugger.LogError($"隐藏UI面板失败，未创建初始化面板，viewType:{viewType}");
+            }
+        }
+
+
+        private async Task<T> CreateView<T>(string viewName) where T : UIViewBase
+        {
+            var prefab = await LoadUIViewPrefab(viewName);
+
             if (prefab == null)
             {
                 Debugger.LogError($"UI预制体加载失败: {viewName}", LogType.FrameCore);
                 return null;
             }
             var go = GameObject.Instantiate(prefab);
-            var view = go.AddComponent<T>();
-            go.transform.SetParent(m_LayerContainer[view.Layer]);
+            var viewBaseScript = go.AddComponent<T>();
+            viewBaseScript.SetStateProgress(UIStateProgressType.LoadResCompleted);
+            go.transform.SetParent(m_LayerContainer[viewBaseScript.Layer]);
             go.transform.localScale = Vector3.one;
-            return view;
+            return viewBaseScript;
         }
 
         /// <summary>
-        /// 
+        /// 加载UI预制体
         /// </summary>
         /// <param name="viewName">资源形参addressable全路径 Assets/xxx/xxx.prefab</param>
         /// <returns></returns>
-        private async Task<GameObject> LoadViewPrefab(string viewName)
+        private async Task<GameObject> LoadUIViewPrefab(string viewName)
         {
             if (m_ViewPrefabs.TryGetValue(viewName, out var prefab))
             {
                 return prefab;
             }
-            // 实际应该使用ResourcesManager异步加载
             prefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(viewName, false);
-            //prefab = await GameEntry.Resource.LoadAssetAsync<GameObject>($"UI/{viewName}.prefab");
-            //prefab = Resources.Load<GameObject>($"UI/{viewName}");
             if (prefab != null)
             {
                 m_ViewPrefabs[viewName] = prefab;
@@ -124,27 +155,29 @@ namespace MFramework.Runtime
             return prefab;
         }
 
-        public void CloseView<T>() where T : UIBase
+        public void DestroyView<T>() where T : UIViewBase
         {
             var viewType = typeof(T);
             CloseView(viewType);
         }
 
-        public T GetView<T>() where T : UIBase
+        public void DestroyAll()
+        {
+            List<UIViewBase> uIBases = m_ActiveViews.Values.ToList();
+            for (int i = 0; i < uIBases.Count; i++)
+            {
+                uIBases[i].DestoryUI();
+            }
+            m_ActiveViews.Clear();
+        }
+
+
+        public T GetView<T>() where T : UIViewBase
         {
             m_ActiveViews.TryGetValue(typeof(T), out var view);
             return view as T;
         }
 
-        public void CloseAll()
-        {
-            List<UIBase> uIBases = m_ActiveViews.Values.ToList();
-            for (int i = 0; i < uIBases.Count; i++)
-            {
-                uIBases[i].Close();
-            }
-            m_ActiveViews.Clear();
-        }
 
         private string GetViewName(Type viewType)
         {
@@ -161,7 +194,7 @@ namespace MFramework.Runtime
 
         protected override void OnShutdown()
         {
-            CloseAll();
+            //DestroyAll();
             m_ViewPrefabs.Clear();
         }
 
@@ -169,14 +202,24 @@ namespace MFramework.Runtime
         {
             if (m_ActiveViews.TryGetValue(viewType, out var view))
             {
-                view.Close();
+                view.DestoryUI();
                 m_ActiveViews.Remove(viewType);
             }
         }
 
-        public void CloseView(IUIView view)
+        public void DestroyView(IUIView view)
         {
             CloseView(view.GetType());
+        }
+
+        public T GetModel<T>() where T : UIModelBase
+        {
+            throw new NotImplementedException();
+        }
+
+        public T GetController<T>() where T : IUIController
+        {
+            throw new NotImplementedException();
         }
     }
 }
