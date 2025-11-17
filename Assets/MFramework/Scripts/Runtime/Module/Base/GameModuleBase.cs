@@ -1,4 +1,4 @@
-﻿// GameModuleBase.cs - 模块基类
+// GameModuleBase.cs - 模块基类
 using System.Diagnostics;
 using System.Threading.Tasks;
 namespace MFramework.Runtime
@@ -6,9 +6,6 @@ namespace MFramework.Runtime
     public abstract class GameModuleBase : IGameModule
     {
         public ModuleState State { get; protected set; } = ModuleState.Uninitialized;
-
-        public virtual int Priority => 100;
-
         protected ILoggerModule Logger => FrameworkManager.Instance.GetModule<ILoggerModule>();
         protected IEventManager EventManager => FrameworkManager.Instance.GetModule<IEventManager>();
 

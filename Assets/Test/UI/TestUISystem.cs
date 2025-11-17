@@ -58,5 +58,19 @@ public class TestUISystem : MonoBehaviour
             await GameEntry.UI.HideViewAsync<UIPanelMain>($"测试HideView传参{++m_Count}", $"测试HideViewBefore传参{++m_Count}");
         }
         curHeight += height;
+
+        if (GUI.Button(new Rect(curWidth, curHeight, width, height), "HideViewAsync", style))
+        {
+            GameEntry.UI.GetController<UIControlMain>().Show(null);
+        }
+        curHeight += height;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            GameEntry.UI.GetModel<UIModelMain>().Title = $"{Random.Range(1000, 9999)}";
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -14,14 +15,12 @@ namespace MFramework.Runtime
         [SerializeField]
         private string _ = "以下字段为运行时自动绑定，请勿手动修改";
 
-        public UIStateProgressType StateProgress { get; private set; } = UIStateProgressType.Unstart;
-
         public UILayerType Layer => m_Layer;
         public bool IsActive => gameObject.activeInHierarchy;
 
-
         private Task m_TaskInit;
 
+        public GameObject UIForm { get => this.gameObject; }
 
         public enum UILayerType
         {
@@ -30,7 +29,6 @@ namespace MFramework.Runtime
             Popup = 1000,
             Tips = 1500,
         }
-
 
         public enum UIStateProgressType
         {
@@ -50,55 +48,14 @@ namespace MFramework.Runtime
             SetLayer();
             m_TaskInit = Initialize();
             await m_TaskInit;
-            StateProgress = UIStateProgressType.InitCompleted;
-        }
-
-        public virtual async Task Show(object showData = null, object showBeforeData = null)
-        {
-            await m_TaskInit;
-            await OnShowBefore(showBeforeData);
-            StateProgress = UIStateProgressType.ShowBeforeCompleted;
-            gameObject.SetActive(true);
-            OnShow(showData);
-            StateProgress = UIStateProgressType.ShowCompleted;
-        }
-
-        public virtual async Task Hide(object hideData = null, object hideBoforeData = null)
-        {
-            await m_TaskInit;
-            await OnHideBefore(hideBoforeData);
-            StateProgress = UIStateProgressType.HideBeforeCompleted;
-            gameObject.SetActive(false);
-            OnHide(hideData);
-            StateProgress = UIStateProgressType.HideCompleted;
         }
 
         public virtual void DestoryUI()
         {
-            OnClose();
-            //GameEntry.UI.CloseView(this);
+            GameEntry.UI.DestroyView(this);
             Destroy(gameObject);
-            StateProgress = UIStateProgressType.DestoryCompleted;
+            //StateProgress = UIStateProgressType.DestoryCompleted;
         }
-
-        public void SetStateProgress(UIStateProgressType stateProgress)
-        {
-            StateProgress = stateProgress;
-        }
-
-        protected virtual void OnShow(object data) { }
-        protected virtual Task OnShowBefore(object data) => Task.CompletedTask;
-        protected virtual void OnHide(object data) { }
-        protected virtual Task OnHideBefore(object data) => Task.CompletedTask;
-        protected virtual void OnClose() { }
-
-        // IGameModule 实现
-        public virtual int Priority => 0;
-
-
-        public abstract Task Initialize();
-        public virtual void Shutdown() => DestoryUI();
-
 
         private void SetLayer()
         {
@@ -139,5 +96,15 @@ namespace MFramework.Runtime
                 }
             }
         }
+
+        public virtual void Shutdown()
+        {
+
+        }
+
+        public abstract void ShowPanel(IUIModel uIModel);
+        public abstract void HidePanel(IUIModel uIModel);
+        public abstract void RefreshUI(IUIModel uIModel);
+        public abstract Task Initialize();
     }
 }

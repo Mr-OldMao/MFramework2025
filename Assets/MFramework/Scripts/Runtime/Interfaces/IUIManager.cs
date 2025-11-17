@@ -20,7 +20,7 @@ namespace MFramework.Runtime
 
         T GetModel<T>() where T : UIModelBase;
 
-        T GetController<T>() where T : IUIController;
+        T GetController<T>() where T : UIControllerBase;
     }
 
 }

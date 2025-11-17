@@ -10,12 +10,19 @@ namespace MFramework.Runtime
         public virtual void Initialize() { }
         public virtual void Reset() { }
 
-        // 数据变更事件
-        public event Action<string> OnDataChanged;
-
-        protected void NotifyDataChanged(string propertyName = "")
+        public void DispatchEvent(int eventId)
         {
-            OnDataChanged?.Invoke(propertyName);
+            GameEntry.Event.DispatchEvent(eventId);
+        }
+
+        public void DispatchEvent(GameEventType gameEventType)
+        {
+            GameEntry.Event.DispatchEvent(gameEventType);
+        }
+
+        public void DispatchEvent<T>(int eventId, T eventData)
+        {
+            GameEntry.Event.DispatchEvent(eventId, eventData);
         }
     }
 }

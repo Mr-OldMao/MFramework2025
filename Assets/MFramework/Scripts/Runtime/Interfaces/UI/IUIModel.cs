@@ -6,7 +6,5 @@ namespace MFramework.Runtime
     {
         void Initialize();
         void Reset();
-
-        event Action<string> OnDataChanged;
     }
 }

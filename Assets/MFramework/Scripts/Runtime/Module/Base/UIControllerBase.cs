@@ -1,46 +1,71 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
+using System.Threading.Tasks;
+using static MFramework.Runtime.UIViewBase;
 
 namespace MFramework.Runtime
 {
-    public abstract class UIControllerBase<TView, TModel> : IUIController
-          where TView : class, IUIView
-          where TModel : IUIModel, new()
+    public abstract class UIControllerBase : IUIController
     {
-        public TView View { get; private set; }
-        public TModel Model { get; private set; }
+        public IUIView View { get; private set; }
+        public IUIModel Model { get; private set; }
 
-        IUIView IUIController.View => View;
-        IUIModel IUIController.Model => Model;
+        public UIStateProgressType StateProgress { get; private set; } = UIStateProgressType.Unstart;
 
-        public virtual void Initialize(IUIView view, IUIModel model)
+        private Task m_TaskInit;
+
+        public virtual async Task Initialize(IUIView view, IUIModel model)
         {
-            View = view as TView;
-            Model = (TModel)model;
+            View = view;
+            Model = model;
 
-            if (Model != null)
-            {
-                Model.OnDataChanged += OnModelDataChanged;
-                Model.Initialize();
-            }
-
-            OnInitialized();
+            Model?.Initialize();
+            m_TaskInit = View?.Initialize();
+            await m_TaskInit;
+            StateProgress = UIStateProgressType.InitCompleted;
         }
 
-        public abstract void OnShow(object data);
-        public abstract void OnHide();
-        public abstract void OnClose();
 
-        protected virtual void OnInitialized() { }
-        protected virtual void OnModelDataChanged(string propertyName) { }
+        public void SetStateProgress(UIStateProgressType stateProgress)
+        {
+            StateProgress = stateProgress;
+        }
 
         protected virtual void Dispose()
         {
-            if (Model != null)
-            {
-                Model.OnDataChanged -= OnModelDataChanged;
-            }
+
         }
+
+        public virtual async Task Show(object showData = null, object showBeforeData = null)
+        {
+            await m_TaskInit;
+            await OnShowBefore(showBeforeData);
+            StateProgress = UIStateProgressType.ShowBeforeCompleted;
+            View.UIForm.SetActive(true);
+            OnShow(showData);
+            StateProgress = UIStateProgressType.ShowCompleted;
+        }
+
+        public virtual async Task Hide(object hideData = null, object hideBoforeData = null)
+        {
+            await m_TaskInit;
+            await OnHideBefore(hideBoforeData);
+            StateProgress = UIStateProgressType.HideBeforeCompleted;
+            View.UIForm.SetActive(false);
+            OnHide(hideData);
+            StateProgress = UIStateProgressType.HideCompleted;
+        }
+
+        public virtual void DestoryUI()
+        {
+            GameEntry.UI.DestroyView(View);
+            UnityEngine.Object.Destroy(View.UIForm);
+            StateProgress = UIStateProgressType.DestoryCompleted;
+        }
+
+
+        protected virtual void OnShow(object data) { }
+        protected virtual Task OnShowBefore(object data) => Task.CompletedTask;
+        protected virtual void OnHide(object data) { }
+        protected virtual Task OnHideBefore(object data) => Task.CompletedTask;
     }
 }

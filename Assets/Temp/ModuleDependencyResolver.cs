@@ -7,13 +7,13 @@ using MFramework.Runtime;
 using UnityEngine;
 public class ModuleDependencyResolver
 {
-    public List<Type> ResolveInitOrder(List<IGameModule> modules)
-    {
-        // 根据模块优先级和依赖关系排序
-        return modules.OrderBy(m => m.Priority)
-                     .Select(m => m.GetType())
-                     .ToList();
-    }
+    //public List<Type> ResolveInitOrder(List<IGameModule> modules)
+    //{
+    //    // 根据模块优先级和依赖关系排序
+    //    return modules.OrderBy(m => m.Priority)
+    //                 .Select(m => m.GetType())
+    //                 .ToList();
+    //}
 
     public void ValidateDependencies(IGameModule module)
     {

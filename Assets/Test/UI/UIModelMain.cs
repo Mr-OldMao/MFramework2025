@@ -1,7 +1,4 @@
 using MFramework.Runtime;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace GameMain
 {
@@ -16,7 +13,7 @@ namespace GameMain
             set
             {
                 m_Title = value;
-                NotifyDataChanged(nameof(Title));
+                DispatchEvent(GameEventType.TestUIEvent);
             }
         }
 
@@ -26,7 +23,7 @@ namespace GameMain
             set
             {
                 m_Score = value;
-                NotifyDataChanged(nameof(Score));
+                DispatchEvent(GameEventType.TestUIEvent);
             }
         }
     }

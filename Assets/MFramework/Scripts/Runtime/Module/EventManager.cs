@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,8 +6,6 @@ namespace MFramework.Runtime
 {
     public class EventManager : GameModuleBase
     {
-        public override int Priority => 10; // 高优先级
-
         private readonly Dictionary<int, List<Action>> m_DicEventHandlers = new();
         private readonly Dictionary<int, List<Delegate>> m_DicEventTHandlers = new Dictionary<int, List<Delegate>>();
 
@@ -40,6 +38,11 @@ namespace MFramework.Runtime
             }
         }
 
+        public void RegisterEvent(GameEventType gameEventType, Action callback)
+        {
+            RegisterEvent((int)gameEventType, callback);
+        }
+
         public void UnRegisterEvent(int eventId, Action callback)
         {
             if (m_DicEventHandlers.ContainsKey(eventId))
@@ -50,6 +53,11 @@ namespace MFramework.Runtime
                     m_DicEventHandlers.Remove(eventId);
                 }
             }
+        }
+
+        public void UnRegisterEvent(GameEventType gameEventType, Action callback)
+        {
+            UnRegisterEvent((int)gameEventType, callback);
         }
 
         public void DispatchEvent(int eventId)
@@ -68,6 +76,11 @@ namespace MFramework.Runtime
                     }
                 }
             }
+        }
+
+        public void DispatchEvent(GameEventType gameEventType)
+        {
+            DispatchEvent((int)gameEventType);
         }
 
         public void RegisterEvent<T>(int eventId, Action<T> callback)
@@ -119,6 +132,11 @@ namespace MFramework.Runtime
             m_DicEventHandlers.Remove(eventId);
         }
 
+        public void UnRegisterEvent(GameEventType gameEventType)
+        {
+            UnRegisterEvent((int)gameEventType);
+        }
+
         ///// <summary>
         ///// 自动绑定MonoBehaviour销毁时自动解绑
         ///// </summary>
@@ -155,5 +173,5 @@ namespace MFramework.Runtime
         //    onDestroy?.Invoke();
         //}
 
-    } 
+    }
 }

@@ -1,11 +1,11 @@
-// ExampleUI.cs
+using GameMain;
 using System.Threading.Tasks;
 using TMPro;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace MFramework.Runtime.UI
 {
+    [UIBindControl( typeof(UIControlMain), typeof(UIModelMain))]
     [UILayer(UILayerType.Tips)]
     public class UIPanelMain : UIViewBase
     {
@@ -15,31 +15,32 @@ namespace MFramework.Runtime.UI
 
         public override async Task Initialize()
         {
-            Debugger.Log($"{this.GetType()}, init start  ");
+            Debugger.Log($"{this.GetType()}, Initialize start  ");
             await Task.Delay(2000);
-            Debugger.Log($"{this.GetType()}, init end  ");
+            Debugger.Log($"{this.GetType()}, Initialize end  ");
         }
 
-        protected override Task OnShowBefore(object data)
+        public override void RefreshUI(IUIModel model)
         {
-            Debugger.Log($"{this.GetType().Name}, OnShowBefore ,data: {data}");
-            return base.OnShowBefore(data);
+            UIModelMain uIModelMain = model as UIModelMain;
+            Debugger.Log($"{this.GetType().Name},RefreshUI ");
+            txtTest.text = uIModelMain.Title;
         }
 
-        protected override Task OnHideBefore(object data)
+        public override void ShowPanel(IUIModel uIModel)
         {
-            Debugger.Log($"{this.GetType().Name}, OnHideBefore ,data: {data}");
-            return base.OnHideBefore(data);
+            Debugger.Log($"{this.GetType().Name},ShowPanel , data: {uIModel}");
+            RegisterUIEvent();
         }
 
-        protected override void OnShow(object data)
+        public override void HidePanel(IUIModel uIModel)
         {
-            Debugger.Log($"{this.GetType().Name},OnShow , data: {data}");
-            if (data is string title)
-            {
-                txtTest.text = title;
-            }
+            Debugger.Log($"{this.GetType().Name},HidePanel , data: {uIModel}");
+            UnRegisterEvent();
+        }
 
+        private void RegisterUIEvent()
+        {
             btnTest.onClick.AddListener(() =>
             {
                 Debugger.Log("btnTest click");
@@ -51,13 +52,11 @@ namespace MFramework.Runtime.UI
             });
         }
 
-        protected override void OnHide(object data)
+        private void UnRegisterEvent()
         {
-            Debugger.Log($"{this.GetType().Name},OnHide , data: {data}");
-
+            Debugger.Log($"{this.GetType().Name},UnRegisterUIEvent ");
             btnTest.onClick.RemoveAllListeners();
             btnClose.onClick.RemoveAllListeners();
         }
-
     }
 }

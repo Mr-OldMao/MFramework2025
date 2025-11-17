@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,10 +12,14 @@ namespace MFramework.Runtime
     public class UIManager : GameModuleBase, IUIManager
     {
         private Transform m_UIRoot;
-        private Dictionary<Type, UIViewBase> m_ActiveViews = new Dictionary<Type, UIViewBase>();
+        private Dictionary<Type, UIViewBase> m_UIViews = new Dictionary<Type, UIViewBase>();
+        private Dictionary<Type, UIControllerBase> m_UIControllers = new Dictionary<Type, UIControllerBase>();
+        private Dictionary<Type, UIModelBase> m_UIModels = new Dictionary<Type, UIModelBase>();
         private Dictionary<string, GameObject> m_ViewPrefabs = new Dictionary<string, GameObject>();
         private Dictionary<UILayerType, Transform> m_LayerContainer = new Dictionary<UILayerType, Transform>();
-        public override int Priority => 30;
+
+        //todo
+        private Dictionary<Type, UIStateProgressType> m_StateProgressType = new Dictionary<Type, UIStateProgressType>();
 
         protected override async Task OnInitialize()
         {
@@ -75,16 +80,21 @@ namespace MFramework.Runtime
         {
             var viewType = typeof(T);
 
-            if (m_ActiveViews.TryGetValue(viewType, out var existingView))
+            if (m_UIControllers.TryGetValue(viewType, out var control))
             {
-                if (existingView !=null)
+                if (control != null)
                 {
-                    await existingView.Show(showData, showBeforeData);
-                    return existingView as T;
+                    await control.Show(showData, showBeforeData);
+                    return control as T;
                 }
                 else
                 {
-                    m_ActiveViews.Remove(viewType);
+                    m_UIControllers.Remove(viewType);
+                    m_UIViews.Remove(viewType);
+                    if (m_UIViews[viewType] != null)
+                    {
+                        m_UIViews[viewType].DestoryUI();
+                    }
                 }
             }
 
@@ -92,11 +102,20 @@ namespace MFramework.Runtime
             var view = await CreateView<T>(viewName);
             if (view != null)
             {
-                m_ActiveViews[viewType] = view;
-                await view.Show(showData, showBeforeData);
-            }
+                m_UIViews[viewType] = view;
 
-            return view as T;
+                var bindControl = view.GetType().GetCustomAttribute<UIBindControlAttribute>();
+                var newControl = bindControl.uiControllerBase;
+                newControl.SetStateProgress(UIStateProgressType.LoadResCompleted);
+                m_UIControllers[viewType] = newControl;
+
+                var newModel = bindControl.uiModelBase;
+                m_UIModels[viewType] = newModel;
+
+                await newControl.Initialize(view, newModel);
+                await newControl.Show(showData, showBeforeData);
+            }
+            return view;
         }
 
         public void HideView<T>(object showData = null, object showBeforeData = null) where T : UIViewBase
@@ -108,9 +127,9 @@ namespace MFramework.Runtime
         {
             var viewType = typeof(T);
 
-            if (m_ActiveViews.TryGetValue(viewType, out var existingView))
+            if (m_UIControllers.TryGetValue(viewType, out var control))
             {
-                await existingView.Hide(hideData, hideBoforeData);
+                await control.Hide(hideData, hideBoforeData);
             }
             else
             {
@@ -130,7 +149,7 @@ namespace MFramework.Runtime
             }
             var go = GameObject.Instantiate(prefab);
             var viewBaseScript = go.AddComponent<T>();
-            viewBaseScript.SetStateProgress(UIStateProgressType.LoadResCompleted);
+
             go.transform.SetParent(m_LayerContainer[viewBaseScript.Layer]);
             go.transform.localScale = Vector3.one;
             return viewBaseScript;
@@ -155,26 +174,10 @@ namespace MFramework.Runtime
             return prefab;
         }
 
-        public void DestroyView<T>() where T : UIViewBase
-        {
-            var viewType = typeof(T);
-            CloseView(viewType);
-        }
-
-        public void DestroyAll()
-        {
-            List<UIViewBase> uIBases = m_ActiveViews.Values.ToList();
-            for (int i = 0; i < uIBases.Count; i++)
-            {
-                uIBases[i].DestoryUI();
-            }
-            m_ActiveViews.Clear();
-        }
-
 
         public T GetView<T>() where T : UIViewBase
         {
-            m_ActiveViews.TryGetValue(typeof(T), out var view);
+            m_UIViews.TryGetValue(typeof(T), out var view);
             return view as T;
         }
 
@@ -187,6 +190,59 @@ namespace MFramework.Runtime
             return $"{rootPath}{name}.prefab";
         }
 
+
+
+        public void DestroyView<T>() where T : UIViewBase
+        {
+            var viewType = typeof(T);
+            RemoveContainer(viewType);
+        }
+
+        public void DestroyAll()
+        {
+            List<UIViewBase> uiViewBases = m_UIViews.Values.ToList();
+            for (int i = 0; i < uiViewBases.Count; i++)
+            {
+                uiViewBases[i].DestoryUI();
+            }
+            m_UIViews.Clear();
+
+            List<UIControllerBase> uiControlBases = m_UIControllers.Values.ToList();
+            for (int i = 0; i < uiControlBases.Count; i++)
+            {
+                uiControlBases[i].DestoryUI();
+            }
+            m_UIControllers.Clear();
+        }
+        public void DestroyView(IUIView view)
+        {
+            RemoveContainer(view.GetType());
+        }
+        private void RemoveContainer(Type type)
+        {
+            if (m_UIViews.TryGetValue(type, out var view))
+            {
+                m_UIViews.Remove(type);
+            }
+            if (m_UIControllers.TryGetValue(type, out var control))
+            {
+                m_UIControllers.Remove(type);
+            }
+        }
+
+
+
+        public T GetModel<T>() where T : UIModelBase
+        {
+            return m_UIModels.Values.Where(p => p.GetType() == typeof(T)).FirstOrDefault() as T;
+        }
+
+        public T GetController<T>() where T : UIControllerBase
+        {
+            return m_UIControllers.Values.Where(p => p.GetType() == typeof(T)).FirstOrDefault() as T;
+        }
+
+
         public void OnUpdate(float deltaTime)
         {
             // 可更新UI的逻辑
@@ -196,30 +252,6 @@ namespace MFramework.Runtime
         {
             //DestroyAll();
             m_ViewPrefabs.Clear();
-        }
-
-        public void CloseView(Type viewType)
-        {
-            if (m_ActiveViews.TryGetValue(viewType, out var view))
-            {
-                view.DestoryUI();
-                m_ActiveViews.Remove(viewType);
-            }
-        }
-
-        public void DestroyView(IUIView view)
-        {
-            CloseView(view.GetType());
-        }
-
-        public T GetModel<T>() where T : UIModelBase
-        {
-            throw new NotImplementedException();
-        }
-
-        public T GetController<T>() where T : IUIController
-        {
-            throw new NotImplementedException();
         }
     }
 }
