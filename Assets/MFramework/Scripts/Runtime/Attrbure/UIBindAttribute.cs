@@ -3,11 +3,11 @@ using System;
 namespace MFramework.Runtime
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class UIBindControlAttribute : Attribute
+    public class UIBindAttribute : Attribute
     {
         public UIControllerBase uiControllerBase;
         public UIModelBase uiModelBase;
-        public UIBindControlAttribute(Type uiController,Type uiModel)
+        public UIBindAttribute(Type uiController,Type uiModel)
         {
             if (uiControllerBase == null)
             {

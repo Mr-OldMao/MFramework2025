@@ -21,6 +21,18 @@ namespace MFramework.Runtime
         //todo
         private Dictionary<Type, UIStateProgressType> m_StateProgressType = new Dictionary<Type, UIStateProgressType>();
 
+
+        private Dictionary<Type, UIDataInfo> m_DicUIDataInfos = new Dictionary<Type, UIDataInfo>();
+        public class UIDataInfo
+        {
+            public GameObject formPrefab;
+            public UIViewBase uiView;
+            public UIControllerBase uiController;
+            public UIModelBase uiModel;
+            public UIStateProgressType stateProgressType;
+            public UILayerType uiLayerType;
+        }
+
         protected override async Task OnInitialize()
         {
             CreateUIRoot();
@@ -91,10 +103,10 @@ namespace MFramework.Runtime
                 {
                     m_UIControllers.Remove(viewType);
                     m_UIViews.Remove(viewType);
-                    if (m_UIViews[viewType] != null)
-                    {
-                        m_UIViews[viewType].DestoryUI();
-                    }
+                    //if (m_UIViews[viewType] != null)
+                    //{
+                    //    m_UIViews[viewType].OnDestory();
+                    //}
                 }
             }
 
@@ -104,7 +116,7 @@ namespace MFramework.Runtime
             {
                 m_UIViews[viewType] = view;
 
-                var bindControl = view.GetType().GetCustomAttribute<UIBindControlAttribute>();
+                var bindControl = view.GetType().GetCustomAttribute<UIBindAttribute>();
                 var newControl = bindControl.uiControllerBase;
                 newControl.SetStateProgress(UIStateProgressType.LoadResCompleted);
                 m_UIControllers[viewType] = newControl;
@@ -203,14 +215,14 @@ namespace MFramework.Runtime
             List<UIViewBase> uiViewBases = m_UIViews.Values.ToList();
             for (int i = 0; i < uiViewBases.Count; i++)
             {
-                uiViewBases[i].DestoryUI();
+                uiViewBases[i].OnDestory();
             }
             m_UIViews.Clear();
 
             List<UIControllerBase> uiControlBases = m_UIControllers.Values.ToList();
             for (int i = 0; i < uiControlBases.Count; i++)
             {
-                uiControlBases[i].DestoryUI();
+                uiControlBases[i].OnDestory();
             }
             m_UIControllers.Clear();
         }
@@ -223,10 +235,16 @@ namespace MFramework.Runtime
             if (m_UIViews.TryGetValue(type, out var view))
             {
                 m_UIViews.Remove(type);
+                view.OnDestory();
             }
             if (m_UIControllers.TryGetValue(type, out var control))
             {
                 m_UIControllers.Remove(type);
+                control.OnDestory();
+            }
+            if (m_StateProgressType.TryGetValue(type, out var state))
+            {
+                state = UIStateProgressType.DestoryCompleted;
             }
         }
 

@@ -1,4 +1,3 @@
-// 使用方式
 using GameMain;
 using MFramework.Runtime;
 using MFramework.Runtime.UI;
@@ -7,16 +6,14 @@ using UnityEngine;
 
 public class TestUISystem : MonoBehaviour
 {
-    private async void Start()
+    private int m_Count = 0;
+
+    private void Start()
     {
-        await Task.Delay(2000);
-
-        //TestShowUI();
-
+        GameEntry.UI.ShowView<UIPanelMain>($"测试ShowView传参{++m_Count}", $"测试ShowViewBefore传参{++m_Count}");
     }
 
-    private int m_Count = 0;
-    public async void TestShowUI()
+    public void TestShowUI()
     {
         GameEntry.UI.ShowView<UIPanelMain>($"测试ShowView传参{++m_Count}", $"测试ShowViewBefore传参{++m_Count}");
 
@@ -50,27 +47,26 @@ public class TestUISystem : MonoBehaviour
         curHeight += height;
         if (GUI.Button(new Rect(curWidth, curHeight, width, height), "ShowViewAsync", style))
         {
-            await GameEntry.UI.ShowViewAsync<UIPanelMain>($"测试ShowView传参{++m_Count}", $"测试ShowViewBefore传参{++m_Count}");
+            await GameEntry.UI.ShowViewAsync<UIPanelMain>($"测试ShowViewAsync传参{++m_Count}", $"测试ShowViewAsync传参{++m_Count}");
         }
         curHeight += height;
         if (GUI.Button(new Rect(curWidth, curHeight, width, height), "HideViewAsync", style))
         {
-            await GameEntry.UI.HideViewAsync<UIPanelMain>($"测试HideView传参{++m_Count}", $"测试HideViewBefore传参{++m_Count}");
+            await GameEntry.UI.HideViewAsync<UIPanelMain>($"测试HideViewAsync传参{++m_Count}", $"测试HideViewAsync传参{++m_Count}");
         }
         curHeight += height;
 
-        if (GUI.Button(new Rect(curWidth, curHeight, width, height), "HideViewAsync", style))
+        if (GUI.Button(new Rect(curWidth, curHeight, width, height), "Show", style))
         {
-            GameEntry.UI.GetController<UIControlMain>().Show(null);
+            GameEntry.UI.GetController<UIControlMain>().Show($"测试Show传参{++m_Count}", $"测试Show传参{++m_Count}");
         }
         curHeight += height;
-    }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (GUI.Button(new Rect(curWidth, curHeight, width, height), "更改数据", style))
         {
-            GameEntry.UI.GetModel<UIModelMain>().Title = $"{Random.Range(1000, 9999)}";
+            int data = Random.Range(1000, 9999);
+            GameEntry.UI.GetModel<UIModelMain>().Title = $"{data}";
         }
+        curHeight += height;
     }
 }

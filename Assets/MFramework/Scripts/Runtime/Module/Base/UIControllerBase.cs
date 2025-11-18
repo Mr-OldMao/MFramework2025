@@ -55,7 +55,7 @@ namespace MFramework.Runtime
             StateProgress = UIStateProgressType.HideCompleted;
         }
 
-        public virtual void DestoryUI()
+        public virtual void OnDestory()
         {
             GameEntry.UI.DestroyView(View);
             UnityEngine.Object.Destroy(View.UIForm);

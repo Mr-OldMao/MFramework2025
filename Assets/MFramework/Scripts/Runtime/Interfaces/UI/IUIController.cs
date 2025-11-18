@@ -10,8 +10,6 @@ namespace MFramework.Runtime
         Task Initialize(IUIView view, IUIModel model);
         Task Show(object showData = null, object showBeforeData = null);
         Task Hide(object hideData = null, object hideBoforeData = null);
-        void DestoryUI(); //TODO
-
-
+        void OnDestory(); //TODO
     }
 }

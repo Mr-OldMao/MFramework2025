@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MFramework.Runtime.UI
 {
-    [UIBindControl( typeof(UIControlMain), typeof(UIModelMain))]
+    [UIBind(typeof(UIControlMain), typeof(UIModelMain))]
     [UILayer(UILayerType.Tips)]
     public class UIPanelMain : UIViewBase
     {
@@ -15,8 +15,8 @@ namespace MFramework.Runtime.UI
 
         public override async Task Initialize()
         {
-            Debugger.Log($"{this.GetType()}, Initialize start  ");
-            await Task.Delay(2000);
+            Debugger.Log($"{this.GetType()}, Initialize start (delay 500ms)");
+            await Task.Delay(500);
             Debugger.Log($"{this.GetType()}, Initialize end  ");
         }
 
@@ -48,7 +48,7 @@ namespace MFramework.Runtime.UI
             btnClose.onClick.AddListener(() =>
             {
                 Debugger.Log("btnClose click");
-                DestoryUI();
+                OnDestory();
             });
         }
 

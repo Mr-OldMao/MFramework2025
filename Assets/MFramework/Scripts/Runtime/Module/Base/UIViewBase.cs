@@ -50,11 +50,10 @@ namespace MFramework.Runtime
             await m_TaskInit;
         }
 
-        public virtual void DestoryUI()
+        public virtual void OnDestory()
         {
             GameEntry.UI.DestroyView(this);
             Destroy(gameObject);
-            //StateProgress = UIStateProgressType.DestoryCompleted;
         }
 
         private void SetLayer()

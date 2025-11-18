@@ -28,7 +28,7 @@ namespace GameMain
         protected override void OnShow(object data)
         {
             View.ShowPanel(Model);
-
+            View.RefreshUI(Model);
 
             GameEntry.Event.RegisterEvent(GameEventType.TestUIEvent, () =>
             {
@@ -43,6 +43,12 @@ namespace GameMain
             View.HidePanel(Model);
 
             GameEntry.Event.UnRegisterEvent(GameEventType.TestUIEvent);
+        }
+
+        public override void OnDestory()
+        {
+            base.OnDestory();
+            OnHide(null);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace MFramework.Runtime
         UILayerType Layer { get; }
         bool IsActive { get; }
 
-        void DestoryUI();
+        void OnDestory();
 
         void ShowPanel(IUIModel uIModel);
 
