@@ -1,6 +1,7 @@
 using GameMain;
 using System.Threading.Tasks;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MFramework.Runtime.UI
@@ -10,7 +11,7 @@ namespace MFramework.Runtime.UI
     public class UIPanelMain : UIViewBase
     {
         public TextMeshProUGUI txtTest;
-        public Button btnTest;
+        public Button btnChangeData;
         public Button btnClose;
 
         public override async Task Initialize()
@@ -31,6 +32,8 @@ namespace MFramework.Runtime.UI
         {
             Debugger.Log($"{this.GetType().Name},ShowPanel , data: {uIModel}");
             RegisterUIEvent();
+
+            RefreshUI(uIModel);
         }
 
         public override void HidePanel(IUIModel uIModel)
@@ -39,11 +42,19 @@ namespace MFramework.Runtime.UI
             UnRegisterEvent();
         }
 
+        public override void OnDestory()
+        {
+            base.OnDestory();
+            UnRegisterEvent();
+        }
+
         private void RegisterUIEvent()
         {
-            btnTest.onClick.AddListener(() =>
+            btnChangeData.onClick.AddListener(() =>
             {
-                Debugger.Log("btnTest click");
+                Debugger.Log("btnChangeData click 修改数据");
+                int data = Random.Range(1000, 9999);
+                (Controller as UIControlMain).SetTitleData($"{data}");
             });
             btnClose.onClick.AddListener(() =>
             {
@@ -55,7 +66,7 @@ namespace MFramework.Runtime.UI
         private void UnRegisterEvent()
         {
             Debugger.Log($"{this.GetType().Name},UnRegisterUIEvent ");
-            btnTest.onClick.RemoveAllListeners();
+            btnChangeData.onClick.RemoveAllListeners();
             btnClose.onClick.RemoveAllListeners();
         }
     }

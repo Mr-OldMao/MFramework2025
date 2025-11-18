@@ -9,8 +9,6 @@ namespace MFramework.Runtime
         public IUIView View { get; private set; }
         public IUIModel Model { get; private set; }
 
-        public UIStateProgressType StateProgress { get; private set; } = UIStateProgressType.Unstart;
-
         private Task m_TaskInit;
 
         public virtual async Task Initialize(IUIView view, IUIModel model)
@@ -21,13 +19,7 @@ namespace MFramework.Runtime
             Model?.Initialize();
             m_TaskInit = View?.Initialize();
             await m_TaskInit;
-            StateProgress = UIStateProgressType.InitCompleted;
-        }
-
-
-        public void SetStateProgress(UIStateProgressType stateProgress)
-        {
-            StateProgress = stateProgress;
+            GameEntry.UI.SetState(View, UIStateProgressType.InitCompleted);
         }
 
         protected virtual void Dispose()
@@ -35,37 +27,38 @@ namespace MFramework.Runtime
 
         }
 
-        public virtual async Task Show(object showData = null, object showBeforeData = null)
+
+
+        public virtual async Task Show(object showBeforeData = null, object showAfterData = null)
         {
             await m_TaskInit;
-            await OnShowBefore(showBeforeData);
-            StateProgress = UIStateProgressType.ShowBeforeCompleted;
+            await OnShow(showBeforeData);
+            GameEntry.UI.SetState(View, UIStateProgressType.ShowBeforeCompleted);
             View.UIForm.SetActive(true);
-            OnShow(showData);
-            StateProgress = UIStateProgressType.ShowCompleted;
+            await OnShowAfter(showAfterData);
+            GameEntry.UI.SetState(View, UIStateProgressType.ShowCompleted);
         }
 
-        public virtual async Task Hide(object hideData = null, object hideBoforeData = null)
+        public virtual async Task Hide(object hideAfterData = null, object hideBoforeData = null)
         {
             await m_TaskInit;
             await OnHideBefore(hideBoforeData);
-            StateProgress = UIStateProgressType.HideBeforeCompleted;
+            GameEntry.UI.SetState(View, UIStateProgressType.HideBeforeCompleted);
             View.UIForm.SetActive(false);
-            OnHide(hideData);
-            StateProgress = UIStateProgressType.HideCompleted;
+            await OnHide(hideAfterData);
+            GameEntry.UI.SetState(View, UIStateProgressType.HideCompleted);
         }
 
         public virtual void OnDestory()
         {
-            GameEntry.UI.DestroyView(View);
+            GameEntry.UI.Clear(View);
             UnityEngine.Object.Destroy(View.UIForm);
-            StateProgress = UIStateProgressType.DestoryCompleted;
+            GameEntry.UI.SetState(View, UIStateProgressType.DestoryCompleted);
         }
 
-
-        protected virtual void OnShow(object data) { }
-        protected virtual Task OnShowBefore(object data) => Task.CompletedTask;
-        protected virtual void OnHide(object data) { }
+        protected virtual Task OnShow(object data) => Task.CompletedTask;
+        protected virtual Task OnShowAfter(object data) => Task.CompletedTask;
+        protected virtual Task OnHide(object data) => Task.CompletedTask;
         protected virtual Task OnHideBefore(object data) => Task.CompletedTask;
     }
 }

@@ -12,23 +12,15 @@ namespace MFramework.Runtime
     public class UIManager : GameModuleBase, IUIManager
     {
         private Transform m_UIRoot;
-        private Dictionary<Type, UIViewBase> m_UIViews = new Dictionary<Type, UIViewBase>();
-        private Dictionary<Type, UIControllerBase> m_UIControllers = new Dictionary<Type, UIControllerBase>();
-        private Dictionary<Type, UIModelBase> m_UIModels = new Dictionary<Type, UIModelBase>();
-        private Dictionary<string, GameObject> m_ViewPrefabs = new Dictionary<string, GameObject>();
         private Dictionary<UILayerType, Transform> m_LayerContainer = new Dictionary<UILayerType, Transform>();
-
-        //todo
-        private Dictionary<Type, UIStateProgressType> m_StateProgressType = new Dictionary<Type, UIStateProgressType>();
-
-
         private Dictionary<Type, UIDataInfo> m_DicUIDataInfos = new Dictionary<Type, UIDataInfo>();
+
         public class UIDataInfo
         {
             public GameObject formPrefab;
-            public UIViewBase uiView;
-            public UIControllerBase uiController;
-            public UIModelBase uiModel;
+            public IUIView view;
+            public IUIController control;
+            public IUIModel model;
             public UIStateProgressType stateProgressType;
             public UILayerType uiLayerType;
         }
@@ -83,76 +75,87 @@ namespace MFramework.Runtime
             await Task.CompletedTask;
         }
 
-        public void ShowView<T>(object showData = null, object showBeforeData = null) where T : UIViewBase
+        public UIDataInfo GetUIDataInfo<T>() where T : IUIView
         {
-            ShowViewAsync<T>(showData, showBeforeData);
+            return m_DicUIDataInfos.GetValueOrDefault(typeof(T));
         }
 
-        public async Task<T> ShowViewAsync<T>(object showData = null, object showBeforeData = null) where T : UIViewBase
+        public UIDataInfo GetUIDataInfo(Type type)
+        {
+            return m_DicUIDataInfos.GetValueOrDefault(type);
+        }
+
+        public void ShowView<T>(object showBeforeData = null, object showAfterData = null) where T : UIViewBase
+        {
+#pragma warning disable CS4014
+            ShowViewAsync<T>(showBeforeData, showAfterData);
+#pragma warning restore CS4014
+        }
+
+        public async Task<T> ShowViewAsync<T>(object showBeforeData = null, object showAfterData = null) where T : UIViewBase
         {
             var viewType = typeof(T);
-
-            if (m_UIControllers.TryGetValue(viewType, out var control))
+            UIDataInfo uiDataInfo = GetUIDataInfo<T>();
+            if (uiDataInfo != null)
             {
-                if (control != null)
-                {
-                    await control.Show(showData, showBeforeData);
-                    return control as T;
-                }
-                else
-                {
-                    m_UIControllers.Remove(viewType);
-                    m_UIViews.Remove(viewType);
-                    //if (m_UIViews[viewType] != null)
-                    //{
-                    //    m_UIViews[viewType].OnDestory();
-                    //}
-                }
+                await uiDataInfo.control.Show(showBeforeData, showAfterData);
+                return uiDataInfo.view as T;
             }
+
+            UIDataInfo newUIDataInfo = new UIDataInfo();
+            m_DicUIDataInfos.Add(viewType, newUIDataInfo);
 
             var viewName = GetViewName(viewType);
             var view = await CreateView<T>(viewName);
             if (view != null)
             {
-                m_UIViews[viewType] = view;
-
                 var bindControl = view.GetType().GetCustomAttribute<UIBindAttribute>();
                 var newControl = bindControl.uiControllerBase;
-                newControl.SetStateProgress(UIStateProgressType.LoadResCompleted);
-                m_UIControllers[viewType] = newControl;
-
                 var newModel = bindControl.uiModelBase;
-                m_UIModels[viewType] = newModel;
-
+                view.Controller = newControl;
+                newUIDataInfo.stateProgressType = UIStateProgressType.LoadResCompleted;
+                newUIDataInfo.control = newControl;
+                newUIDataInfo.model = newModel;
+                newUIDataInfo.view = view;
                 await newControl.Initialize(view, newModel);
-                await newControl.Show(showData, showBeforeData);
+                await newControl.Show(showBeforeData, showAfterData);
             }
             return view;
         }
 
-        public void HideView<T>(object showData = null, object showBeforeData = null) where T : UIViewBase
+        public void HideView<T>(object hideAfterData = null, object showBeforeData = null) where T : UIViewBase
         {
-            HideViewAsync<T>(showData, showBeforeData);
+#pragma warning disable CS4014
+            HideViewAsync<T>(hideAfterData, showBeforeData);
+#pragma warning restore CS4014
         }
 
-        public async Task HideViewAsync<T>(object hideData = null, object hideBoforeData = null) where T : UIViewBase
+        public async Task HideViewAsync<T>(object hideAfterData = null, object hideBoforeData = null) where T : UIViewBase
         {
-            var viewType = typeof(T);
+            UIDataInfo uiDataInfo = GetUIDataInfo<T>();
 
-            if (m_UIControllers.TryGetValue(viewType, out var control))
+            if (uiDataInfo != null)
             {
-                await control.Hide(hideData, hideBoforeData);
+                await uiDataInfo.control.Hide(hideAfterData, hideBoforeData);
             }
             else
             {
-                Debugger.LogError($"隐藏UI面板失败，未创建初始化面板，viewType:{viewType}");
+                Debugger.LogError($"隐藏UI面板失败，未创建初始化面板，viewType:{typeof(T)}");
             }
         }
 
+        public void SetState(IUIView type, UIStateProgressType stateProgressType)
+        {
+            var uiDataInfo = GetUIDataInfo(type.GetType());
+            if (uiDataInfo != null)
+            {
+                uiDataInfo.stateProgressType = stateProgressType;
+            }
+        }
 
         private async Task<T> CreateView<T>(string viewName) where T : UIViewBase
         {
-            var prefab = await LoadUIViewPrefab(viewName);
+            var prefab = await LoadUIViewPrefab<T>(viewName);
 
             if (prefab == null)
             {
@@ -172,25 +175,19 @@ namespace MFramework.Runtime
         /// </summary>
         /// <param name="viewName">资源形参addressable全路径 Assets/xxx/xxx.prefab</param>
         /// <returns></returns>
-        private async Task<GameObject> LoadUIViewPrefab(string viewName)
+        private async Task<GameObject> LoadUIViewPrefab<T>(string viewName) where T : UIViewBase
         {
-            if (m_ViewPrefabs.TryGetValue(viewName, out var prefab))
+            UIDataInfo uiDataInfo = GetUIDataInfo<T>();
+            if (uiDataInfo.formPrefab != null)
             {
-                return prefab;
+                return uiDataInfo.formPrefab;
             }
-            prefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(viewName, false);
-            if (prefab != null)
+            var formPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(viewName, false);
+            if (formPrefab != null)
             {
-                m_ViewPrefabs[viewName] = prefab;
+                uiDataInfo.formPrefab = formPrefab;
             }
-            return prefab;
-        }
-
-
-        public T GetView<T>() where T : UIViewBase
-        {
-            m_UIViews.TryGetValue(typeof(T), out var view);
-            return view as T;
+            return formPrefab;
         }
 
 
@@ -204,62 +201,69 @@ namespace MFramework.Runtime
 
 
 
-        public void DestroyView<T>() where T : UIViewBase
+        public void Clear<T>() where T : UIViewBase
         {
             var viewType = typeof(T);
             RemoveContainer(viewType);
         }
 
-        public void DestroyAll()
+        public void ClearAll()
         {
-            List<UIViewBase> uiViewBases = m_UIViews.Values.ToList();
-            for (int i = 0; i < uiViewBases.Count; i++)
+            List<UIDataInfo> uiDataInfos = m_DicUIDataInfos.Values.ToList();
+            for (int i = 0; i < uiDataInfos.Count; i++)
             {
-                uiViewBases[i].OnDestory();
+                uiDataInfos[i].view.OnDestory();
+                uiDataInfos[i].control.OnDestory();
+                GameEntry.Resource.ReleaseInstance(uiDataInfos[i].formPrefab);
             }
-            m_UIViews.Clear();
-
-            List<UIControllerBase> uiControlBases = m_UIControllers.Values.ToList();
-            for (int i = 0; i < uiControlBases.Count; i++)
-            {
-                uiControlBases[i].OnDestory();
-            }
-            m_UIControllers.Clear();
+            m_DicUIDataInfos.Clear();
         }
-        public void DestroyView(IUIView view)
+        public void Clear(IUIView view)
         {
             RemoveContainer(view.GetType());
         }
+
         private void RemoveContainer(Type type)
         {
-            if (m_UIViews.TryGetValue(type, out var view))
+            var uiDataInfo = GetUIDataInfo(type);
+            if (uiDataInfo != null)
             {
-                m_UIViews.Remove(type);
-                view.OnDestory();
-            }
-            if (m_UIControllers.TryGetValue(type, out var control))
-            {
-                m_UIControllers.Remove(type);
-                control.OnDestory();
-            }
-            if (m_StateProgressType.TryGetValue(type, out var state))
-            {
-                state = UIStateProgressType.DestoryCompleted;
+                //uiDataInfo.view.OnDestory();
+                //uiDataInfo.control.OnDestory();
+                uiDataInfo.stateProgressType = UIStateProgressType.DestoryCompleted;
+                GameEntry.Resource.ReleaseInstance(uiDataInfo.formPrefab);
+                m_DicUIDataInfos.Remove(type);
             }
         }
 
-
+        public T GetView<T>() where T : UIViewBase
+        {
+            return GetUIDataInfo<T>().view as T;
+        }
 
         public T GetModel<T>() where T : UIModelBase
         {
-            return m_UIModels.Values.Where(p => p.GetType() == typeof(T)).FirstOrDefault() as T;
+            var dataInfo = m_DicUIDataInfos.Values.Where(p => p.model.GetType() == typeof(T)).FirstOrDefault();
+            return dataInfo?.model as T;
+        }
+
+        public UIModelBase GetModel(IUIModel uiModel)
+        {
+            var dataInfo = m_DicUIDataInfos.Values.Where(p => p.model == uiModel).FirstOrDefault();
+            return dataInfo?.model as UIModelBase;
         }
 
         public T GetController<T>() where T : UIControllerBase
         {
-            return m_UIControllers.Values.Where(p => p.GetType() == typeof(T)).FirstOrDefault() as T;
+            var dataInfo = m_DicUIDataInfos.Values.Where(p => p.control.GetType() == typeof(T)).FirstOrDefault();
+            return dataInfo?.control as T;
         }
 
+        public UIControllerBase GetController(IUIController uiController)
+        {
+            var dataInfo = m_DicUIDataInfos.Values.Where(p => p.control == uiController).FirstOrDefault();
+            return dataInfo?.control as UIControllerBase;
+        }
 
         public void OnUpdate(float deltaTime)
         {
@@ -268,8 +272,7 @@ namespace MFramework.Runtime
 
         protected override void OnShutdown()
         {
-            //DestroyAll();
-            m_ViewPrefabs.Clear();
+
         }
     }
 }

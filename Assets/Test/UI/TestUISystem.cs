@@ -1,7 +1,6 @@
 using GameMain;
 using MFramework.Runtime;
 using MFramework.Runtime.UI;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class TestUISystem : MonoBehaviour
@@ -13,14 +12,35 @@ public class TestUISystem : MonoBehaviour
         GameEntry.UI.ShowView<UIPanelMain>($"测试ShowView传参{++m_Count}", $"测试ShowViewBefore传参{++m_Count}");
     }
 
-    public void TestShowUI()
+    public async void ShowAPI()
     {
-        GameEntry.UI.ShowView<UIPanelMain>($"测试ShowView传参{++m_Count}", $"测试ShowViewBefore传参{++m_Count}");
-
-
         GameEntry.UI.GetView<UIPanelMain>();
 
         GameEntry.UI.GetController<UIControlMain>();
+        GameEntry.UI.GetController(new UIControlMain());
+
+        GameEntry.UI.GetModel<UIModelMain>();
+        GameEntry.UI.GetModel(new UIModelMain());
+
+        GameEntry.UI.ShowView<UIPanelMain>();
+        GameEntry.UI.ShowView<UIPanelMain>(null);
+        GameEntry.UI.ShowView<UIPanelMain>(null, null);
+
+        GameEntry.UI.HideView<UIPanelMain>();
+        GameEntry.UI.HideView<UIPanelMain>(null);
+        GameEntry.UI.HideView<UIPanelMain>(null, null);
+
+        await GameEntry.UI.ShowViewAsync<UIPanelMain>();
+        await GameEntry.UI.ShowViewAsync<UIPanelMain>(null);
+        await GameEntry.UI.ShowViewAsync<UIPanelMain>(null, null);
+
+        await GameEntry.UI.HideViewAsync<UIPanelMain>();
+        await GameEntry.UI.HideViewAsync<UIPanelMain>(null);
+        await GameEntry.UI.HideViewAsync<UIPanelMain>(null, null);
+
+        GameEntry.UI.Clear<UIPanelMain>();
+        GameEntry.UI.Clear(new UIPanelMain());
+        GameEntry.UI.ClearAll();
     }
 
     private async void OnGUI()
@@ -47,7 +67,9 @@ public class TestUISystem : MonoBehaviour
         curHeight += height;
         if (GUI.Button(new Rect(curWidth, curHeight, width, height), "ShowViewAsync", style))
         {
-            await GameEntry.UI.ShowViewAsync<UIPanelMain>($"测试ShowViewAsync传参{++m_Count}", $"测试ShowViewAsync传参{++m_Count}");
+            var model = GameEntry.UI.GetModel<UIModelMain>();
+            model.Title = $"test param {++m_Count}";
+            await GameEntry.UI.ShowViewAsync<UIPanelMain>(model, $"测试ShowViewAsync传参{++m_Count}");
         }
         curHeight += height;
         if (GUI.Button(new Rect(curWidth, curHeight, width, height), "HideViewAsync", style))

@@ -7,20 +7,16 @@ namespace MFramework.Runtime
 {
     public abstract class UIViewBase : MonoBehaviour, IUIView
     {
-        [SerializeField]
-        private string m_ViewName;
+        [Header("以下字段为运行时自动绑定，请勿手动修改")]
         [SerializeField]
         private UILayerType m_Layer;
-
-        [SerializeField]
-        private string _ = "以下字段为运行时自动绑定，请勿手动修改";
-
         public UILayerType Layer => m_Layer;
         public bool IsActive => gameObject.activeInHierarchy;
 
         private Task m_TaskInit;
 
         public GameObject UIForm { get => this.gameObject; }
+        public IUIController Controller { get; set; }
 
         public enum UILayerType
         {
@@ -52,8 +48,8 @@ namespace MFramework.Runtime
 
         public virtual void OnDestory()
         {
-            GameEntry.UI.DestroyView(this);
             Destroy(gameObject);
+            GameEntry.UI.Clear(this);
         }
 
         private void SetLayer()

@@ -9,6 +9,8 @@ namespace MFramework.Runtime
         GameObject UIForm { get; }
 
         UILayerType Layer { get; }
+
+        IUIController Controller { get; set; }
         bool IsActive { get; }
 
         void OnDestory();

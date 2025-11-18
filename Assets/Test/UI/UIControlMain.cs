@@ -13,10 +13,10 @@ namespace GameMain
             Debugger.Log($"{this.GetType()}, init end  ");
         }
 
-        protected override Task OnShowBefore(object data)
+        protected override Task OnShowAfter(object data)
         {
             Debugger.Log($"{this.GetType().Name}, OnShowBefore ,data: {data}");
-            return base.OnShowBefore(data);
+            return base.OnShowAfter(data);
         }
 
         protected override Task OnHideBefore(object data)
@@ -25,30 +25,42 @@ namespace GameMain
             return base.OnHideBefore(data);
         }
 
-        protected override void OnShow(object data)
+        protected override Task OnShow(object data)
         {
-            View.ShowPanel(Model);
-            View.RefreshUI(Model);
+            Debugger.Log($"{this.GetType().Name},OnShow , data: {data}");
 
+            View.ShowPanel(Model);
+            if (data != null && data is IUIModel)
+            {
+                View.RefreshUI(data as IUIModel);
+            }
             GameEntry.Event.RegisterEvent(GameEventType.TestUIEvent, () =>
             {
                 View.RefreshUI(Model);
             });
 
+            return base.OnShow(data);
         }
 
-        protected override void OnHide(object data)
+        protected override Task OnHide(object data)
         {
             Debugger.Log($"{this.GetType().Name},OnHide , data: {data}");
             View.HidePanel(Model);
 
             GameEntry.Event.UnRegisterEvent(GameEventType.TestUIEvent);
+
+            return base.OnHide(data);
         }
 
         public override void OnDestory()
         {
             base.OnDestory();
             OnHide(null);
+        }
+
+        public void SetTitleData(string titleDes)
+        {
+            (Model as UIModelMain).Title = titleDes;
         }
     }
 }
