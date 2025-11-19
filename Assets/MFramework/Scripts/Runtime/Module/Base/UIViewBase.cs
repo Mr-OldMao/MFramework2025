@@ -16,37 +16,13 @@ namespace MFramework.Runtime
         public UILayerType Layer => m_Layer;
         public bool IsActive => gameObject.activeInHierarchy;
 
-        private Task m_TaskInit;
-
         public GameObject UIForm { get => this.gameObject; }
         public IUIController Controller { get; set; }
 
-        public enum UILayerType
-        {
-            Background = 0,
-            Normal = 500,
-            Popup = 1000,
-            Tips = 1500,
-        }
-
-        public enum UIStateProgressType
-        {
-            Unstart = 0,
-            LoadResCompleted,
-            InitCompleted,
-            ShowBeforeCompleted,
-            ShowCompleted,
-            HideBeforeCompleted,
-            HideCompleted,
-            DestoryCompleted,
-        }
-
-        protected virtual async void Awake()
+        protected virtual void Awake()
         {
             AutoBindComponents();
             SetLayer();
-            m_TaskInit = Initialize();
-            await m_TaskInit;
         }
 
 
@@ -130,22 +106,25 @@ namespace MFramework.Runtime
                 }
             }
         }
+        public virtual Task ShowPanel()
+        {
+            gameObject.SetActive(true);
+            return Task.CompletedTask;
+        }
+        public virtual Task HidePanel()
+        {
+            gameObject.SetActive(false);
+            return Task.CompletedTask;
+        }
+        public abstract void RefreshUI(IUIModel uIModel = null);
+
+
 
         public virtual void Shutdown()
         {
 
         }
 
-        public virtual void ShowPanel(IUIModel uIModel = null)
-        {
-            gameObject.SetActive(true);
-        }
-        public virtual  void HidePanel(IUIModel uIModel = null)
-        {
-            gameObject.SetActive(false);
-        }
-        public abstract void RefreshUI(IUIModel uIModel = null);
         public abstract Task Initialize();
-
     }
 }

@@ -26,7 +26,7 @@ namespace MFramework.Runtime
                     Debugger.LogError("UI数据类绑定失败，请检查是否继承自UIModelBase");
                     return;
                 }
-                uiModelBase = (UIModelBase)Activator.CreateInstance(uiModel);
+                uiModelBase = (UIModelBase)Activator.CreateInstance(uiModel, uiControllerBase);
             }
         }
     }

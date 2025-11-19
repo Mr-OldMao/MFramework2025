@@ -1,3 +1,4 @@
+using GameMain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static MFramework.Runtime.UIViewBase;
 
 namespace MFramework.Runtime
 {
@@ -21,10 +21,9 @@ namespace MFramework.Runtime
             public IUIView view;
             public IUIController control;
             public IUIModel model;
-            public UIStateProgressType stateProgressType;
+            public UIStateProgressType state;
             public UILayerType uiLayerType;
         }
-
         protected override async Task OnInitialize()
         {
             CreateUIRoot();
@@ -85,58 +84,75 @@ namespace MFramework.Runtime
             return m_DicUIDataInfos.GetValueOrDefault(type);
         }
 
-        public void ShowView<T>(object showBeforeData = null, object showAfterData = null) where T : UIViewBase
+        public void ShowView<T>() where T : UIViewBase
         {
 #pragma warning disable CS4014
-            ShowViewAsync<T>(showBeforeData, showAfterData);
+            ShowViewAsync<T>();
 #pragma warning restore CS4014
         }
 
-        public async Task<T> ShowViewAsync<T>(object showBeforeData = null, object showAfterData = null) where T : UIViewBase
+        public async Task<T> ShowViewAsync<T>() where T : UIViewBase
         {
             var viewType = typeof(T);
             UIDataInfo uiDataInfo = GetUIDataInfo<T>();
             if (uiDataInfo != null)
             {
-                await uiDataInfo.control.Show(showBeforeData, showAfterData);
-                return uiDataInfo.view as T;
+                if (GetState(uiDataInfo.view) >= UIStateProgressType.InitEnd)
+                {
+                    SetState(uiDataInfo.view, UIStateProgressType.ShowStart);
+                    await uiDataInfo.view.ShowPanel();
+                    SetState(uiDataInfo.view, UIStateProgressType.ShowEnd);
+                    return uiDataInfo.view as T;
+                }
+                else
+                {
+                    //等待初始化完成返回
+                    Debugger.LogError($"显示窗体失败,{uiDataInfo.state}");
+                    //await ShowViewAsync<T>(); //未测试性能
+                }
             }
-
             UIDataInfo newUIDataInfo = new UIDataInfo();
             m_DicUIDataInfos.Add(viewType, newUIDataInfo);
+            newUIDataInfo.state = UIStateProgressType.LoadResStart;
 
             var viewName = GetViewName(viewType);
             var view = await CreateView<T>(viewName);
+            SetState(view, UIStateProgressType.LoadResEnd);
             if (view != null)
             {
                 var bindControl = view.GetType().GetCustomAttribute<UIBindAttribute>();
                 var newControl = bindControl.uiControllerBase;
                 var newModel = bindControl.uiModelBase;
                 view.Controller = newControl;
-                newUIDataInfo.stateProgressType = UIStateProgressType.LoadResCompleted;
                 newUIDataInfo.control = newControl;
                 newUIDataInfo.model = newModel;
                 newUIDataInfo.view = view;
-                await newControl.Initialize(view, newModel);
-                await newControl.Show(showBeforeData, showAfterData);
+                SetState(view, UIStateProgressType.InitStart);
+                await newControl.Init(view, newModel);
+                SetState(view, UIStateProgressType.InitEnd);
+                SetState(view, UIStateProgressType.ShowStart);
+                await view.ShowPanel();
+                SetState(view, UIStateProgressType.ShowEnd);
             }
             return view;
         }
 
-        public void HideView<T>(object hideAfterData = null, object showBeforeData = null) where T : UIViewBase
+        public void HideView<T>() where T : UIViewBase
         {
 #pragma warning disable CS4014
-            HideViewAsync<T>(hideAfterData, showBeforeData);
+            HideViewAsync<T>();
 #pragma warning restore CS4014
         }
 
-        public async Task HideViewAsync<T>(object hideAfterData = null, object hideBoforeData = null) where T : UIViewBase
+        public async Task HideViewAsync<T>() where T : UIViewBase
         {
             UIDataInfo uiDataInfo = GetUIDataInfo<T>();
 
             if (uiDataInfo != null)
             {
-                await uiDataInfo.control.Hide(hideAfterData, hideBoforeData);
+                SetState(uiDataInfo.view, UIStateProgressType.HideStart);
+                await uiDataInfo.view.HidePanel();
+                SetState(uiDataInfo.view, UIStateProgressType.HideEnd);
             }
             else
             {
@@ -149,8 +165,22 @@ namespace MFramework.Runtime
             var uiDataInfo = GetUIDataInfo(type.GetType());
             if (uiDataInfo != null)
             {
-                uiDataInfo.stateProgressType = stateProgressType;
+                uiDataInfo.state = stateProgressType;
+                Debugger.Log($"当前ui状态：{stateProgressType}", LogType.Test);
             }
+        }
+
+        public UIStateProgressType GetState(IUIView type)
+        {
+            if (type != null)
+            {
+                var uiDataInfo = GetUIDataInfo(type.GetType());
+                if (uiDataInfo != null)
+                {
+                    return uiDataInfo.state;
+                }
+            }
+            return UIStateProgressType.Unstart;
         }
 
         private async Task<T> CreateView<T>(string viewName) where T : UIViewBase
@@ -193,10 +223,7 @@ namespace MFramework.Runtime
 
         private string GetViewName(Type viewType)
         {
-            var name = viewType.Name;
-            //TODO AddressableUI根节点路径
-            string rootPath = "Assets/Download/prefab/ui/";
-            return $"{rootPath}{name}.prefab";
+            return $"{SystemConstantData.PATH_PREFAB_UI_ROOT}{viewType.Name}.prefab";
         }
 
 
@@ -204,7 +231,7 @@ namespace MFramework.Runtime
         public void Clear<T>() where T : UIViewBase
         {
             var viewType = typeof(T);
-            RemoveContainer(viewType);
+            Clear(viewType);
         }
 
         public void ClearAll()
@@ -213,26 +240,24 @@ namespace MFramework.Runtime
             for (int i = 0; i < uiDataInfos.Count; i++)
             {
                 uiDataInfos[i].view.OnDestory();
-                uiDataInfos[i].control.OnDestory();
                 GameEntry.Resource.ReleaseInstance(uiDataInfos[i].formPrefab);
             }
             m_DicUIDataInfos.Clear();
         }
         public void Clear(IUIView view)
         {
-            RemoveContainer(view.GetType());
+            Clear(view.GetType());
         }
 
-        private void RemoveContainer(Type type)
+        private void Clear(Type type)
         {
             var uiDataInfo = GetUIDataInfo(type);
             if (uiDataInfo != null)
             {
-                //uiDataInfo.view.OnDestory();
-                //uiDataInfo.control.OnDestory();
-                uiDataInfo.stateProgressType = UIStateProgressType.DestoryCompleted;
+                uiDataInfo.state = UIStateProgressType.DestoryStart;
                 GameEntry.Resource.ReleaseInstance(uiDataInfo.formPrefab);
                 m_DicUIDataInfos.Remove(type);
+                uiDataInfo.state = UIStateProgressType.DestoryEnd;
             }
         }
 

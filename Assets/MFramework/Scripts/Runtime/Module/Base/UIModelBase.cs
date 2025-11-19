@@ -1,14 +1,17 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System.Threading.Tasks;
 
 namespace MFramework.Runtime
 {
     public abstract class UIModelBase : IUIModel
     {
-        public virtual void Initialize() { }
+        public abstract Task Init();
         public virtual void Reset() { }
+
+        public IUIController Controller { get; set; }
+        protected UIModelBase(IUIController controller)
+        {
+            Controller = controller;
+        }
 
         public void DispatchEvent(int eventId)
         {

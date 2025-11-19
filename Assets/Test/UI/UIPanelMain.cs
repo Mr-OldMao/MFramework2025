@@ -26,27 +26,28 @@ namespace MFramework.Runtime.UI
             Debugger.Log($"{this.GetType()}, Initialize end  ");
         }
 
-        public override void RefreshUI(IUIModel model)
+        public override void RefreshUI(IUIModel model = null)
         {
-            UIModelMain uIModelMain = model as UIModelMain;
+            UIModelMain uIModelMain = GameEntry.UI.GetModel<UIModelMain>();
             Debugger.Log($"{this.GetType().Name},RefreshUI ");
             txtTest.text = uIModelMain.Title;
         }
 
-        public override void ShowPanel(IUIModel uIModel = null)
+        public override Task ShowPanel()
         {
-            base.ShowPanel(uIModel);
-            Debugger.Log($"{this.GetType().Name},ShowPanel , data: {uIModel}");
+            base.ShowPanel();
+            Debugger.Log($"{this.GetType().Name},ShowPanel ");
             RegisterUIEvent();
-
-            RefreshUI(uIModel);
+            RefreshUI();
+            return Task.CompletedTask;
         }
 
-        public override void HidePanel(IUIModel uIModel = null)
+        public override Task HidePanel()
         {
-            base.HidePanel(uIModel);
-            Debugger.Log($"{this.GetType().Name},HidePanel , data: {uIModel}");
+            base.HidePanel();
+            Debugger.Log($"{this.GetType().Name},HidePanel ");
             UnRegisterEvent();
+            return Task.CompletedTask;
         }
 
         public override void OnDestory()
@@ -75,10 +76,18 @@ namespace MFramework.Runtime.UI
             });
             btnChangeSprite.onClick.AddListener(() =>
             {
-                var spriteName = "resFileImgPlane" + Random.Range(1, 7);
-                Debugger.Log($"btnChangeSprite click , spriteName :{spriteName}");
-                SetSprite(imgItem1, EAtlasType.temp, spriteName);
+                ChangeSprite();
             });
+
+            GameEntry.Event.RegisterEvent(GameEventType.TestUIEvent, () => RefreshUI());
+        }
+
+        public void ChangeSprite()
+        {
+            Debugger.Log($"btnChangeSprite click");
+            SetSprite(imgItem1, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
+            SetSprite(imgItem2, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
+            SetSprite(imgItem3, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
         }
 
         private void UnRegisterEvent()
@@ -86,6 +95,9 @@ namespace MFramework.Runtime.UI
             Debugger.Log($"{this.GetType().Name},UnRegisterUIEvent ");
             btnChangeData.onClick.RemoveAllListeners();
             btnClose.onClick.RemoveAllListeners();
+            btnDestory.onClick.RemoveAllListeners();
+            btnChangeSprite.onClick.RemoveAllListeners();
+            GameEntry.Event.UnRegisterEvent(GameEventType.TestUIEvent);
         }
     }
 }

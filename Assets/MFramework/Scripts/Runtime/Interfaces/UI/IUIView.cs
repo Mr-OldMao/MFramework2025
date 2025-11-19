@@ -14,9 +14,10 @@ namespace MFramework.Runtime
         IUIController Controller { get; set; }
         bool IsActive { get; }
 
-        void ShowPanel(IUIModel uIModel = null);
-        void HidePanel(IUIModel uIModel = null);
-        void RefreshUI(IUIModel uIModel = null);
+
+        Task ShowPanel();
+        Task HidePanel();
+        void RefreshUI(IUIModel uIModel);
 
         void SetSprite(Image img, EAtlasType atlasType, string spriteName, Action<Sprite> callback = null);
         Task<Sprite> SetSpriteAsync(Image img, EAtlasType atlasType, string spriteName);

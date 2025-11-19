@@ -1,10 +1,11 @@
 using System;
+using System.Threading.Tasks;
 
 namespace MFramework.Runtime
 {
     public interface IUIModel
     {
-        void Initialize();
+        Task Init();
         void Reset();
     }
 }

@@ -1,30 +1,28 @@
 using MFramework.Runtime;
+using System.Threading.Tasks;
 
 namespace GameMain
 {
     public class UIModelMain : UIModelBase
     {
-        private string m_Title;
-        private int m_Score;
+        public string Title { get; private set; }
 
-        public string Title
+        public UIModelMain(IUIController controller) : base(controller)
         {
-            get => m_Title;
-            set
-            {
-                m_Title = value;
-                DispatchEvent(GameEventType.TestUIEvent);
-            }
+
         }
 
-        public int Score
+        public override async Task Init()
         {
-            get => m_Score;
-            set
-            {
-                m_Score = value;
-                DispatchEvent(GameEventType.TestUIEvent);
-            }
+            //模拟异步读表读数据
+            await Task.Delay(200);
+            Title = "UIModelMain_Init()";
+        }
+
+        public void UpdateTitle(string title)
+        {
+            Title = title;
+            DispatchEvent(GameEventType.TestUIEvent);
         }
     }
 }
