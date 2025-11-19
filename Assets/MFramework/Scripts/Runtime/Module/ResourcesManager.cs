@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -143,6 +143,10 @@ namespace MFramework.Runtime
             }
         }
 
+        public async void LoadSpriteAssetAsync<T>(string address, Action<Sprite> callback, bool isAutoAddSuffix = true) where T : Object
+        {
+
+        }
 
         /// <summary>
         /// 预加载资源

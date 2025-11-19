@@ -13,7 +13,12 @@ namespace MFramework.Runtime.UI
         public TextMeshProUGUI txtTest;
         public Button btnChangeData;
         public Button btnClose;
+        public Button btnDestory;
+        public Button btnChangeSprite;
 
+        public Image imgItem1;
+        public Image imgItem2;
+        public Image imgItem3;
         public override async Task Initialize()
         {
             Debugger.Log($"{this.GetType()}, Initialize start (delay 500ms)");
@@ -28,16 +33,18 @@ namespace MFramework.Runtime.UI
             txtTest.text = uIModelMain.Title;
         }
 
-        public override void ShowPanel(IUIModel uIModel)
+        public override void ShowPanel(IUIModel uIModel = null)
         {
+            base.ShowPanel(uIModel);
             Debugger.Log($"{this.GetType().Name},ShowPanel , data: {uIModel}");
             RegisterUIEvent();
 
             RefreshUI(uIModel);
         }
 
-        public override void HidePanel(IUIModel uIModel)
+        public override void HidePanel(IUIModel uIModel = null)
         {
+            base.HidePanel(uIModel);
             Debugger.Log($"{this.GetType().Name},HidePanel , data: {uIModel}");
             UnRegisterEvent();
         }
@@ -56,10 +63,21 @@ namespace MFramework.Runtime.UI
                 int data = Random.Range(1000, 9999);
                 (Controller as UIControlMain).SetTitleData($"{data}");
             });
+            btnDestory.onClick.AddListener(() =>
+            {
+                Debugger.Log("btnDestory click");
+                OnDestory();
+            });
             btnClose.onClick.AddListener(() =>
             {
                 Debugger.Log("btnClose click");
-                OnDestory();
+                HidePanel();
+            });
+            btnChangeSprite.onClick.AddListener(() =>
+            {
+                var spriteName = "resFileImgPlane" + Random.Range(1, 7);
+                Debugger.Log($"btnChangeSprite click , spriteName :{spriteName}");
+                SetSprite(imgItem1, EAtlasType.temp, spriteName);
             });
         }
 

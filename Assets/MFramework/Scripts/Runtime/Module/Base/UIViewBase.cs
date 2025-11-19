@@ -1,7 +1,10 @@
+using GameMain;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.U2D;
+using UnityEngine.UI;
 
 namespace MFramework.Runtime
 {
@@ -44,6 +47,42 @@ namespace MFramework.Runtime
             SetLayer();
             m_TaskInit = Initialize();
             await m_TaskInit;
+        }
+
+
+        /// <summary>
+        /// 设置精灵图片
+        /// </summary>
+        /// <param name="img"></param>
+        /// <param name="atlasName"></param>
+        /// <param name="spriteName"></param>
+        /// <param name="callback"></param>
+        public void SetSprite(Image img, EAtlasType atlasType, string spriteName, Action<Sprite> callback = null)
+        {
+            string atlasPath = $"{SystemConstantData.PATH_ATLAS_ROOT}{atlasType}.spriteatlas";
+            GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(atlasPath, (atlas) =>
+            {
+                if (atlas != null)
+                {
+                    Sprite sprite = atlas.GetSprite(spriteName);
+                    img.sprite = sprite;
+                    callback?.Invoke(sprite);
+                }
+                else
+                {
+                    Debugger.LogError($"atlas is null,atlasPath:{atlasPath},spriteName:{spriteName},img:{img},uiform:{this}");
+                }
+            }, false);
+        }
+
+        public async Task<Sprite> SetSpriteAsync(Image img, EAtlasType atlasType, string spriteName)
+        {
+            string atlasPath = $"{SystemConstantData.PATH_ATLAS_ROOT}{atlasType}.spriteatlas";
+
+            var atlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(atlasPath, false);
+            Sprite sprite = atlas.GetSprite(spriteName);
+            img.sprite = sprite;
+            return sprite;
         }
 
         public virtual void OnDestory()
@@ -97,9 +136,16 @@ namespace MFramework.Runtime
 
         }
 
-        public abstract void ShowPanel(IUIModel uIModel);
-        public abstract void HidePanel(IUIModel uIModel);
-        public abstract void RefreshUI(IUIModel uIModel);
+        public virtual void ShowPanel(IUIModel uIModel = null)
+        {
+            gameObject.SetActive(true);
+        }
+        public virtual  void HidePanel(IUIModel uIModel = null)
+        {
+            gameObject.SetActive(false);
+        }
+        public abstract void RefreshUI(IUIModel uIModel = null);
         public abstract Task Initialize();
+
     }
 }
