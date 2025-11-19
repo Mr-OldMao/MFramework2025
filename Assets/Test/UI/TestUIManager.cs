@@ -3,7 +3,7 @@ using MFramework.Runtime;
 using MFramework.Runtime.UI;
 using UnityEngine;
 
-public class TestUISystem : MonoBehaviour
+public class TestUIManager : MonoBehaviour
 {
     public async void ShowAPI()
     {
@@ -23,9 +23,9 @@ public class TestUISystem : MonoBehaviour
 
         await GameEntry.UI.HideViewAsync<UIPanelMain>();
 
-        GameEntry.UI.Clear<UIPanelMain>();
-        GameEntry.UI.Clear(new UIPanelMain());
-        GameEntry.UI.ClearAll();
+        GameEntry.UI.RemoveView<UIPanelMain>();
+        GameEntry.UI.RemoveView(new UIPanelMain());
+        GameEntry.UI.RemoveAllView();
     }
 
     private async void OnGUI()
@@ -61,12 +61,6 @@ public class TestUISystem : MonoBehaviour
         }
         curHeight += height;
 
-        if (GUI.Button(new Rect(curWidth, curHeight, width, height), "Show", style))
-        {
-            GameEntry.UI.GetView<UIPanelMain>().ShowPanel();
-        }
-        curHeight += height;
-
         if (GUI.Button(new Rect(curWidth, curHeight, width, height), "更改数据", style))
         {
             int data = Random.Range(1000, 9999);
@@ -77,6 +71,12 @@ public class TestUISystem : MonoBehaviour
         if (GUI.Button(new Rect(curWidth, curHeight, width, height), "更改图片", style))
         {
             GameEntry.UI.GetView<UIPanelMain>().ChangeSprite();
+        }
+        curHeight += height;
+
+        if (GUI.Button(new Rect(curWidth, curHeight, width, height), "销毁窗体", style))
+        {
+            GameEntry.UI.RemoveView<UIPanelMain>();
         }
         curHeight += height;
     }

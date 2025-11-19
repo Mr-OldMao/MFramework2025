@@ -1,4 +1,4 @@
-namespace GameMain
+namespace MFramework.Runtime.Extend
 {
     public class SystemConstantData
     {

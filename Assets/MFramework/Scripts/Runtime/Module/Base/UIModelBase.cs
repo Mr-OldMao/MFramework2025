@@ -12,20 +12,6 @@ namespace MFramework.Runtime
         {
             Controller = controller;
         }
-
-        public void DispatchEvent(int eventId)
-        {
-            GameEntry.Event.DispatchEvent(eventId);
-        }
-
-        public void DispatchEvent(GameEventType gameEventType)
-        {
-            GameEntry.Event.DispatchEvent(gameEventType);
-        }
-
-        public void DispatchEvent<T>(int eventId, T eventData)
-        {
-            GameEntry.Event.DispatchEvent(eventId, eventData);
-        }
+        public virtual void Shutdown() { }
     }
 }

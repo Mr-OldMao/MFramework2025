@@ -12,9 +12,9 @@ namespace MFramework.Runtime
 
         Task HideViewAsync<T>() where T : UIViewBase;
 
-        void Clear<T>() where T : UIViewBase;
-        void Clear(IUIView view);
-        void ClearAll();
+        void RemoveView<T>() where T : UIViewBase;
+        void RemoveView(IUIView view);
+        void RemoveAllView();
 
         T GetView<T>() where T : UIViewBase;
 

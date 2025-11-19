@@ -1,11 +1,7 @@
-using System;
-using System.Threading.Tasks;
-
 namespace MFramework.Runtime
 {
-    public interface IUIModel
+    public interface IUIModel : IGameModule
     {
-        Task Init();
         void Reset();
     }
 }

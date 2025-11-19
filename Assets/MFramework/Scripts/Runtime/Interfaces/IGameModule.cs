@@ -1,15 +1,23 @@
 using System.Threading.Tasks;
 
 // 模块基础接口
-public interface IGameModule
+public interface IGameModule : IShutdown, IInit
 {
-    //int Priority { get; } // 初始化优先级
-    Task Initialize();
+
+}
+
+public interface IInit
+{
+    Task Init();
+}
+
+public interface IShutdown
+{
     void Shutdown();
 }
 
 // 可更新模块接口
-public interface IUpdatableModule 
+public interface IUpdatableModule
 {
     void OnUpdate(float deltaTime);
 }

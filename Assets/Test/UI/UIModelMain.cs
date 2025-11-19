@@ -22,7 +22,7 @@ namespace GameMain
         public void UpdateTitle(string title)
         {
             Title = title;
-            DispatchEvent(GameEventType.TestUIEvent);
+            GameEntry.Event.DispatchEvent(GameEventType.TestUIEvent);
         }
     }
 }

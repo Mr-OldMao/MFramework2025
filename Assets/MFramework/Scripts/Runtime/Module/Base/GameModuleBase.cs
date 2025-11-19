@@ -9,7 +9,7 @@ namespace MFramework.Runtime
         protected ILoggerModule Logger => FrameworkManager.Instance.GetModule<ILoggerModule>();
         protected IEventManager EventManager => FrameworkManager.Instance.GetModule<IEventManager>();
 
-        public virtual async Task Initialize()
+        public virtual async Task Init()
         {
             Logger?.Log($"{GetType().Name} 开始初始化...", LogType.FrameNormal);
             await OnInitialize();

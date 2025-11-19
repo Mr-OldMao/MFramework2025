@@ -13,14 +13,14 @@ namespace MFramework.Runtime.UI
         public TextMeshProUGUI txtTest;
         public Button btnChangeData;
         public Button btnClose;
-        public Button btnDestory;
         public Button btnChangeSprite;
 
         public Image imgItem1;
         public Image imgItem2;
         public Image imgItem3;
-        public override async Task Initialize()
+        public override async Task Init()
         {
+            await base.Init();
             Debugger.Log($"{this.GetType()}, Initialize start (delay 500ms)");
             await Task.Delay(500);
             Debugger.Log($"{this.GetType()}, Initialize end  ");
@@ -37,7 +37,6 @@ namespace MFramework.Runtime.UI
         {
             base.ShowPanel();
             Debugger.Log($"{this.GetType().Name},ShowPanel ");
-            RegisterUIEvent();
             RefreshUI();
             return Task.CompletedTask;
         }
@@ -50,24 +49,26 @@ namespace MFramework.Runtime.UI
             return Task.CompletedTask;
         }
 
-        public override void OnDestory()
+        public override void Shutdown()
         {
-            base.OnDestory();
-            UnRegisterEvent();
+            base.Shutdown();
+        }
+         
+        public void ChangeSprite()
+        {
+            Debugger.Log($"btnChangeSprite click");
+            SetSprite(imgItem1, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
+            SetSprite(imgItem2, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
+            SetSprite(imgItem3, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
         }
 
-        private void RegisterUIEvent()
+        protected override void RegisterEvent()
         {
             btnChangeData.onClick.AddListener(() =>
             {
                 Debugger.Log("btnChangeData click 修改数据");
                 int data = Random.Range(1000, 9999);
                 (Controller as UIControlMain).SetTitleData($"{data}");
-            });
-            btnDestory.onClick.AddListener(() =>
-            {
-                Debugger.Log("btnDestory click");
-                OnDestory();
             });
             btnClose.onClick.AddListener(() =>
             {
@@ -82,20 +83,11 @@ namespace MFramework.Runtime.UI
             GameEntry.Event.RegisterEvent(GameEventType.TestUIEvent, () => RefreshUI());
         }
 
-        public void ChangeSprite()
-        {
-            Debugger.Log($"btnChangeSprite click");
-            SetSprite(imgItem1, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
-            SetSprite(imgItem2, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
-            SetSprite(imgItem3, EAtlasType.temp, "resFileImgPlane" + Random.Range(1, 7));
-        }
-
-        private void UnRegisterEvent()
+        protected override void UnRegisterEvent()
         {
             Debugger.Log($"{this.GetType().Name},UnRegisterUIEvent ");
             btnChangeData.onClick.RemoveAllListeners();
             btnClose.onClick.RemoveAllListeners();
-            btnDestory.onClick.RemoveAllListeners();
             btnChangeSprite.onClick.RemoveAllListeners();
             GameEntry.Event.UnRegisterEvent(GameEventType.TestUIEvent);
         }

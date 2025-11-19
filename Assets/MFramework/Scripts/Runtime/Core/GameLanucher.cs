@@ -82,7 +82,7 @@ namespace MFramework.Runtime
             {
                 var module = m_QueueGameModels.Dequeue();
                 frameworkManager.RegisterModule(module);
-                await module.Initialize();
+                await module.Init();
                 UpdateLaunchProgress(++currentStep, totalSteps, $"初始化完成:{module}");
             }
 
@@ -109,7 +109,7 @@ namespace MFramework.Runtime
             var logger = new LoggerModule();
             frameworkManager = new FrameworkManager();
             frameworkManager.RegisterModule<ILoggerModule>(logger);
-            await logger.Initialize();
+            await logger.Init();
         }
 
         private void InitializeCoreModules()
