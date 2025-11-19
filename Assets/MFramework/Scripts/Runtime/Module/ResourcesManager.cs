@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.U2D;
 using Object = UnityEngine.Object;
 
@@ -18,7 +19,7 @@ namespace MFramework.Runtime
         // 资源缓存字典
         private Dictionary<string, AsyncOperationHandle> m_AssetHandles;
         // 场景缓存字典
-        private Dictionary<string, AsyncOperationHandle> m_SceneHandles;
+        private Dictionary<string, AsyncOperationHandle<SceneInstance>> m_SceneHandles;
 
         // 默认后缀名映射
         private Dictionary<Type, string> _defaultSuffixes;
@@ -28,7 +29,7 @@ namespace MFramework.Runtime
         protected override Task OnInitialize()
         {
             m_AssetHandles = new Dictionary<string, AsyncOperationHandle>();
-            m_SceneHandles = new Dictionary<string, AsyncOperationHandle>();
+            m_SceneHandles = new Dictionary<string, AsyncOperationHandle<SceneInstance>>();
             InitializeDefaultSuffixes();
             return Task.CompletedTask;
         }
@@ -143,11 +144,6 @@ namespace MFramework.Runtime
             }
         }
 
-        public async void LoadSpriteAssetAsync<T>(string address, Action<Sprite> callback, bool isAutoAddSuffix = true) where T : Object
-        {
-
-        }
-
         /// <summary>
         /// 预加载资源
         /// </summary>
@@ -195,11 +191,12 @@ namespace MFramework.Runtime
                 // 如果场景已加载，直接返回
                 if (m_SceneHandles.ContainsKey(sceneAddress) && m_SceneHandles[sceneAddress].IsValid())
                 {
-                    Debug.Log($"Scene already loaded: {sceneAddress}");
+                    Debug.Log($"Scene already loaded: {sceneAddress},TODO 从缓存重新加载相同场景");
+                    await Addressables.LoadSceneAsync(sceneAddress).Task;//TODO 从缓存重新加载相同场景
                     return;
                 }
 
-                var handle = Addressables.LoadSceneAsync(sceneAddress);
+                AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(sceneAddress);
                 await handle.Task;
 
                 if (handle.Status == AsyncOperationStatus.Succeeded)
@@ -326,7 +323,7 @@ namespace MFramework.Runtime
             {
                 address = ProcessAssetAddress<T>(address);
             }
-           return ReleaseAsset(address);
+            return ReleaseAsset(address);
         }
 
         /// <summary>
