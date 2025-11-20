@@ -8,33 +8,25 @@ public class AssetBundleFolderGenerator : EditorWindow
     private static readonly string ArtRootPath = "Assets/Art";
     private static readonly string DownloadRootPath = "Assets/Download";
 
-    // Ô¤¶¨ÒåµÄÎÄ¼ş¼Ğ½á¹¹ - ÃÀÊõ×ÊÔ´Ä¿Â¼
+    // é¢„å®šä¹‰çš„æ–‡ä»¶å¤¹ç»“æ„ - ç¾æœ¯èµ„æºç›®å½•
     private static readonly List<string> ArtFolderPaths = new List<string>
     {
-        // Ô¤ÖÆÌåÏà¹Ø
-        "prefabs/characters/heroes",
-        "prefabs/characters/monsters",
-        "prefabs/characters/npcs",
+        // é¢„åˆ¶ä½“ç›¸å…³
         "prefabs/ui/common",
         "prefabs/ui/battle",
         "prefabs/ui/system",
-        "prefabs/effects/skills",
         "prefabs/effects/ui",
         "prefabs/effects/environment",
-        "prefabs/props/weapons",
-        "prefabs/props/armors",
-        "prefabs/props/consumables",
         
-        // Ä£ĞÍÏà¹Ø
+        // æ¨¡å‹ç›¸å…³
         "models/characters/heroes",
-        "models/characters/monsters",
         "models/characters/npcs",
         "models/environment/terrain",
         "models/environment/buildings",
         "models/props/weapons",
         "models/props/armors",
         
-        // ÎÆÀíÏà¹Ø
+        // çº¹ç†ç›¸å…³
         "textures/characters/heroes",
         "textures/characters/monsters",
         "textures/characters/npcs",
@@ -47,20 +39,20 @@ public class AssetBundleFolderGenerator : EditorWindow
         "textures/atlas/common",
         "textures/atlas/ui",
         
-        // ²ÄÖÊÏà¹Ø
+        // æè´¨ç›¸å…³
         "materials/characters",
         "materials/environment",
         "materials/effects",
         "materials/ui",
         
-        // ¶¯»­Ïà¹Ø
+        // åŠ¨ç”»ç›¸å…³
         "animations/characters/heroes",
         "animations/characters/monsters",
         "animations/characters/npcs",
         "animations/effects",
         "animations/ui",
         
-        // ÒôÆµÏà¹Ø
+        // éŸ³é¢‘ç›¸å…³
         "audio/music/bgm",
         "audio/music/events",
         "audio/sfx/ui",
@@ -69,44 +61,44 @@ public class AssetBundleFolderGenerator : EditorWindow
         "audio/sfx/environment",
         "audio/sfx/weapons",
         
-        // ShaderÏà¹Ø
+        // Shaderç›¸å…³
         "shaders/common",
         "shaders/characters",
         "shaders/environment",
         "shaders/effects",
         "shaders/ui",
         
-        // ×ÖÌåÏà¹Ø
+        // å­—ä½“ç›¸å…³
         "fonts/main",
         "fonts/special",
         "fonts/numbers",
         
-        // ³¡¾°Ïà¹Ø
+        // åœºæ™¯ç›¸å…³
         "scenes/main",
         "scenes/battle",
         "scenes/special",
         "scenes/ui",
         
-        // ÆäËû×ÊÔ´
+        // å…¶ä»–èµ„æº
         "others/videos",
         "others/rawdata",
         "others/references"
     };
 
-    // AB°üÄ¿Â¼½á¹¹ - ¶ÔÓ¦´ò°ü·Ö×é
+    // ç¨‹åºABåŒ…èµ„æºç›®å½•ç»“æ„ - å¯¹åº”æ‰“åŒ…åˆ†ç»„
     private static readonly List<string> DownloadFolderPaths = new List<string>
     {
-        // °´¹¦ÄÜÄ£¿é·Ö×é
-        "base",              // »ù´¡×ÊÔ´
-        "ui",               // UI×ÊÔ´
-        "characters",       // ½ÇÉ«×ÊÔ´
-        "monsters",         // ¹ÖÎï×ÊÔ´
-        "environment",      // »·¾³×ÊÔ´
-        "effects",          // ÌØĞ§×ÊÔ´
-        "audio",            // ÒôÆµ×ÊÔ´
-        "config",           // ÅäÖÃÊı¾İ
+        // æŒ‰åŠŸèƒ½æ¨¡å—åˆ†ç»„
+        "base",              // åŸºç¡€èµ„æº
+        "ui",               // UIèµ„æº
+        "characters",       // è§’è‰²èµ„æº
+        "monsters",         // æ€ªç‰©èµ„æº
+        "environment",      // ç¯å¢ƒèµ„æº
+        "effects",          // ç‰¹æ•ˆèµ„æº
+        "audio",            // éŸ³é¢‘èµ„æº
+        "config",           // é…ç½®æ•°æ®
         
-        // °´×ÊÔ´ÀàĞÍÏ¸·Ö
+        // æŒ‰èµ„æºç±»å‹ç»†åˆ†
         "ui/common",
         "ui/battle",
         "ui/system",
@@ -123,10 +115,10 @@ public class AssetBundleFolderGenerator : EditorWindow
         "config/language"
     };
 
-    [MenuItem("Tools/AssetBundle/Éú³ÉË«Ä¿Â¼ÎÄ¼ş¼Ğ½á¹¹")]
+    [MenuItem("Tools/æ–‡ä»¶å¤¹æ‰¹é‡ç”Ÿæˆå™¨")]
     public static void ShowWindow()
     {
-        var window = GetWindow<AssetBundleFolderGenerator>("AB°üË«Ä¿Â¼Éú³ÉÆ÷");
+        var window = GetWindow<AssetBundleFolderGenerator>("æ–‡ä»¶å¤¹æ‰¹é‡ç”Ÿæˆå™¨");
         window.minSize = new Vector2(500, 600);
         window.Show();
     }
@@ -137,11 +129,11 @@ public class AssetBundleFolderGenerator : EditorWindow
     private bool[] artFolderToggleStates;
     private bool[] downloadFolderToggleStates;
     private int selectedTab = 0;
-    private readonly string[] tabNames = { "ÃÀÊõ×ÊÔ´Ä¿Â¼", "AB°üÄ¿Â¼" };
+    private readonly string[] tabNames = { "ç¾æœ¯èµ„æºç›®å½•", "ç¨‹åºABèµ„æºç›®å½•" };
 
     private void OnEnable()
     {
-        // ³õÊ¼»¯Ñ¡ÖĞ×´Ì¬
+        // åˆå§‹åŒ–é€‰ä¸­çŠ¶æ€
         artFolderToggleStates = new bool[ArtFolderPaths.Count];
         downloadFolderToggleStates = new bool[DownloadFolderPaths.Count];
 
@@ -160,24 +152,24 @@ public class AssetBundleFolderGenerator : EditorWindow
     {
         GUILayout.Space(10);
 
-        // ±êÌâ
-        EditorGUILayout.LabelField("AssetBundle Ë«Ä¿Â¼½á¹¹Éú³ÉÆ÷", EditorStyles.boldLabel);
+        // æ ‡é¢˜
+        EditorGUILayout.LabelField("æ ¸å¿ƒç›®å½•æ–‡ä»¶å¤¹ç»“æ„æ‰¹é‡ç”Ÿæˆå™¨", EditorStyles.boldLabel);
         EditorGUILayout.Space();
 
-        // Ä¿Â¼ËµÃ÷
+        // ç›®å½•è¯´æ˜
         EditorGUILayout.HelpBox(
-            "ÃÀÊõ×ÊÔ´Ä¿Â¼ (Assets/Art): ´æ·ÅÔ­Ê¼ÃÀÊõ×ÊÔ´£¬ÓÃÓÚ±à¼­ºÍÖÆ×÷\n" +
-            "AB°üÄ¿Â¼ (Assets/Download): ´æ·Å´ò°ü×ÊÔ´£¬ÉèÖÃAssetBundle±êÇ©",
+            "ç¾æœ¯èµ„æºç›®å½• (Assets/Art): å­˜æ”¾åŸå§‹ç¾æœ¯èµ„æºï¼Œç”¨äºç¼–è¾‘å’Œåˆ¶ä½œ\n" +
+            "ç¨‹åºABåŒ…èµ„æºç›®å½• (Assets/Download): å­˜æ”¾æ‰“åŒ…èµ„æº",
             MessageType.Info
         );
 
         EditorGUILayout.Space();
 
-        // ±êÇ©Ò³
+        // æ ‡ç­¾é¡µ
         selectedTab = GUILayout.Toolbar(selectedTab, tabNames);
         EditorGUILayout.Space();
 
-        // ¸ù¾İÑ¡ÖĞµÄ±êÇ©ÏÔÊ¾²»Í¬µÄÄÚÈİ
+        // æ ¹æ®é€‰ä¸­çš„æ ‡ç­¾æ˜¾ç¤ºä¸åŒçš„å†…å®¹
         switch (selectedTab)
         {
             case 0:
@@ -190,25 +182,25 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         EditorGUILayout.Space();
 
-        // ²Ù×÷°´Å¥
+        // æ“ä½œæŒ‰é’®
         DrawActionButtons();
     }
 
     private void DrawArtFolderTab()
     {
-        EditorGUILayout.LabelField("ÃÀÊõ×ÊÔ´Ä¿Â¼½á¹¹", EditorStyles.boldLabel);
-        EditorGUILayout.LabelField($"Â·¾¶: {ArtRootPath}", EditorStyles.miniLabel);
+        EditorGUILayout.LabelField("ç¾æœ¯èµ„æºç›®å½•ç»“æ„", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField($"è·¯å¾„: {ArtRootPath}", EditorStyles.miniLabel);
 
         EditorGUILayout.Space();
 
-        // ¿ØÖÆÑ¡Ïî
+        // æ§åˆ¶é€‰é¡¹
         EditorGUILayout.BeginHorizontal();
-        generateArtFolders = EditorGUILayout.Toggle("Éú³ÉÃÀÊõÄ¿Â¼", generateArtFolders);
-        if (GUILayout.Button("È«Ñ¡"))
+        generateArtFolders = EditorGUILayout.Toggle("ç”Ÿæˆç¾æœ¯ç›®å½•", generateArtFolders);
+        if (GUILayout.Button("å…¨é€‰"))
         {
             SetAllArtFoldersState(true);
         }
-        if (GUILayout.Button("È«²»Ñ¡"))
+        if (GUILayout.Button("å…¨ä¸é€‰"))
         {
             SetAllArtFoldersState(false);
         }
@@ -216,7 +208,7 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         EditorGUILayout.Space();
 
-        // ÎÄ¼ş¼ĞÁĞ±í
+        // æ–‡ä»¶å¤¹åˆ—è¡¨
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(300));
 
         for (int i = 0; i < ArtFolderPaths.Count; i++)
@@ -233,26 +225,26 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         EditorGUILayout.EndScrollView();
 
-        // Í³¼ÆĞÅÏ¢
+        // ç»Ÿè®¡ä¿¡æ¯
         int selectedCount = GetSelectedArtFolderCount();
-        EditorGUILayout.LabelField($"ÒÑÑ¡Ôñ: {selectedCount}/{ArtFolderPaths.Count} ¸öÎÄ¼ş¼Ğ", EditorStyles.helpBox);
+        EditorGUILayout.LabelField($"å·²é€‰æ‹©: {selectedCount}/{ArtFolderPaths.Count} ä¸ªæ–‡ä»¶å¤¹", EditorStyles.helpBox);
     }
 
     private void DrawDownloadFolderTab()
     {
-        EditorGUILayout.LabelField("AB°üÄ¿Â¼½á¹¹", EditorStyles.boldLabel);
-        EditorGUILayout.LabelField($"Â·¾¶: {DownloadRootPath}", EditorStyles.miniLabel);
+        EditorGUILayout.LabelField("ç¨‹åºABåŒ…èµ„æºç›®å½•ç»“æ„", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField($"è·¯å¾„: {DownloadRootPath}", EditorStyles.miniLabel);
 
         EditorGUILayout.Space();
 
-        // ¿ØÖÆÑ¡Ïî
+        // æ§åˆ¶é€‰é¡¹
         EditorGUILayout.BeginHorizontal();
-        generateDownloadFolders = EditorGUILayout.Toggle("Éú³ÉAB°üÄ¿Â¼", generateDownloadFolders);
-        if (GUILayout.Button("È«Ñ¡"))
+        generateDownloadFolders = EditorGUILayout.Toggle("ç”Ÿæˆç¨‹åºABåŒ…èµ„æºç›®å½•", generateDownloadFolders);
+        if (GUILayout.Button("å…¨é€‰"))
         {
             SetAllDownloadFoldersState(true);
         }
-        if (GUILayout.Button("È«²»Ñ¡"))
+        if (GUILayout.Button("å…¨ä¸é€‰"))
         {
             SetAllDownloadFoldersState(false);
         }
@@ -260,7 +252,7 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         EditorGUILayout.Space();
 
-        // ÎÄ¼ş¼ĞÁĞ±í
+        // æ–‡ä»¶å¤¹åˆ—è¡¨
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(300));
 
         for (int i = 0; i < DownloadFolderPaths.Count; i++)
@@ -277,21 +269,21 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         EditorGUILayout.EndScrollView();
 
-        // Í³¼ÆĞÅÏ¢
+        // ç»Ÿè®¡ä¿¡æ¯
         int selectedCount = GetSelectedDownloadFolderCount();
-        EditorGUILayout.LabelField($"ÒÑÑ¡Ôñ: {selectedCount}/{DownloadFolderPaths.Count} ¸öÎÄ¼ş¼Ğ", EditorStyles.helpBox);
+        EditorGUILayout.LabelField($"å·²é€‰æ‹©: {selectedCount}/{DownloadFolderPaths.Count} ä¸ªæ–‡ä»¶å¤¹", EditorStyles.helpBox);
     }
 
     private void DrawActionButtons()
     {
         EditorGUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Éú³ÉÑ¡ÖĞÄ¿Â¼", GUILayout.Height(35)))
+        if (GUILayout.Button("ç”Ÿæˆé€‰ä¸­ç›®å½•", GUILayout.Height(35)))
         {
             GenerateSelectedFolders();
         }
 
-        if (GUILayout.Button("Éú³ÉÍêÕû½á¹¹", GUILayout.Height(35)))
+        if (GUILayout.Button("ç”Ÿæˆå®Œæ•´ç»“æ„", GUILayout.Height(35)))
         {
             GenerateCompleteStructure();
         }
@@ -300,16 +292,11 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         EditorGUILayout.Space();
 
-        // ¹¤¾ß°´Å¥
+        // å·¥å…·æŒ‰é’®
         EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("ÇåÀí¿ÕÎÄ¼ş¼Ğ"))
+        if (GUILayout.Button("æ¸…ç†ç©ºæ–‡ä»¶å¤¹"))
         {
             CleanEmptyFolders();
-        }
-
-        if (GUILayout.Button("ÉèÖÃAB°ü±êÇ©"))
-        {
-            SetAssetBundleLabels();
         }
         EditorGUILayout.EndHorizontal();
     }
@@ -320,23 +307,23 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         if (folderPath.StartsWith("prefabs"))
         {
-            style.normal.textColor = new Color(0.2f, 0.6f, 1f); // À¶É«
+            style.normal.textColor = new Color(0.2f, 0.6f, 1f); // è“è‰²
         }
         else if (folderPath.StartsWith("models"))
         {
-            style.normal.textColor = new Color(0.8f, 0.4f, 0.1f); // ×ØÉ«
+            style.normal.textColor = new Color(0.8f, 0.4f, 0.1f); // æ£•è‰²
         }
         else if (folderPath.StartsWith("textures"))
         {
-            style.normal.textColor = new Color(0.9f, 0.6f, 0.2f); // ³ÈÉ«
+            style.normal.textColor = new Color(0.9f, 0.6f, 0.2f); // æ©™è‰²
         }
         else if (folderPath.StartsWith("materials") || folderPath.StartsWith("shaders"))
         {
-            style.normal.textColor = new Color(0.2f, 0.8f, 0.4f); // ÂÌÉ«
+            style.normal.textColor = new Color(0.2f, 0.8f, 0.4f); // ç»¿è‰²
         }
         else if (folderPath.StartsWith("audio"))
         {
-            style.normal.textColor = new Color(0.8f, 0.4f, 0.9f); // ×ÏÉ«
+            style.normal.textColor = new Color(0.8f, 0.4f, 0.9f); // ç´«è‰²
         }
         else
         {
@@ -352,27 +339,27 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         if (folderPath.StartsWith("ui"))
         {
-            style.normal.textColor = new Color(0.9f, 0.3f, 0.3f); // ºìÉ«
+            style.normal.textColor = new Color(0.9f, 0.3f, 0.3f); // çº¢è‰²
         }
         else if (folderPath.StartsWith("characters") || folderPath.StartsWith("monsters"))
         {
-            style.normal.textColor = new Color(0.2f, 0.6f, 1f); // À¶É«
+            style.normal.textColor = new Color(0.2f, 0.6f, 1f); // è“è‰²
         }
         else if (folderPath.StartsWith("environment"))
         {
-            style.normal.textColor = new Color(0.2f, 0.8f, 0.4f); // ÂÌÉ«
+            style.normal.textColor = new Color(0.2f, 0.8f, 0.4f); // ç»¿è‰²
         }
         else if (folderPath.StartsWith("effects"))
         {
-            style.normal.textColor = new Color(0.8f, 0.4f, 0.9f); // ×ÏÉ«
+            style.normal.textColor = new Color(0.8f, 0.4f, 0.9f); // ç´«è‰²
         }
         else if (folderPath.StartsWith("audio"))
         {
-            style.normal.textColor = new Color(0.9f, 0.6f, 0.2f); // ³ÈÉ«
+            style.normal.textColor = new Color(0.9f, 0.6f, 0.2f); // æ©™è‰²
         }
         else if (folderPath.StartsWith("config"))
         {
-            style.normal.textColor = new Color(0.5f, 0.5f, 0.5f); // »ÒÉ«
+            style.normal.textColor = new Color(0.5f, 0.5f, 0.5f); // ç°è‰²
         }
         else
         {
@@ -423,7 +410,7 @@ public class AssetBundleFolderGenerator : EditorWindow
         int artCreatedCount = 0;
         int downloadCreatedCount = 0;
 
-        // Éú³ÉÃÀÊõ×ÊÔ´Ä¿Â¼
+        // ç”Ÿæˆç¾æœ¯èµ„æºç›®å½•
         if (generateArtFolders)
         {
             if (!Directory.Exists(ArtRootPath))
@@ -445,7 +432,7 @@ public class AssetBundleFolderGenerator : EditorWindow
             }
         }
 
-        // Éú³ÉAB°üÄ¿Â¼
+        // ç”Ÿæˆç¨‹åºABåŒ…èµ„æºç›®å½•
         if (generateDownloadFolders)
         {
             if (!Directory.Exists(DownloadRootPath))
@@ -463,7 +450,7 @@ public class AssetBundleFolderGenerator : EditorWindow
                         Directory.CreateDirectory(fullPath);
                         downloadCreatedCount++;
 
-                        // ÔÚAB°üÄ¿Â¼ÖĞ´´½¨.readmeÎÄ¼şËµÃ÷
+                        // åœ¨ç¨‹åºABåŒ…èµ„æºç›®å½•ä¸­åˆ›å»º.readmeæ–‡ä»¶è¯´æ˜
                         CreateReadmeFile(fullPath);
                     }
                 }
@@ -472,31 +459,31 @@ public class AssetBundleFolderGenerator : EditorWindow
 
         AssetDatabase.Refresh();
 
-        EditorUtility.DisplayDialog("Íê³É",
-            $"Éú³ÉÍê³É£¡\n" +
-            $"ÃÀÊõÄ¿Â¼: {artCreatedCount} ¸öÎÄ¼ş¼Ğ\n" +
-            $"AB°üÄ¿Â¼: {downloadCreatedCount} ¸öÎÄ¼ş¼Ğ", "È·¶¨");
+        EditorUtility.DisplayDialog("å®Œæˆ",
+            $"ç”Ÿæˆå®Œæˆï¼\n" +
+            $"ç¾æœ¯ç›®å½•: {artCreatedCount} ä¸ªæ–‡ä»¶å¤¹\n" +
+            $"ç¨‹åºABåŒ…èµ„æºç›®å½•: {downloadCreatedCount} ä¸ªæ–‡ä»¶å¤¹", "ç¡®å®š");
 
-        Debug.Log($"Ë«Ä¿Â¼½á¹¹Éú³ÉÍê³É - ÃÀÊõ: {artCreatedCount}, AB°ü: {downloadCreatedCount}");
+        Debug.Log($"åŒç›®å½•ç»“æ„ç”Ÿæˆå®Œæˆ - ç¾æœ¯: {artCreatedCount}, ABåŒ…: {downloadCreatedCount}");
     }
 
     private void CreateReadmeFile(string folderPath)
     {
-        string readmePath = Path.Combine(folderPath, "AB°üËµÃ÷.txt");
+        string readmePath = Path.Combine(folderPath, "ABåŒ…è¯´æ˜.txt");
         if (!File.Exists(readmePath))
         {
             string folderName = Path.GetFileName(folderPath);
-            string content = $@"´ËÎÄ¼ş¼ĞÓÃÓÚ´æ·Å '{folderName}' Ïà¹ØµÄAssetBundle×ÊÔ´
+            string content = $@"æ­¤æ–‡ä»¶å¤¹ç”¨äºå­˜æ”¾ '{folderName}' ç›¸å…³çš„AssetBundleèµ„æº
 
-Ê¹ÓÃËµÃ÷:
-1. ½«ĞèÒª´ò°üµÄ×ÊÔ´·ÅÈë´ËÎÄ¼ş¼Ğ
-2. ÔÚInspectorÖĞÉèÖÃAssetBundle±êÇ©
-3. Ê¹ÓÃAssetBundle Browser½øĞĞ´ò°ü
+ä½¿ç”¨è¯´æ˜:
+1. å°†éœ€è¦æ‰“åŒ…çš„èµ„æºæ”¾å…¥æ­¤æ–‡ä»¶å¤¹
+2. åœ¨Inspectorä¸­è®¾ç½®AssetBundleæ ‡ç­¾
+3. ä½¿ç”¨AssetBundle Browserè¿›è¡Œæ‰“åŒ…
 
-×¢ÒâÊÂÏî:
-- ±£³Ö×ÊÔ´ÒÀÀµ¹ØÏµÇåÎú
-- ±ÜÃâÑ­»·ÒÀÀµ
-- ¿ØÖÆµ¥¸öAB°ü´óĞ¡";
+æ³¨æ„äº‹é¡¹:
+- ä¿æŒèµ„æºä¾èµ–å…³ç³»æ¸…æ™°
+- é¿å…å¾ªç¯ä¾èµ–
+- æ§åˆ¶å•ä¸ªABåŒ…å¤§å°";
 
             File.WriteAllText(readmePath, content);
         }
@@ -511,15 +498,15 @@ public class AssetBundleFolderGenerator : EditorWindow
 
     private void CleanEmptyFolders()
     {
-        if (EditorUtility.DisplayDialog("È·ÈÏÇåÀí",
-            "È·¶¨ÒªÇåÀíÁ½¸öÄ¿Â¼ÏÂµÄËùÓĞ¿ÕÎÄ¼ş¼ĞÂğ£¿", "ÊÇ", "·ñ"))
+        if (EditorUtility.DisplayDialog("ç¡®è®¤æ¸…ç†",
+            "ç¡®å®šè¦æ¸…ç†ä¸¤ä¸ªç›®å½•ä¸‹çš„æ‰€æœ‰ç©ºæ–‡ä»¶å¤¹å—ï¼Ÿ", "æ˜¯", "å¦"))
         {
             int artRemoved = DeleteEmptyFoldersRecursive(ArtRootPath);
             int downloadRemoved = DeleteEmptyFoldersRecursive(DownloadRootPath);
             AssetDatabase.Refresh();
 
-            EditorUtility.DisplayDialog("Íê³É",
-                $"ÇåÀíÍê³É£¡\nÃÀÊõÄ¿Â¼: {artRemoved} ¸ö¿ÕÎÄ¼ş¼Ğ\nAB°üÄ¿Â¼: {downloadRemoved} ¸ö¿ÕÎÄ¼ş¼Ğ", "È·¶¨");
+            EditorUtility.DisplayDialog("å®Œæˆ",
+                $"æ¸…ç†å®Œæˆï¼\nç¾æœ¯ç›®å½•: {artRemoved} ä¸ªç©ºæ–‡ä»¶å¤¹\nç¨‹åºABåŒ…èµ„æºç›®å½•: {downloadRemoved} ä¸ªç©ºæ–‡ä»¶å¤¹", "ç¡®å®š");
         }
     }
 
@@ -542,7 +529,7 @@ public class AssetBundleFolderGenerator : EditorWindow
         bool hasRealFiles = false;
         foreach (string file in allFiles)
         {
-            if (!file.EndsWith(".meta") && !file.EndsWith("AB°üËµÃ÷.txt"))
+            if (!file.EndsWith(".meta") && !file.EndsWith("ABåŒ…è¯´æ˜.txt"))
             {
                 hasRealFiles = true;
                 break;
@@ -561,86 +548,5 @@ public class AssetBundleFolderGenerator : EditorWindow
         }
 
         return removedCount;
-    }
-
-    private void SetAssetBundleLabels()
-    {
-        if (!Directory.Exists(DownloadRootPath))
-        {
-            EditorUtility.DisplayDialog("´íÎó", "AB°üÄ¿Â¼²»´æÔÚ£¬ÇëÏÈÉú³ÉÄ¿Â¼½á¹¹", "È·¶¨");
-            return;
-        }
-
-        // ÕâÀï¿ÉÒÔÌí¼Ó×Ô¶¯ÉèÖÃAssetBundle±êÇ©µÄÂß¼­
-        // ÀıÈç¸ù¾İÎÄ¼ş¼Ğ½á¹¹×Ô¶¯ÉèÖÃ±êÇ©Ãû
-
-        EditorUtility.DisplayDialog("ÌáÊ¾",
-            "AssetBundle±êÇ©ÉèÖÃ¹¦ÄÜ´ıÊµÏÖ\n" +
-            "ÇëÊÖ¶¯ÔÚInspectorÖĞÎªResources/DownloadÏÂµÄ×ÊÔ´ÉèÖÃAB±êÇ©", "È·¶¨");
-    }
-
-    [MenuItem("Tools/AssetBundle/¿ìËÙÉú³ÉºËĞÄ½á¹¹")]
-    private static void GenerateCoreStructure()
-    {
-        // ¿ìËÙÉú³É×îºËĞÄµÄÎÄ¼ş¼Ğ½á¹¹
-        var coreArtFolders = new List<string>
-        {
-            "prefabs/ui/common",
-            "prefabs/characters/heroes",
-            "textures/ui/icons",
-            "textures/characters/heroes",
-            "audio/sfx/ui",
-            "audio/sfx/battle",
-            "fonts/main"
-        };
-
-        var coreDownloadFolders = new List<string>
-        {
-            "base",
-            "ui/common",
-            "ui/battle",
-            "characters/heroes",
-            "audio/sfx",
-            "config/data"
-        };
-
-        // ´´½¨¸ùÄ¿Â¼
-        if (!Directory.Exists(ArtRootPath))
-        {
-            Directory.CreateDirectory(ArtRootPath);
-        }
-        if (!Directory.Exists(DownloadRootPath))
-        {
-            Directory.CreateDirectory(DownloadRootPath);
-        }
-
-        // ´´½¨ºËĞÄÃÀÊõÄ¿Â¼
-        int artCreated = 0;
-        foreach (string folder in coreArtFolders)
-        {
-            string fullPath = Path.Combine(ArtRootPath, folder);
-            if (!Directory.Exists(fullPath))
-            {
-                Directory.CreateDirectory(fullPath);
-                artCreated++;
-            }
-        }
-
-        // ´´½¨ºËĞÄAB°üÄ¿Â¼
-        int downloadCreated = 0;
-        foreach (string folder in coreDownloadFolders)
-        {
-            string fullPath = Path.Combine(DownloadRootPath, folder);
-            if (!Directory.Exists(fullPath))
-            {
-                Directory.CreateDirectory(fullPath);
-                downloadCreated++;
-                //CreateReadmeFile(fullPath);
-            }
-        }
-
-        AssetDatabase.Refresh();
-        EditorUtility.DisplayDialog("Íê³É",
-            $"ºËĞÄ½á¹¹Éú³ÉÍê³É£¡\nÃÀÊõ: {artCreated} ¸öÎÄ¼ş¼Ğ\nAB°ü: {downloadCreated} ¸öÎÄ¼ş¼Ğ", "È·¶¨");
     }
 }
