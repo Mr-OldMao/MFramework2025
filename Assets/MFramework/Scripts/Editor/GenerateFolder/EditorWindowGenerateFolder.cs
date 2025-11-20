@@ -3,7 +3,7 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 
-public class AssetBundleFolderGenerator : EditorWindow
+public class EditorWindowGenerateFolder : EditorWindow
 {
     private static readonly string ArtRootPath = "Assets/Art";
     private static readonly string DownloadRootPath = "Assets/Download";
@@ -118,7 +118,7 @@ public class AssetBundleFolderGenerator : EditorWindow
     [MenuItem("Tools/文件夹批量生成器")]
     public static void ShowWindow()
     {
-        var window = GetWindow<AssetBundleFolderGenerator>("文件夹批量生成器");
+        var window = GetWindow<EditorWindowGenerateFolder>("文件夹批量生成器");
         window.minSize = new Vector2(500, 600);
         window.Show();
     }
