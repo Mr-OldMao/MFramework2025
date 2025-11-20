@@ -1,6 +1,4 @@
 using MFramework.Runtime;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,7 +15,7 @@ namespace GameMain
         public override void OnFrameworkInitialized()
         {
             Debugger.Log("框架启动完成,即将切换主场景");
-            string sceneName = "testScene";
+            string sceneName = "TestScene";
             SceneManager.LoadSceneAsync(sceneName);
             Debugger.Log($"切换场景完成，{sceneName}");
         }

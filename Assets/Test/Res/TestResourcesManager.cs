@@ -33,7 +33,7 @@ namespace MFramework.Runtime
         private string UIPanelCommon = "Assets/Download/prefab/ui/common/UIPanelCommon.prefab";
         private string UIPanelMain = "Assets/Download/prefab/ui/UIPanelMain.prefab";
 
-        private string testScene = "Assets/Download/scene/testScene.unity";
+        private string TestScene = "Assets/Download/scene/TestScene.unity";
 
         private string item = "Assets/Download/texture/atlas/item.spriteatlas";
         private string temp = "Assets/Download/texture/atlas/temp.spriteatlas";
@@ -241,7 +241,7 @@ namespace MFramework.Runtime
 
             if (GUI.Button(new Rect(curWidth, curHeight, width, height), "加载并切换场景", style))
             {
-                await GameEntry.Resource.LoadSceneAsync(testScene);
+                await GameEntry.Resource.LoadSceneAsync(TestScene);
             }
             curHeight += height;
             curHeight += height;
@@ -267,9 +267,6 @@ namespace MFramework.Runtime
 
             if (GUI.Button(new Rect(curWidth, curHeight, width, height), "测试卸载资源", style))
             {
-
-                GameObject go = null;
-
                 Debugger.Log("time1:" + System.DateTime.Now.ToString());
                 for (int i = 0; i < 1000000; i++)
                 {
@@ -283,7 +280,7 @@ namespace MFramework.Runtime
                 }
                 Debugger.Log("time3:" + System.DateTime.Now.ToString());
 
-
+                //GameObject go = null;
                 //Debugger.Log("time1:" + System.DateTime.Now.ToString());
 
                 //for (int i = 0; i < 10000; i++)

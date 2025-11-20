@@ -233,14 +233,22 @@ namespace MFramework.Runtime
 
         private void CreateUIRoot()
         {
-            Transform uiRoot = new GameObject("UIRoot").transform;
-            uiRoot.SetParent(null);
+            GameObject uiRoot = GameObject.Find("UIRoot");
+            if (uiRoot == null)
+            {
+                uiRoot = new GameObject("UIRoot");
+                uiRoot.transform.SetParent(null);
+            }
             GameObject.DontDestroyOnLoad(uiRoot.gameObject);
 
-            var eventSystem = new GameObject("EventSystem");
-            eventSystem.AddComponent<EventSystem>();
-            eventSystem.AddComponent<StandaloneInputModule>();
-            eventSystem.transform.SetParent(uiRoot);
+            var eventSystem = GameObject.Find("EventSystem");
+            if (eventSystem == null)
+            {
+                eventSystem = new GameObject("EventSystem");
+                eventSystem.AddComponent<EventSystem>();
+                eventSystem.AddComponent<StandaloneInputModule>();
+                eventSystem.transform.SetParent(uiRoot.transform);
+            }
 
             var layerValues = Enum.GetValues(typeof(UILayerType));
             var layerNames = Enum.GetNames(typeof(UILayerType));
@@ -248,22 +256,40 @@ namespace MFramework.Runtime
             for (int i = 0; i < layerValues.Length; i++)
             {
                 var res = Enum.Parse(typeof(UILayerType), layerNames[i]);
-                var go = CreateLayer(layerNames[i], (int)res, uiRoot);
+                var go = CreateLayer(layerNames[i], (int)res, uiRoot.transform);
                 m_LayerContainer.Add((UILayerType)res, go);
             }
         }
 
         private Transform CreateLayer(string name, int sortingOrder, Transform parent)
         {
-            GameObject layer = new GameObject(name);
-            layer.transform.SetParent(parent);
-
-            var canvas = layer.gameObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.overrideSorting = true;
-            canvas.sortingOrder = sortingOrder;
-
-            layer.gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+            GameObject layer = parent.Find(name)?.gameObject;
+            if (layer == null)
+            {
+                layer = new GameObject(name);
+                layer.transform.SetParent(parent);
+            }
+            var canvas = layer.GetComponent<Canvas>();
+            if (canvas == null)
+            {
+                canvas = layer.AddComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.overrideSorting = true;
+                canvas.sortingOrder = sortingOrder;
+            }
+            var graphicRaycaster = layer.GetComponent<UnityEngine.UI.GraphicRaycaster>();
+            if (graphicRaycaster == null)
+            {
+                graphicRaycaster = layer.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+            }
+            var canvasScaler = layer.GetComponent<UnityEngine.UI.CanvasScaler>();
+            if (canvasScaler == null)
+            {
+                canvasScaler = layer.AddComponent<UnityEngine.UI.CanvasScaler>();
+                canvasScaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                canvasScaler.referenceResolution = new Vector2(1080, 1920); //TODO 运行时根据配置文件设置分辨率
+                canvasScaler.matchWidthOrHeight = 1f;//TODO 运行时根据配置文件设置宽高权重
+            }
             return layer.transform;
         }
 
@@ -297,7 +323,21 @@ namespace MFramework.Runtime
             var viewBaseScript = go.AddComponent<T>();
 
             go.transform.SetParent(m_LayerContainer[viewBaseScript.Layer]);
-            go.transform.localScale = Vector3.one;
+            var rectTrans = go.GetComponent<RectTransform>();
+            if (rectTrans != null)
+            {
+                rectTrans.anchorMin = Vector3.zero;
+                rectTrans.anchorMax = Vector3.one;
+                rectTrans.pivot = new Vector2(0.5f, 0.5f);
+                rectTrans.localPosition = Vector3.zero;
+                rectTrans.localRotation = Quaternion.identity;
+                rectTrans.localScale = Vector3.one;
+                rectTrans.sizeDelta = Vector2.zero;
+            }
+            else
+            {
+                Debugger.LogError($"UI预制体缺少RectTransform组件: {viewName}", LogType.FrameCore);
+            }
             return viewBaseScript;
         }
 
