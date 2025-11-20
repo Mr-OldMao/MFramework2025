@@ -1,0 +1,5 @@
+struct Prop
+{
+	id:int;
+	value:int;
+}
