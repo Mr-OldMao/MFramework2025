@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections;
 using UnityEngine; 
-public interface IEventManager : IGameModule
+public interface IEventManager : IGameBase
 {
     void RegisterEvent(int eventId, Action callback);
     void UnRegisterEvent(int eventId, Action callback);

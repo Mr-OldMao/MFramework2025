@@ -1,10 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MFramework.Runtime
 {
-	public interface IPoolManager : IGameModule
+	public interface IPoolManager : IGameBase
 	{
         GameObject Get(string poolName);
         void Return(GameObject obj, string poolName);

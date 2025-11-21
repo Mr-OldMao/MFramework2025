@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace MFramework.Runtime
 {
-    public interface IUIManager : IGameModule
+    public interface IUIManager : IGameBase
     {
         void ShowView<T>() where T : UIViewBase;
 

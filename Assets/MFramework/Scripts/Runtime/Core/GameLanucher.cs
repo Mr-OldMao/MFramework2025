@@ -15,7 +15,7 @@ namespace MFramework.Runtime
         private static GameLauncher _instance;
         private FrameworkManager frameworkManager;
 
-        private Queue<IGameModule> m_QueueGameModels = new Queue<IGameModule>();
+        private Queue<IGameBase> m_QueueGameModels = new Queue<IGameBase>();
         private void Awake()
         {
             if (_instance != null)
@@ -61,7 +61,7 @@ namespace MFramework.Runtime
         private async Task InitializeFrameworkStepByStep()
         {
             // 严格按照依赖顺序初始化
-            m_QueueGameModels = new Queue<IGameModule>();
+            m_QueueGameModels = new Queue<IGameBase>();
 
             // 第1步：核心基础模块
             InitializeCoreModules();

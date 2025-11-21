@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,7 +8,7 @@ namespace MFramework.Runtime
     // FrameworkManager.cs - 框架核心管理器
     public class FrameworkManager
     {
-        private readonly Dictionary<Type, IGameModule> _modules = new();
+        private readonly Dictionary<Type, IGameBase> _modules = new();
         private readonly List<IUpdatableModule> _updateModules = new();
 
         public static FrameworkManager Instance { get; private set; }
@@ -19,7 +19,7 @@ namespace MFramework.Runtime
         }
 
         // 模块注册系统
-        public void RegisterModule<T>(T module) where T : IGameModule
+        public void RegisterModule<T>(T module) where T : IGameBase
         {
             var type = GetInterfaceType(module);// typeof(T);
 
@@ -40,17 +40,17 @@ namespace MFramework.Runtime
             Debugger.Log($"模块 {module.GetType()} 注册成功", LogType.FrameCore);
         }
 
-        private Type GetInterfaceType(IGameModule module)
+        private Type GetInterfaceType(IGameBase module)
         {
             // 通过反射获取模块实现的主要接口
             var interfaces = module.GetType().GetInterfaces()
-                .Where(i => typeof(IGameModule).IsAssignableFrom(i) && i != typeof(IGameModule))
+                .Where(i => typeof(IGameBase).IsAssignableFrom(i) && i != typeof(IGameBase))
                 .FirstOrDefault();
 
             return interfaces ?? module.GetType();
         }
 
-        public T GetModule<T>() where T : class, IGameModule
+        public T GetModule<T>() where T : class, IGameBase
         {
             var type = typeof(T);
             _modules.TryGetValue(type, out var module);
@@ -72,7 +72,7 @@ namespace MFramework.Runtime
         }
 
         // 非泛型获取模块（用于依赖检查）
-        public IGameModule GetModule(Type moduleType)
+        public IGameBase GetModule(Type moduleType)
         {
             _modules.TryGetValue(moduleType, out var module);
             return module;

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MFramework.Runtime
 {
-    public interface IUIView : IGameModule
+    public interface IUIView : IGameBase
     {
         GameObject UIForm { get; }
         UILayerType Layer { get; }

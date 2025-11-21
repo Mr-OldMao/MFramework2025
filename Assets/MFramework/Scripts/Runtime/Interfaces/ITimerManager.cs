@@ -1,10 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MFramework.Runtime
 {
-	public interface ITimerManager :IGameModule, IUpdatableModule
+	public interface ITimerManager :IGameBase, IUpdatableModule
 	{
         int AddTimer(float delay, System.Action callback);
         void RemoveTimer(int timerId);

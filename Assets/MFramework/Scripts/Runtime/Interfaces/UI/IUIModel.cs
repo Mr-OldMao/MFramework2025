@@ -1,6 +1,6 @@
 namespace MFramework.Runtime
 {
-    public interface IUIModel : IGameModule
+    public interface IUIModel : IGameBase
     {
         void Reset();
     }

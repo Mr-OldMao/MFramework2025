@@ -1,10 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MFramework.Runtime
 {
-	public interface IAudioManager : IGameModule
+	public interface IAudioManager : IGameBase
 	{
         void PlaySound(string soundName);
         void PlayMusic(string musicName);

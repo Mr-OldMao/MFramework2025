@@ -1,4 +1,4 @@
-﻿public interface ILoggerModule : IGameModule //, IUpdatableModule
+public interface ILoggerModule : IGameBase //, IUpdatableModule
 {
     void Log(string content, LogType logType = LogType.Default); 
     void LogWarning(string content, LogType logType = LogType.Default);

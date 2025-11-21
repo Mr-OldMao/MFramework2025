@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 namespace MFramework.Runtime
 {
-    public abstract class GameModuleBase : IGameModule
+    public abstract class GameModuleBase : IGameBase
     {
         public ModuleState State { get; protected set; } = ModuleState.Uninitialized;
         protected ILoggerModule Logger => FrameworkManager.Instance.GetModule<ILoggerModule>();

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 
 // 模块基础接口
-public interface IGameModule : IShutdown, IInit
+public interface IGameBase : IShutdown, IInit
 {
 
 }
@@ -23,7 +23,7 @@ public interface IUpdatableModule
 }
 
 // 可销毁模块接口  
-public interface IDisposableModule : IGameModule
+public interface IDisposableModule : IGameBase
 {
     void Dispose();
 }
