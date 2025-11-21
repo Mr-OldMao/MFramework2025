@@ -49,10 +49,21 @@ namespace MFramework.Runtime
                     }
                     else
                     {
-                        //等待初始化完成返回
-                        Debugger.LogError($"显示窗体失败,{uiDataInfo.state}");
-                        return default;
-                        //await ShowViewAsync<T>(); //未测试性能
+                        //高频点击显示窗体处理
+                        Debugger.LogWarning($"ShowViewAsync 等待初始化完成返回,CurState:{uiDataInfo.state}");
+                        while (GetState(uiDataInfo.view) < UIStateProgressType.InitEnd)
+                        {
+                            await Task.Yield();
+                        }
+                        SetState(uiDataInfo.view, UIStateProgressType.ShowStart);
+                        await uiDataInfo.view.ShowPanel();
+                        SetState(uiDataInfo.view, UIStateProgressType.ShowEnd);
+                        return uiDataInfo.view as T;
+
+                        ////等待初始化完成返回
+                        //Debugger.LogError($"显示窗体失败,{uiDataInfo.state}");
+                        //return default;
+                        ////await ShowViewAsync<T>(); //未测试性能
                     }
                 }
                 UIDataInfo newUIDataInfo = new UIDataInfo();
