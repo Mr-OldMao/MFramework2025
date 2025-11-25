@@ -347,11 +347,8 @@ namespace MFramework.Runtime
                         Addressables.Release(handle);
                     }
                 }
-
                 m_AssetHandles.Clear();
                 m_SceneHandles.Clear();
-
-                Debug.Log("ResourcesManager cleared all resources");
                 return true;
             }
             catch (Exception ex)
@@ -535,6 +532,7 @@ namespace MFramework.Runtime
         protected override void OnShutdown()
         {
             ReleaseAllAssets();
+            Debugger.Log("Shutdown ResourcesManager", LogType.FrameNormal);
         }
         #endregion
     }

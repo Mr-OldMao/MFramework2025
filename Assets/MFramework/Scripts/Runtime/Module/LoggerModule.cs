@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -89,7 +89,7 @@ namespace MFramework.Runtime
 
         protected override void OnShutdown()
         {
-            Debug.Log("------OnShutdown");
+            Debug.Log("OnShutdown LoggerModule");
         }
     }
 

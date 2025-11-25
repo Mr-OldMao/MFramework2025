@@ -124,6 +124,8 @@ namespace MFramework.Runtime
 
             m_QueueGameModels.Enqueue(new UIManager());
 
+            m_QueueGameModels.Enqueue(new PersistenceDataManager());
+
             //// 3. 配置管理系统
             //var configManager = new ConfigManager();
             //m_QueueGameModels.Enqueue(new ConfigManager());

@@ -20,9 +20,9 @@ namespace MFramework.Runtime
 
         protected override void OnShutdown()
         {
-            Logger.Log("事件系统已关闭...", LogType.FrameNormal);
             m_DicEventHandlers.Clear();
             m_DicEventTHandlers.Clear();
+            Debugger.Log("Shutdown EventManager", LogType.FrameNormal);
         }
 
         public void RegisterEvent(int eventId, Action callback)

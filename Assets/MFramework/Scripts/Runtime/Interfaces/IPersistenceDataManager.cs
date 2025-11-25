@@ -10,7 +10,7 @@ namespace MFramework.Runtime
         T ReadData<T>(string key, bool isBytesData = true) where T : class;
         Task<T> ReadDataAsync<T>(string key, bool isBytesData = true) where T : class;
 
-        bool DeleteData(string key);
-        bool HasData(string key);
+        bool DeleteData(string key, bool isBytesData = true);
+        bool HasData(string key, bool isBytesData = true);
     }
 }
