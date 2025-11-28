@@ -18,13 +18,13 @@ public class ExcelDataProcessor
     {
         var files = new List<string>();
 
-        if (!Directory.Exists(_config.excelFolderPath))
+        if (!Directory.Exists(_config.ExcelFolderPath))
         {
-            Debug.LogWarning($"Excel文件夹不存在: {_config.excelFolderPath}");
+            Debug.LogWarning($"Excel文件夹不存在: {_config.ExcelFolderPath}");
             return files;
         }
 
-        string[] allFiles = Directory.GetFiles(_config.excelFolderPath, "*.xlsx");
+        string[] allFiles = Directory.GetFiles(_config.ExcelFolderPath, "*.xlsx");
         foreach (string file in allFiles)
         {
             if (!file.Contains("~$"))
@@ -57,17 +57,17 @@ public class ExcelDataProcessor
                     break;
                 }
 
-                if (worksheet.Dimension == null || worksheet.Dimension.Rows < _config.dataStartIndex + 1)
+                if (worksheet.Dimension == null || worksheet.Dimension.Rows < _config.DataStartIndex + 1)
                     throw new System.Exception("Excel文件数据不足");
 
                 string tableName = Path.GetFileNameWithoutExtension(excelPath);
                 int columnCount = worksheet.Dimension.Columns;
                 int rowCount = worksheet.Dimension.Rows;
                 //校准有效列数量
-                int realColumnCount = _config.dataStartIndex;
+                int realColumnCount = _config.DataStartIndex;
                 for (int i = 1; i <= columnCount; i++)
                 {
-                    if (!string.IsNullOrEmpty(worksheet.Cells[_config.fieldNameIndex + 1, i].Text.Trim()))
+                    if (!string.IsNullOrEmpty(worksheet.Cells[_config.FieldNameIndex + 1, i].Text.Trim()))
                     {
                         realColumnCount++;
                     }
@@ -78,7 +78,7 @@ public class ExcelDataProcessor
                 }
                 columnCount = realColumnCount;
                 //校准有效行数
-                int realRowCount = _config.dataStartIndex;
+                int realRowCount = _config.DataStartIndex;
                 for (int i = realRowCount + 1; i <= rowCount; i++)
                 {
                     if (!string.IsNullOrEmpty(worksheet.Cells[i, 1].Text.Trim()))
@@ -103,16 +103,16 @@ public class ExcelDataProcessor
                     fieldComments = new string[columnCount],
                     fieldNames = new string[columnCount],
                     fieldTypes = new string[columnCount],
-                    dataRows = new string[rowCount - _config.dataStartIndex][]
+                    dataRows = new string[rowCount - _config.DataStartIndex][]
                 };
                 tableDataArr.Add(tableData);
 
                 // 读取字段注释、名称、类型
                 for (int col = 1; col <= columnCount; col++)
                 {
-                    tableData.fieldComments[col - 1] = worksheet.Cells[_config.fieldCommentIndex + 1, col].Text?.Trim() ?? "";
-                    tableData.fieldNames[col - 1] = worksheet.Cells[_config.fieldNameIndex + 1, col].Text?.Trim() ?? $"Field{col}";
-                    tableData.fieldTypes[col - 1] = worksheet.Cells[_config.fieldTypeIndex + 1, col].Text?.Trim() ?? "string";
+                    tableData.fieldComments[col - 1] = worksheet.Cells[_config.FieldCommentIndex + 1, col].Text?.Trim() ?? "";
+                    tableData.fieldNames[col - 1] = worksheet.Cells[_config.FieldNameIndex + 1, col].Text?.Trim() ?? $"Field{col}";
+                    tableData.fieldTypes[col - 1] = worksheet.Cells[_config.FieldTypeIndex + 1, col].Text?.Trim() ?? "string";
                 }
 
                 // 容错处理
@@ -126,7 +126,7 @@ public class ExcelDataProcessor
 
                 // 读取数据行
                 int dataRowIndex = 0;
-                for (int row = _config.dataStartIndex + 1; row <= rowCount; row++)
+                for (int row = _config.DataStartIndex + 1; row <= rowCount; row++)
                 {
                     List<string> values = new List<string>();
                     for (int col = 1; col <= columnCount; col++)
@@ -151,10 +151,10 @@ public class ExcelDataProcessor
     #region 生成Excel模板文件
     public void GenerateSampleExcel()
     {
-        if (!Directory.Exists(_config.excelFolderPath))
-            Directory.CreateDirectory(_config.excelFolderPath);
+        if (!Directory.Exists(_config.ExcelFolderPath))
+            Directory.CreateDirectory(_config.ExcelFolderPath);
 
-        string excelPath = Path.Combine(_config.excelFolderPath, "TestTemplate.xlsx");
+        string excelPath = Path.Combine(_config.ExcelFolderPath, "TestTemplate.xlsx");
 
         FileInfo newFile = new FileInfo(excelPath);
         using (ExcelPackage package = new ExcelPackage(newFile))
@@ -178,61 +178,131 @@ public class ExcelDataProcessor
         ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(name);
         // 设置表头和数据
         int column = 1;
-        worksheet.Cells[_config.fieldCommentIndex + 1, column++].Value = "id";
-        worksheet.Cells[_config.fieldCommentIndex + 1, column++].Value = "攻击力";
-        worksheet.Cells[_config.fieldCommentIndex + 1, column++].Value = "技能";
-        worksheet.Cells[_config.fieldCommentIndex + 1, column++].Value = "技能CD";
-        worksheet.Cells[_config.fieldCommentIndex + 1, column++].Value = "技能描述";
-        worksheet.Cells[_config.fieldCommentIndex + 1, column++].Value = "升级所消耗的材料";
-        worksheet.Cells[_config.fieldCommentIndex + 1, column++].Value = "升星所消耗的材料";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "id";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "男性";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "技能";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "技能CD";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "技能描述";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "自定义数据类型1";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "自定义数据类型2";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "自定义数据类型3";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "自定义数据类型4";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "自定义数据类型5";
 
         column = 1;
-        worksheet.Cells[_config.fieldNameIndex + 1, column++].Value = "id";
-        worksheet.Cells[_config.fieldNameIndex + 1, column++].Value = "attack";
-        worksheet.Cells[_config.fieldNameIndex + 1, column++].Value = "skills";
-        worksheet.Cells[_config.fieldNameIndex + 1, column++].Value = "skillsCD";
-        worksheet.Cells[_config.fieldNameIndex + 1, column++].Value = "skillsDes";
-        worksheet.Cells[_config.fieldNameIndex + 1, column++].Value = "CostLevel";
-        worksheet.Cells[_config.fieldNameIndex + 1, column++].Value = "CostStart";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "id";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "isMen";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "skills";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "skillsCD";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "skillsDes";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "customDataType1";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "customDataType2";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "customDataType3";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "customDataType4";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "customDataType5";
 
         column = 1;
-        worksheet.Cells[_config.fieldTypeIndex + 1, column++].Value = "int";
-        worksheet.Cells[_config.fieldTypeIndex + 1, column++].Value = "int";
-        worksheet.Cells[_config.fieldTypeIndex + 1, column++].Value = "[int]";
-        worksheet.Cells[_config.fieldTypeIndex + 1, column++].Value = "[int]";
-        worksheet.Cells[_config.fieldTypeIndex + 1, column++].Value = "[string]";
-        worksheet.Cells[_config.fieldTypeIndex + 1, column++].Value = "Prop";
-        worksheet.Cells[_config.fieldTypeIndex + 1, column++].Value = "[Prop]";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "int";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "bool";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[int]";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[int]";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[string]";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "DictIntInt";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[DictIntString]";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[DictStringString]";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "Vector3";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[Vector2]";
 
-        for (int i = _config.dataStartIndex + 1; i <= _config.dataStartIndex + 10; i++)
+        for (int i = _config.DataStartIndex + 1; i <= _config.DataStartIndex + 10; i++)
         {
             column = 1;
             worksheet.Cells[i, column++].Value = 10001000 + i;
-            worksheet.Cells[i, column++].Value = Random.Range(10, 1000);
+            worksheet.Cells[i, column++].Value = Random.Range(0, 1f) > 0.5f;
             worksheet.Cells[i, column++].Value = GenerateRandomIntData(4, ",");
             worksheet.Cells[i, column++].Value = GenerateRandomIntData(4, "，");
             worksheet.Cells[i, column++].Value = GenerateRandomStringData(4, ":");
-            worksheet.Cells[i, column++].Value = $"{{{Random.Range(10, 100)},{Random.Range(10, 100)}}}";
-            worksheet.Cells[i, column++].Value = GenerateRandomPropData(Random.Range(2, 4));
+
+            worksheet.Cells[i, column++].Value = GenerateRandomDictIntIntData(1);
+            worksheet.Cells[i, column++].Value = GenerateRandomDictIntStringData(Random.Range(2, 4));
+            worksheet.Cells[i, column++].Value = GenerateRandomDictStringStringData(Random.Range(2, 4));
+            worksheet.Cells[i, column++].Value = GenerateRandomV3Data(1);
+            worksheet.Cells[i, column++].Value = GenerateRandomV2Data(Random.Range(2, 4));
         }
         worksheet.Cells.AutoFitColumns();
         return worksheet;
     }
 
-    private string GenerateRandomPropData(int count)
+    private string GenerateRandomDictIntIntData(int count)
     {
         string res = string.Empty;
         for (int i = 0; i < count; i++)
         {
-            res += $"{{{Random.Range(10, 100)},{Random.Range(10, 100)}}}";
+            res += $"{{{Random.Range(1, 100)},{Random.Range(1, 100)}}}";
             if (i != count - 1)
             {
                 res += ",";
             }
         }
-        Debug.Log($"GenerateRandomPropData: {res}");
         return res;
     }
+
+    private string GenerateRandomDictIntStringData(int count)
+    {
+        string res = string.Empty;
+        for (int i = 0; i < count; i++)
+        {
+            res += $"{{{Random.Range(1, 100)},\"{Random.Range(1, 100)}\"}}";
+            if (i != count - 1)
+            {
+                res += ",";
+            }
+        }
+        return res;
+    }
+
+    private string GenerateRandomDictStringStringData(int count)
+    {
+        string res = string.Empty;
+        for (int i = 0; i < count; i++)
+        {
+            res += $"{{\"{Random.Range(1, 100)}\",\"{Random.Range(1, 100)}\"}}";
+            if (i != count - 1)
+            {
+                res += ",";
+            }
+        }
+        return res;
+    }
+
+    private string GenerateRandomV3Data(int count)
+    {
+        string res = string.Empty;
+        for (int i = 0; i < count; i++)
+        {
+            res += $"{{ {Random.Range(0f, 9f):F1},{Random.Range(0f, 9f):F1},{Random.Range(0f, 9f):F1} }}";
+            if (i != count - 1)
+            {
+                res += ",";
+            }
+        }
+        return res;
+    }
+
+    private string GenerateRandomV2Data(int count)
+    {
+        string res = string.Empty;
+        for (int i = 0; i < count; i++)
+        {
+            //随机浮点数 保留一位小数
+            res += $"{{ {Random.Range(0.0f, 9.0f):F1},{Random.Range(0.0f, 9.0f):F1} }}";
+            if (i != count - 1)
+            {
+                res += ",";
+            }
+        }
+        return res;
+    }
+
     private string GenerateRandomIntData(int count, string Split)
     {
         string res = string.Empty;

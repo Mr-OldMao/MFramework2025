@@ -30,10 +30,10 @@ namespace Game.Tool
         private void OnEnable()
         {
             _dataProcessor = new ExcelDataProcessor(_config);
-            _codeGenerator = new CodeGeneratorService();
+            _codeGenerator = new CodeGeneratorService(_config);
             _compilerService = new FlatcCompilerService();
 
-            _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.flatcPath);
+            _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.FlatcPath);
 
             RefreshExcelFiles();
         }
@@ -64,10 +64,10 @@ namespace Game.Tool
         {
             // Excel文件夹路径
             EditorGUILayout.BeginHorizontal();
-            string newExcelFolderPath = EditorGUILayout.TextField("Excel文件夹:", _config.excelFolderPath);
-            if (newExcelFolderPath != _config.excelFolderPath)
+            string newExcelFolderPath = EditorGUILayout.TextField("Excel文件夹:", _config.ExcelFolderPath);
+            if (newExcelFolderPath != _config.ExcelFolderPath)
             {
-                _config.excelFolderPath = newExcelFolderPath;
+                _config.ExcelFolderPath = newExcelFolderPath;
                 RefreshExcelFiles();
             }
             if (GUILayout.Button("浏览", GUILayout.Width(60)))
@@ -75,59 +75,70 @@ namespace Game.Tool
                 string path = EditorUtility.OpenFolderPanel("选择Excel文件夹", Application.dataPath, "");
                 if (!string.IsNullOrEmpty(path))
                 {
-                    _config.excelFolderPath = path;
+                    _config.ExcelFolderPath = path;
                     RefreshExcelFiles();
                 }
             }
             EditorGUILayout.EndHorizontal();
 
+            // Excel自定义数据类型路径
+            EditorGUILayout.BeginHorizontal();
+            _config.CustomDataTypeFilePath  = EditorGUILayout.TextField("Excel自定义数据类型路径:", _config.CustomDataTypeFilePath);
+            if (GUILayout.Button("浏览", GUILayout.Width(60)))
+            {
+                string path = EditorUtility.OpenFilePanel("选择Excel自定义数据类型路径", Application.dataPath, "fbs");
+                if (!string.IsNullOrEmpty(path)) 
+                    _config.CustomDataTypeFilePath = path;
+            }
+            EditorGUILayout.EndHorizontal();
+
             // FlatBuffer输出路径
             EditorGUILayout.BeginHorizontal();
-            _config.outputPath = EditorGUILayout.TextField("FlatBuffer输出路径:", _config.outputPath);
+            _config.OutputPath = EditorGUILayout.TextField("FlatBuffer输出路径:", _config.OutputPath);
             if (GUILayout.Button("浏览", GUILayout.Width(60)))
             {
                 string path = EditorUtility.OpenFolderPanel("选择输出文件夹", Application.dataPath, "");
-                if (!string.IsNullOrEmpty(path)) _config.outputPath = path;
+                if (!string.IsNullOrEmpty(path)) _config.OutputPath = path;
             }
             EditorGUILayout.EndHorizontal();
 
             // 数据文件输出路径
             EditorGUILayout.BeginHorizontal();
-            _config.dataPathOutputPath = EditorGUILayout.TextField("数据文件输出路径:", _config.dataPathOutputPath);
+            _config.DataPathOutputPath = EditorGUILayout.TextField("数据文件输出路径:", _config.DataPathOutputPath);
             if (GUILayout.Button("浏览", GUILayout.Width(60)))
             {
                 string path = EditorUtility.OpenFolderPanel("选择输出文件夹", Application.dataPath, "");
-                if (!string.IsNullOrEmpty(path)) _config.dataPathOutputPath = path;
+                if (!string.IsNullOrEmpty(path)) _config.DataPathOutputPath = path;
             }
             EditorGUILayout.EndHorizontal();
 
             // C#代码输出路径
             EditorGUILayout.BeginHorizontal();
-            _config.csOutputPath = EditorGUILayout.TextField("C#代码输出路径:", _config.csOutputPath);
+            _config.CsOutputPath = EditorGUILayout.TextField("C#代码输出路径:", _config.CsOutputPath);
             if (GUILayout.Button("浏览", GUILayout.Width(60)))
             {
                 string path = EditorUtility.OpenFolderPanel("选择C#代码输出文件夹", Application.dataPath, "");
-                if (!string.IsNullOrEmpty(path)) _config.csOutputPath = path;
+                if (!string.IsNullOrEmpty(path)) _config.CsOutputPath = path;
             }
             EditorGUILayout.EndHorizontal();
 
             // .Bytes文件拷贝路径
             EditorGUILayout.BeginHorizontal();
-            _config.copyBytesPath = EditorGUILayout.TextField(".Bytes文件拷贝路径:", _config.copyBytesPath);
+            _config.CopyBytesPath = EditorGUILayout.TextField(".Bytes文件拷贝路径:", _config.CopyBytesPath);
             if (GUILayout.Button("浏览", GUILayout.Width(60)))
             {
                 string path = EditorUtility.OpenFolderPanel("选择输出文件夹", Application.dataPath, "");
-                if (!string.IsNullOrEmpty(path)) _config.copyBytesPath = path;
+                if (!string.IsNullOrEmpty(path)) _config.CopyBytesPath = path;
             }
             EditorGUILayout.EndHorizontal();
 
             // flatc路径
             EditorGUILayout.BeginHorizontal();
-            string newFlatcPath = EditorGUILayout.TextField("flatc路径:", _config.flatcPath);
-            if (newFlatcPath != _config.flatcPath)
+            string newFlatcPath = EditorGUILayout.TextField("flatc路径:", _config.FlatcPath);
+            if (newFlatcPath != _config.FlatcPath)
             {
-                _config.flatcPath = newFlatcPath;
-                _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.flatcPath);
+                _config.FlatcPath = newFlatcPath;
+                _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.FlatcPath);
             }
 
             if (GUILayout.Button("浏览", GUILayout.Width(60)))
@@ -135,8 +146,8 @@ namespace Game.Tool
                 string path = EditorUtility.OpenFilePanel("选择flatc编译器", "", "exe");
                 if (!string.IsNullOrEmpty(path))
                 {
-                    _config.flatcPath = path;
-                    _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.flatcPath);
+                    _config.FlatcPath = path;
+                    _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.FlatcPath);
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -147,10 +158,10 @@ namespace Game.Tool
             // 自动查找flatc
             if (GUILayout.Button("自动查找flatc", GUILayout.Width(100)))
             {
-                string foundPath = _compilerService.FindFlatcCompiler(_config.flatcPath);
+                string foundPath = _compilerService.FindFlatcCompiler(_config.FlatcPath);
                 if (!string.IsNullOrEmpty(foundPath))
                 {
-                    _config.flatcPath = foundPath;
+                    _config.FlatcPath = foundPath;
                     _config.flatcAvailable = true;
                     AddConsoleOutput($"已找到flatc: {foundPath}");
                 }
@@ -163,7 +174,7 @@ namespace Game.Tool
             // 验证flatc状态
             GUILayout.FlexibleSpace();
             GUILayout.Label("状态:", GUILayout.Width(50));
-            _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.flatcPath);
+            _config.flatcAvailable = _compilerService.IsCompilerAvailable(_config.FlatcPath);
             GUILayout.Label(_config.flatcAvailable ? "✓ 可用" : "✗ 不可用",
                            _config.flatcAvailable ? EditorStyles.boldLabel : EditorStyles.miniLabel);
             EditorGUILayout.EndHorizontal();
@@ -172,12 +183,12 @@ namespace Game.Tool
             EditorGUILayout.Space(30);
             GUILayout.Label("Excel解析配置", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
-            _config.fieldCommentIndex = EditorGUILayout.IntField("注释行索引:", _config.fieldCommentIndex);
-            _config.fieldNameIndex = EditorGUILayout.IntField("字段名索引:", _config.fieldNameIndex);
+            _config.FieldCommentIndex = EditorGUILayout.IntField("注释行索引:", _config.FieldCommentIndex);
+            _config.FieldNameIndex = EditorGUILayout.IntField("字段名索引:", _config.FieldNameIndex);
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
-            _config.fieldTypeIndex = EditorGUILayout.IntField("字段类型索引:", _config.fieldTypeIndex);
-            _config.dataStartIndex = EditorGUILayout.IntField("数据起始行:", _config.dataStartIndex);
+            _config.FieldTypeIndex = EditorGUILayout.IntField("字段类型索引:", _config.FieldTypeIndex);
+            _config.DataStartIndex = EditorGUILayout.IntField("数据起始行:", _config.DataStartIndex);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -369,6 +380,7 @@ namespace Game.Tool
         private void GenerateSingleExcelFile(string excelPath)
         {
             List<ExcelTableData> tableDataArr = _dataProcessor.ParseExcelFile(excelPath);
+            _codeGenerator.InitCustomDataType();
             for (int i = 0; i < tableDataArr.Count; i++)
             {
                 ExcelTableData tableData = tableDataArr[i];
@@ -376,16 +388,16 @@ namespace Game.Tool
                 string jsonContent = _codeGenerator.GenerateJsonContent(tableData);
 
                 // 确保输出目录存在
-                if (!Directory.Exists(_config.outputPath))
-                    Directory.CreateDirectory(_config.outputPath);
-                if (!Directory.Exists(_config.dataPathOutputPath))
-                    Directory.CreateDirectory(_config.dataPathOutputPath);
+                if (!Directory.Exists(_config.OutputPath))
+                    Directory.CreateDirectory(_config.OutputPath);
+                if (!Directory.Exists(_config.DataPathOutputPath))
+                    Directory.CreateDirectory(_config.DataPathOutputPath);
 
                 string baseName = $"{tableData.tableName}_{tableData.workbookName}";
-                string fbsPath = Path.Combine(_config.dataPathOutputPath, $"{baseName}.fbs");
-                string jsonPath = Path.Combine(_config.dataPathOutputPath, $"{baseName}.json");
-                string binPath = Path.Combine(_config.dataPathOutputPath, $"{baseName}.bin");
-                string bytesPath = Path.Combine(_config.dataPathOutputPath, $"{baseName}.bytes");
+                string fbsPath = Path.Combine(_config.DataPathOutputPath, $"{baseName}.fbs");
+                string jsonPath = Path.Combine(_config.DataPathOutputPath, $"{baseName}.json");
+                string binPath = Path.Combine(_config.DataPathOutputPath, $"{baseName}.bin");
+                string bytesPath = Path.Combine(_config.DataPathOutputPath, $"{baseName}.bytes");
 
                 File.WriteAllText(fbsPath, fbsContent);
                 AddConsoleOutput($"生成文件: {fbsPath}");
@@ -396,7 +408,7 @@ namespace Game.Tool
 
 
                 // 编译
-                bool success = _compilerService.Compile(_config.flatcPath, fbsPath, jsonPath, _config.outputPath, _config.dataPathOutputPath, AddConsoleOutput);
+                bool success = _compilerService.Compile(_config.FlatcPath, fbsPath, jsonPath, _config.OutputPath, _config.DataPathOutputPath, AddConsoleOutput);
 
                 if (success)
                 {
@@ -417,7 +429,7 @@ namespace Game.Tool
 
         private void CopyBytesToResources()
         {
-            if (!Directory.Exists(_config.dataPathOutputPath))
+            if (!Directory.Exists(_config.DataPathOutputPath))
             {
                 EditorUtility.DisplayDialog("错误", "输出路径不存在，请先生成.bytes文件", "确定");
                 return;
@@ -428,7 +440,7 @@ namespace Game.Tool
 
             try
             {
-                string targetFolder = _config.copyBytesPath;
+                string targetFolder = _config.CopyBytesPath;
 
                 if (!Directory.Exists(targetFolder))
                 {
@@ -437,7 +449,7 @@ namespace Game.Tool
                 }
 
                 // 获取所有.bytes文件
-                string[] bytesFiles = Directory.GetFiles(_config.dataPathOutputPath, "*.bytes");
+                string[] bytesFiles = Directory.GetFiles(_config.DataPathOutputPath, "*.bytes");
 
                 if (bytesFiles.Length == 0)
                 {

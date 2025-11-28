@@ -31,7 +31,7 @@
 //            }
 //            else
 //            {
-//                Debug.LogError($"Resources中未找到文件: {fileName}");
+//                Debug.LogError($"Resources中未找到文件: Resources/{fileName}.bytes");
 //            }
 //        }
 //        catch (System.Exception e)
@@ -52,7 +52,6 @@
 //            for (int i = 0; i < tableArray.DatasLength; i++)
 //            {
 //                var table = tableArray.Datas(i).Value;
-
 //                var fieldNames = table.GetType().GetFields();
 
 //                foreach (var item in fieldNames)
