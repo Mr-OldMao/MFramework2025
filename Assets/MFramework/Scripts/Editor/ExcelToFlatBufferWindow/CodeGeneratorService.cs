@@ -123,18 +123,13 @@ public class CodeGeneratorService
             case "int": return "int";
             case "float": return "float";
             case "bool": return "bool";
-            case "string":
-            case "repeated string":
-                return "string";
+            case "string": return "string";
             case "long": return "long";
             case "double": return "double";
             case "byte": return "byte";
             case "ubyte": return "ubyte";
             case "short": return "short";
-            //case "prop":
-            //    return "Prop";
             default:
-
                 var customStruct = m_DicCustomDataType.Where(p => p.Key.ToLower() == type.ToLower());
                 if (customStruct.Count() > 0)
                 {
@@ -274,7 +269,6 @@ public class CodeGeneratorService
         {
             string content = File.ReadAllText(customDataTypePath);
             content = content.Replace("\r", "").Replace("\n", "").Replace("\t", "");
-            Debug.Log("-------" + content);
 
             string structPattern = @"struct\s+(\w+)\s*\{([^}]*)\}";
             MatchCollection structMatches = Regex.Matches(content, structPattern, RegexOptions.Singleline);
@@ -377,10 +371,6 @@ public class CodeGeneratorService
                 //string subFieldValue = FormatValueForJson(fieldValues[i], subFieldType, fieldName, excelTableData);
                 string subFieldValue = fieldValues[i];
                 sb.Append($"\"{subFieldName}\":{subFieldValue}");
-                //if (i != fieldValues.Count - 1)
-                //{
-                //    sb.AppendLine(",");
-                //}
                 sb.Append(i != fieldValues.Count - 1? ",":"");
             }
             sb.Append("}");

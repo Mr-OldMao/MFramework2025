@@ -2,6 +2,7 @@ using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -328,6 +329,56 @@ public class ExcelDataProcessor
             }
         }
         return res;
+    }
+    #endregion
+
+    #region 生成自定义类型文件CustomDataType.fbs
+    public void GenerateCustomDataTypeFile()
+    {
+        if (!File.Exists(_config.CustomDataTypeFilePath))
+        {
+            string filePath = _config.CustomDataTypeFilePath;
+            string content =
+@"struct DictIntInt
+{
+	key:int;
+	value:int;
+}
+
+table DictIntString
+{
+	key:int;
+	value:string;
+}
+
+table DictStringString
+{
+	key:string;
+	value:string;
+}
+
+struct Vector3
+{
+	x:float;
+	y:float;
+	z:float;
+}
+
+struct Vector2
+{
+	x:float;
+	y:float;
+}
+";
+            if (!Directory.Exists(Path.GetDirectoryName(filePath)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+            }
+
+            File.WriteAllText(filePath, content, Encoding.UTF8);
+
+            AssetDatabase.Refresh();
+        }
     }
     #endregion
 }

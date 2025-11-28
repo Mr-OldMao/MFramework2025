@@ -156,7 +156,7 @@ namespace Game.Tool
             EditorGUILayout.BeginHorizontal();
 
             // 自动查找flatc
-            if (GUILayout.Button("自动查找flatc", GUILayout.Width(100)))
+            if (GUILayout.Button("自动查找flatc", GUILayout.Width(150)))
             {
                 string foundPath = _compilerService.FindFlatcCompiler(_config.FlatcPath);
                 if (!string.IsNullOrEmpty(foundPath))
@@ -180,7 +180,7 @@ namespace Game.Tool
             EditorGUILayout.EndHorizontal();
 
             // 索引配置
-            EditorGUILayout.Space(30);
+            EditorGUILayout.Space(10);
             GUILayout.Label("Excel解析配置", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
             _config.FieldCommentIndex = EditorGUILayout.IntField("注释行索引:", _config.FieldCommentIndex);
@@ -193,7 +193,7 @@ namespace Game.Tool
 
             EditorGUILayout.BeginHorizontal();
             // 重置按钮
-            if (GUILayout.Button("重置设置", GUILayout.Width(100)))
+            if (GUILayout.Button("重置所有设置", GUILayout.Height(30), GUILayout.Width(150)))
             {
                 if (EditorUtility.DisplayDialog("确认重置", "确定要重置所有设置为默认值吗？", "确定", "取消"))
                 {
@@ -228,13 +228,28 @@ namespace Game.Tool
             }
             else
             {
-                EditorGUILayout.HelpBox("未找到Excel文件", MessageType.Info);
-                if (GUILayout.Button("生成Excel模板文件"))
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox("未找到Excel文件", MessageType.Warning);
+                if (GUILayout.Button("生成Excel模板文件", GUILayout.Height(38), GUILayout.Width(300)))
                 {
                     _dataProcessor.GenerateSampleExcel();
                     RefreshExcelFiles();
                 }
+                EditorGUILayout.EndHorizontal();
             }
+
+
+            if (!File.Exists(_config.CustomDataTypeFilePath))
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox("未找到CustomDataType.fbs文件", MessageType.Warning);
+                if (GUILayout.Button("生成CustomDataType.fbs模板文件", GUILayout.Height(38),GUILayout.Width(300)))
+                {
+                    _dataProcessor.GenerateCustomDataTypeFile();
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+
         }
 
         private void DrawActionButtons()
