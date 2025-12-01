@@ -1,15 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
+using static MFramework.Runtime.TimerManager;
 
 namespace MFramework.Runtime
 {
 	public interface ITimerManager :IGameBase, IUpdatableModule
 	{
-        int AddTimer(float delay, System.Action callback);
-        void RemoveTimer(int timerId);
-        void PauseTimer(int timerId);
-        void ResumeTimer(int timerId);
+        bool IsStartingUp { get; set; }
+        int AddDelayTimer(float delaySeconds, Action callback);
+        int AddDelayTimer(int delayMilliSeconds, Action callback);
+        int AddDelayTimer(float delaySeconds, float loopSeconds, Action callback, Action loopEndCallback = null, int targetLoopCount = -1);
+        void RemoveDelayTimer(int timerId);
+        TimerInfo GetTimerInfo(int timerId);
+        string ToString(int timerId);
     }
 
 }

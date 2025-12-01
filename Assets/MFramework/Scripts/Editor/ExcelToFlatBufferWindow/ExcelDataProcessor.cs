@@ -65,10 +65,10 @@ public class ExcelDataProcessor
                 int columnCount = worksheet.Dimension.Columns;
                 int rowCount = worksheet.Dimension.Rows;
                 //校准有效列数量
-                int realColumnCount = _config.DataStartIndex;
+                int realColumnCount = 0;
                 for (int i = 1; i <= columnCount; i++)
                 {
-                    if (!string.IsNullOrEmpty(worksheet.Cells[_config.FieldNameIndex + 1, i].Text.Trim()))
+                    if (!string.IsNullOrEmpty(worksheet.Cells[_config.FieldTypeIndex + 1, i].Text.Trim()))
                     {
                         realColumnCount++;
                     }
