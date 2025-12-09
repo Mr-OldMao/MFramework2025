@@ -11,5 +11,14 @@ namespace MFramework.Runtime.Extend
         /// AddressableUI预制体根节点路径
         /// </summary>
         public const string PATH_PREFAB_UI_ROOT = "Assets/Download/prefab/ui/";
+
+        /// <summary>
+        /// Addressable 音频BGM节点路径
+        /// </summary>
+        public const string PATH_AUDIO_BGM = "Assets/Download/audio/bgm/";
+        /// <summary>
+        /// Addressable 音频音效节点路径
+        /// </summary>
+        public const string PATH_AUDIO_SOUND = "Assets/Download/audio/sound/";
     }
 }

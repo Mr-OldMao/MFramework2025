@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace MFramework.Runtime
 {
@@ -11,7 +12,7 @@ namespace MFramework.Runtime
 
         private int m_CurTimerId = 0;
 
-        public bool IsStartingUp { get ; set ; }
+        public bool IsStartingUp { get; set; }
 
         public Task Init()
         {
@@ -94,6 +95,13 @@ namespace MFramework.Runtime
             return AddDelayTimer(timerInfo);
         }
 
+        public int AddDelayTimer(int delayFrame, int loopFrameInterval, Action callback, Action loopEndCallback = null, int targetLoopCount = -1)
+        {
+            int targetFrame = Application.targetFrameRate;
+            return AddDelayTimer(delayFrame / (float)targetFrame, loopFrameInterval / (float)targetFrame, callback, loopEndCallback, targetLoopCount);
+        }
+
+
         public void RemoveDelayTimer(int timerId)
         {
             var timerInfo = GetTimerInfo(timerId);
@@ -127,7 +135,7 @@ namespace MFramework.Runtime
                 }
                 else
                 {
-                    info = $"timerId:{timerInfo.timerId}" 
+                    info = $"timerId:{timerInfo.timerId}"
                         + $",curDelaySeconds:{timerInfo.curDelaySeconds},targetDelaySeconds:{timerInfo.targetDelaySeconds}"
                         + $",curLoopCount:{timerInfo.delayLoopInfo.curInvokeCount},targetLoopCount:{timerInfo.delayLoopInfo.targetInvokeCount}"
                         + $",curLoopIntervalSeconds:{timerInfo.delayLoopInfo.curLoopIntervalSeconds},targetLoopIntervalSeconds:{timerInfo.delayLoopInfo.targetLoopIntervalSeconds}";

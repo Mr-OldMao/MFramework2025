@@ -15,7 +15,8 @@ namespace MFramework.Runtime
     /// </summary>
     public class TestResourcesManager : MonoBehaviour
     {
-        private string resFileAudioClip = "Assets/Download/audio/bgm/resFileAudioClip.ogg";
+        private string resFileAudioClipSound1 = "Assets/Download/audio/sound/resFileAudioClipSound1.mp3";
+        private string resFileAudioClipSound2 = "Assets/Download/audio/sound/resFileAudioClipSound2.ogg";
 
         private string resFileBytes = "Assets/Download/config/data/resFileBytes.bytes";
         private string resFileTxt = $"Assets/Download/base/resFileTxt.txt";
@@ -134,9 +135,16 @@ namespace MFramework.Runtime
             }
             curHeight += height;
 
-            if (GUI.Button(new Rect(curWidth, curHeight, width, height), "加载音频资源", style))
+            if (GUI.Button(new Rect(curWidth, curHeight, width, height), "加载.mp3音频资源", style))
             {
-                var res = await GameEntry.Resource.LoadAssetAsync<AudioClip>(resFileAudioClip);
+                var res = await GameEntry.Resource.LoadAssetAsync<AudioClip>(resFileAudioClipSound1);
+                Log(res);
+            }
+            curHeight += height;
+
+            if (GUI.Button(new Rect(curWidth, curHeight, width, height), "加载.ogg音频资源", style))
+            {
+                var res = await GameEntry.Resource.LoadAssetAsync<AudioClip>(resFileAudioClipSound2);
                 Log(res);
             }
             curHeight += height;

@@ -14,8 +14,8 @@ namespace MFramework.Runtime
         public static UIManager UI =>  Framework?.GetModule<IUIManager>() as UIManager;
         public static PersistenceDataManager LocalData => Framework?.GetModule<IPersistenceDataManager>() as PersistenceDataManager;
         public static TimerManager Timer => Framework?.GetModule<ITimerManager>() as TimerManager;
+        public static AudioManager Audio => Framework?.GetModule<IAudioManager>() as AudioManager;
 
-        public static IAudioManager Audio => Framework?.GetModule<IAudioManager>();
         public static ISceneManager Scene => Framework?.GetModule<ISceneManager>();
         public static IPoolManager Pool => Framework?.GetModule<IPoolManager>();
         //public static DataManager Data => Framework?.GetModule<IDataManager>() as DataManager;
