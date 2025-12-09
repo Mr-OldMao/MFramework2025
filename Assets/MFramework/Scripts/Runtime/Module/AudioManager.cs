@@ -181,7 +181,6 @@ namespace MFramework.Runtime
                 {
                     if (!audioSource.isPlaying && audioData.audioStateType != AudioStateType.Pause)
                     {
-                        Debug.LogError($"播放结束,newAudioID:{newAudioID}");
                         ReturnToPool(audioSource, newAudioID);
                         playedCallback?.Invoke();
                         GameEntry.Timer.RemoveDelayTimer(timerID);
