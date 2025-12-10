@@ -2,7 +2,7 @@ using MFramework.Runtime.Extend;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MFramework.Runtime
@@ -26,7 +26,7 @@ namespace MFramework.Runtime
         private const int m_InitialPoolSize = 2;
 
 
-        public Task Init()
+        public UniTask Init()
         {
             Transform audioSoundsContainer = new GameObject("AudioSoundsContainer").transform;
             m_SoundEffectContainer = new GameObject("SoundEffects").transform;
@@ -49,7 +49,7 @@ namespace MFramework.Runtime
             m_AudioID = 0;
 
             UnityEngine.Object.DontDestroyOnLoad(audioSoundsContainer);
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         #region 对象池
@@ -98,7 +98,7 @@ namespace MFramework.Runtime
         #endregion
 
 
-        private async Task<AudioClip> LoadAudioClip(string audioName, AudioSourceType audioSourceType)
+        private async UniTask<AudioClip> LoadAudioClip(string audioName, AudioSourceType audioSourceType)
         {
             switch (audioSourceType)
             {
@@ -145,7 +145,7 @@ namespace MFramework.Runtime
             await PlaySound(audioName, playedCallback, 1f, false);
         }
 
-        public async Task<int> PlaySound(string audioName, Action playedCallback = null, float volume = 1, bool isLoop = false)
+        public async UniTask<int> PlaySound(string audioName, Action playedCallback = null, float volume = 1, bool isLoop = false)
         {
             AudioClip clip = await LoadAudioClip(audioName, AudioSourceType.SoundEffect);
             if (clip == null)
@@ -194,7 +194,7 @@ namespace MFramework.Runtime
             return newAudioID;
         }
 
-        public async Task<int> PlayBGM(string audioName, float volume = 1, bool isLoop = true)
+        public async UniTask<int> PlayBGM(string audioName, float volume = 1, bool isLoop = true)
         {
             // 如果已经在播放相同的背景音乐，直接返回
             if (m_CurBGMAudioSourceData != null

@@ -1,10 +1,10 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MFramework.Runtime
 {
     public abstract class UIModelBase : IUIModel
     {
-        public abstract Task Init();
+        public abstract UniTask Init();
         public virtual void Reset() { }
 
         public IUIController Controller { get; set; }

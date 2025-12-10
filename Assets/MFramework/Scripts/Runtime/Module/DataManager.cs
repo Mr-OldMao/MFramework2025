@@ -2,7 +2,7 @@
 //using System.Collections.Generic;
 //using System.IO;
 //using System.Text;
-//using System.Threading.Tasks;
+//using Cysharp.Threading.Tasks;
 //using UnityEngine;
 //using UnityEngine.Networking;
 
@@ -44,7 +44,7 @@
 //        #endregion
 
 //        #region 初始化
-//        public Task Init()
+//        public UniTask Init()
 //        {
 //            // 初始化持久化数据目录
 //            _persistenceDataFolder = Path.Combine(Application.persistentDataPath, "GameData");
@@ -54,7 +54,7 @@
 //            }
 
 //            InitializeSourceBasePaths();
-//            return Task.CompletedTask;
+//            return UniTask.CompletedTask;
 //        }
 
 //        private void InitializeSourceBasePaths()
@@ -74,7 +74,7 @@
 
 //        #region 核心数据加载接口
 
-//        public async Task<byte[]> LoadBytesAsync(string dataPath, DataSourceType dataSourceType)
+//        public async UniTask<byte[]> LoadBytesAsync(string dataPath, DataSourceType dataSourceType)
 //        {
 //            if (string.IsNullOrEmpty(dataPath))
 //                throw new ArgumentException("数据路径不能为空");
@@ -107,13 +107,13 @@
 //            }
 //        }
 
-//        public async Task<string> LoadTextAsync(string dataPath, DataSourceType dataSourceType)
+//        public async UniTask<string> LoadTextAsync(string dataPath, DataSourceType dataSourceType)
 //        {
 //            var bytes = await LoadBytesAsync(dataPath, dataSourceType);
 //            return Encoding.UTF8.GetString(bytes);
 //        }
 
-//        public async Task<T> LoadDataAsync<T>(string dataName, DataSourceType dataSourceType) where T : class
+//        public async UniTask<T> LoadDataAsync<T>(string dataName, DataSourceType dataSourceType) where T : class
 //        {
 //            if (string.IsNullOrEmpty(dataName))
 //                throw new ArgumentException("数据名称不能为空");
@@ -194,7 +194,7 @@
 //            }
 //        }
 
-//        public async Task PreloadDataAsync(string dataName, DataSourceType dataSourceType)
+//        public async UniTask PreloadDataAsync(string dataName, DataSourceType dataSourceType)
 //        {
 //            string cacheKey = GetCacheKey(dataName, dataSourceType);
 
@@ -442,7 +442,7 @@
 
 //        #region 私有方法 - 数据源加载
 
-//        private async Task<byte[]> LoadBytesFromStreamingAssetsAsync(string dataPath)
+//        private async UniTask<byte[]> LoadBytesFromStreamingAssetsAsync(string dataPath)
 //        {
 //            string fullPath = Path.Combine(Application.streamingAssetsPath, dataPath);
 
@@ -454,7 +454,7 @@
                 
 //                while (!operation.isDone)
 //                {
-//                    await Task.Yield();
+//                    await UniTask.Yield();
 //                }
                 
 //                if (request.result != UnityWebRequest.Result.Success)
@@ -472,7 +472,7 @@
 //#endif
 //        }
 
-//        private async Task<byte[]> LoadBytesFromResourcesAsync(string dataPath)
+//        private async UniTask<byte[]> LoadBytesFromResourcesAsync(string dataPath)
 //        {
 //            // 移除文件扩展名（Resources.Load不需要扩展名）
 //            string resourcePath = Path.GetFileNameWithoutExtension(dataPath);
@@ -481,7 +481,7 @@
 
 //            while (!resourceRequest.isDone)
 //            {
-//                await Task.Yield();
+//                await UniTask.Yield();
 //            }
 
 //            var textAsset = resourceRequest.asset as TextAsset;
@@ -491,7 +491,7 @@
 //            return textAsset.bytes;
 //        }
 
-//        private async Task<byte[]> LoadBytesFromPersistentDataAsync(string dataPath)
+//        private async UniTask<byte[]> LoadBytesFromPersistentDataAsync(string dataPath)
 //        {
 //            string fullPath = Path.Combine(Application.persistentDataPath, dataPath);
 
@@ -557,7 +557,7 @@
 //        /// <summary>
 //        /// 从StreamingAssets加载数据（便捷方法）
 //        /// </summary>
-//        public Task<T> LoadFromStreamingAssetsAsync<T>(string dataPath) where T : class
+//        public UniTask<T> LoadFromStreamingAssetsAsync<T>(string dataPath) where T : class
 //        {
 //            return LoadDataAsync<T>(dataPath, DataSourceType.StreamingAssets);
 //        }
@@ -565,7 +565,7 @@
 //        /// <summary>
 //        /// 从Resources加载数据（便捷方法）
 //        /// </summary>
-//        public Task<T> LoadFromResourcesAsync<T>(string dataPath) where T : class
+//        public UniTask<T> LoadFromResourcesAsync<T>(string dataPath) where T : class
 //        {
 //            return LoadDataAsync<T>(dataPath, DataSourceType.Resources);
 //        }
@@ -573,7 +573,7 @@
 //        /// <summary>
 //        /// 从PersistentData加载数据（便捷方法）
 //        /// </summary>
-//        public Task<T> LoadFromPersistentDataAsync<T>(string dataPath) where T : class
+//        public UniTask<T> LoadFromPersistentDataAsync<T>(string dataPath) where T : class
 //        {
 //            return LoadDataAsync<T>(dataPath, DataSourceType.PersistentData);
 //        }

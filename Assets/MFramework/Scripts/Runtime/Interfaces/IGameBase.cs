@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 // 模块基础接口
 public interface IGameBase : IShutdown, IInit
@@ -8,7 +8,7 @@ public interface IGameBase : IShutdown, IInit
 
 public interface IInit
 {
-    Task Init();
+    UniTask Init();
 }
 
 public interface IShutdown

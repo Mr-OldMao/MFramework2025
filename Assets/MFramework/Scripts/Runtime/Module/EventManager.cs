@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MFramework.Runtime
 {
@@ -10,11 +10,11 @@ namespace MFramework.Runtime
         private readonly Dictionary<int, List<Delegate>> m_DicEventTHandlers = new Dictionary<int, List<Delegate>>();
 
         private readonly int m_MaxEventCountHint = 2;
-        protected override async Task OnInitialize()
+        protected override async UniTask OnInitialize()
         {
             Logger.Log("事件系统初始化中...", LogType.FrameNormal);
             // 初始化事件系统
-            await Task.Delay(100); // 模拟初始化耗时
+            await UniTask.Delay(100); // 模拟初始化耗时
             Logger.Log("事件系统初始化完成...", LogType.FrameNormal);
         }
 

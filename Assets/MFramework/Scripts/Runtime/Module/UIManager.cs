@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -32,7 +32,7 @@ namespace MFramework.Runtime
 #pragma warning restore CS4014
         }
 
-        public async Task<T> ShowViewAsync<T>() where T : UIViewBase
+        public async UniTask<T> ShowViewAsync<T>() where T : UIViewBase
         {
             try
             {
@@ -53,7 +53,7 @@ namespace MFramework.Runtime
                         Debugger.LogWarning($"ShowViewAsync 等待初始化完成返回,CurState:{uiDataInfo.state}");
                         while (GetState(uiDataInfo.view) < UIStateProgressType.InitEnd)
                         {
-                            await Task.Yield();
+                            await UniTask.Yield();
                         }
                         SetState(uiDataInfo.view, UIStateProgressType.ShowStart);
                         await uiDataInfo.view.ShowPanel();
@@ -110,7 +110,7 @@ namespace MFramework.Runtime
 #pragma warning restore CS4014
         }
 
-        public async Task HideViewAsync<T>() where T : UIViewBase
+        public async UniTask HideViewAsync<T>() where T : UIViewBase
         {
             try
             {
@@ -230,7 +230,7 @@ namespace MFramework.Runtime
         #endregion
 
 
-        protected override async Task OnInitialize()
+        protected override async UniTask OnInitialize()
         {
             CreateUIRoot();
             await LoadUIConfig();
@@ -304,11 +304,11 @@ namespace MFramework.Runtime
             return layer.transform;
         }
 
-        private async Task LoadUIConfig()
+        private async UniTask LoadUIConfig()
         {
             // 可以从配置表或Addressables加载UI配置
             // 这里简单实现，实际项目中可以从JSON/ScriptableObject加载
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
         private void SetState(IUIView type, UIStateProgressType stateProgressType)
@@ -321,7 +321,7 @@ namespace MFramework.Runtime
             }
         }
 
-        private async Task<T> CreateView<T>(string viewName) where T : UIViewBase
+        private async UniTask<T> CreateView<T>(string viewName) where T : UIViewBase
         {
             var prefab = await LoadUIViewPrefab<T>(viewName);
 
@@ -357,7 +357,7 @@ namespace MFramework.Runtime
         /// </summary>
         /// <param name="viewName">资源形参addressable全路径 Assets/xxx/xxx.prefab</param>
         /// <returns></returns>
-        private async Task<GameObject> LoadUIViewPrefab<T>(string viewName) where T : UIViewBase
+        private async UniTask<GameObject> LoadUIViewPrefab<T>(string viewName) where T : UIViewBase
         {
             UIDataInfo uiDataInfo = GetUIDataInfo<T>();
             if (uiDataInfo.formPrefab != null)

@@ -1,11 +1,11 @@
 using MFramework.Runtime;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace GameMain
 {
     public class UIControlMain : UIControllerBase
     {
-        public override async Task Init(IUIView view, IUIModel model)
+        public override async UniTask Init(IUIView view, IUIModel model)
         {
             Debugger.Log($"{this.GetType()}, init start  ");
             await base.Init(view, model);

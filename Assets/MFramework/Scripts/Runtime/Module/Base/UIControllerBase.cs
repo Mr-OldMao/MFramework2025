@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MFramework.Runtime
 {
@@ -7,12 +7,12 @@ namespace MFramework.Runtime
         public IUIView View { get; private set; }
         public IUIModel Model { get; private set; }
 
-        public virtual async Task Init(IUIView view, IUIModel model)
+        public virtual async UniTask Init(IUIView view, IUIModel model)
         {
             View = view;
             Model = model;
-            await Model?.Init();
-            await View?.Init();
+            await Model.Init();
+            await View.Init();
         }
 
         public virtual void OnDestory() { }

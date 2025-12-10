@@ -2,7 +2,7 @@ using GameMain;
 using MFramework.Runtime.Extend;
 using System;
 using System.Reflection;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UI;
@@ -28,10 +28,10 @@ namespace MFramework.Runtime
             SetLayer();
         }
 
-        public virtual Task Init()
+        public virtual UniTask Init()
         {
             m_IsRegisteredEvent = false;
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public void SetSprite(Image img, EAtlasType atlasType, string spriteName, Action<Sprite> callback = null)
@@ -52,7 +52,7 @@ namespace MFramework.Runtime
             }, false);
         }
 
-        public virtual Task ShowPanel()
+        public virtual UniTask ShowPanel()
         {
             gameObject.SetActive(true);
             if (!m_IsRegisteredEvent)
@@ -60,10 +60,10 @@ namespace MFramework.Runtime
                 m_IsRegisteredEvent = !m_IsRegisteredEvent;
                 RegisterEvent();
             }
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
-        public virtual Task HidePanel()
+        public virtual UniTask HidePanel()
         {
             gameObject.SetActive(false);
             if (m_IsRegisteredEvent)
@@ -71,12 +71,12 @@ namespace MFramework.Runtime
                 m_IsRegisteredEvent = !m_IsRegisteredEvent;
                 UnRegisterEvent();
             }
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public abstract void RefreshUI(IUIModel uIModel = null);
 
-        public async Task<Sprite> SetSpriteAsync(Image img, EAtlasType atlasType, string spriteName)
+        public async UniTask<Sprite> SetSpriteAsync(Image img, EAtlasType atlasType, string spriteName)
         {
             string atlasPath = $"{SystemConstantData.PATH_ATLAS_ROOT}{atlasType}.spriteatlas";
             var atlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(atlasPath, false);

@@ -1,13 +1,13 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MFramework.Runtime
 {
     public interface IAudioManager : IGameBase
     {
-        Task<int> PlaySound(string audioName, Action playedCallback, float volume = 1, bool isLoop = false);
-        Task<int> PlayBGM(string audioName, float volume = 1, bool isLoop = true);
+        UniTask<int> PlaySound(string audioName, Action playedCallback, float volume = 1, bool isLoop = false);
+        UniTask<int> PlayBGM(string audioName, float volume = 1, bool isLoop = true);
 
         void SetVolume(int audioId, float volume);
         void SetMute(int audioId, bool isMute);

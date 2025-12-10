@@ -1,7 +1,5 @@
-using System;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MFramework.Runtime
@@ -26,9 +24,16 @@ namespace MFramework.Runtime
 
             _instance = this;
             DontDestroyOnLoad(gameObject);
-
+            InitPlayerLoopHelper();
             // 初始化框架
             InitializeFramework();
+        }
+
+        private void InitPlayerLoopHelper()
+        {
+            var playerLoop = UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop();
+            PlayerLoopHelper.Initialize(ref playerLoop, InjectPlayerLoopTimings.Standard);
+            //PlayerLoopHelper.Initialize(ref playerLoop, InjectPlayerLoopTimings.All);
         }
 
         private async void InitializeFramework()
@@ -58,7 +63,7 @@ namespace MFramework.Runtime
 
 
         // GameLauncher.cs - 详细初始化流程
-        private async Task InitializeFrameworkStepByStep()
+        private async UniTask InitializeFrameworkStepByStep()
         {
             // 严格按照依赖顺序初始化
             m_QueueGameModels = new Queue<IGameBase>();
@@ -89,9 +94,6 @@ namespace MFramework.Runtime
             UpdateLaunchProgress(totalSteps, totalSteps, "框架启动完成！");
         }
 
-
-
-
         private void UpdateLaunchProgress(int current, int total, string message)
         {
             var progress = ((float)current / total) * 100;
@@ -104,7 +106,7 @@ namespace MFramework.Runtime
             Debugger.Log($"初始化进度：{progress}% , {message}", LogType.FrameCore);
         }
 
-        private async Task InitializeLogSystemImmediately()
+        private async UniTask InitializeLogSystemImmediately()
         {
             var logger = new LoggerModule();
             frameworkManager = new FrameworkManager();
@@ -138,7 +140,7 @@ namespace MFramework.Runtime
             //m_QueueGameModels.Enqueue(new PoolManager());
         }
 
-        private async Task InitializeResourceModules()
+        private async UniTask InitializeResourceModules()
         {
             //// 5. 资源管理模块
             //var resourceManager = new ResourceManager();
@@ -150,10 +152,11 @@ namespace MFramework.Runtime
             //frameworkManager.RegisterModule<ISceneManager>(sceneManager);
             //await sceneManager.Initialize();
 
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
+
         }
 
-        private async Task InitializeGameplayModules()
+        private async UniTask InitializeGameplayModules()
         {
             //// 7. UI管理系统
             //var uiManager = new UIManager();
@@ -174,10 +177,10 @@ namespace MFramework.Runtime
             //var stateMachineManager = new StateMachineManager();
             //frameworkManager.RegisterModule<IStateMachineManager>(stateMachineManager);
             //await stateMachineManager.Initialize();
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
-        private async Task InitializeAdvancedModules()
+        private async UniTask InitializeAdvancedModules()
         {
             //// 11. 网络模块（可选）
             //if (frameworkConfig.enableNetwork)
@@ -199,7 +202,7 @@ namespace MFramework.Runtime
             //var debugManager = new DebugManager();
             //frameworkManager.RegisterModule<IDebugManager>(debugManager);
             //await debugManager.Initialize();
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
         #region mono

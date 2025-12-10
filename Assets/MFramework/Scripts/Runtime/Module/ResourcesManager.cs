@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -26,12 +26,12 @@ namespace MFramework.Runtime
         /// <summary>
         /// 初始化资源管理器
         /// </summary>
-        protected override Task OnInitialize()
+        protected override UniTask OnInitialize()
         {
             m_AssetHandles = new Dictionary<string, AsyncOperationHandle>();
             m_SceneHandles = new Dictionary<string, AsyncOperationHandle<SceneInstance>>();
             InitializeDefaultSuffixes();
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         #region 对外接口
@@ -44,12 +44,12 @@ namespace MFramework.Runtime
             callback?.Invoke(res);
         }
 
-        public async Task<T> LoadAssetAsync<T>(string address, bool isAutoAddSuffix = true) where T : Object
+        public async UniTask<T> LoadAssetAsync<T>(string address, bool isAutoAddSuffix = true) where T : Object
         {
             return await LoadAssetAsync<T>(address, null, null, isAutoAddSuffix);
         }
 
-        public async Task<T> LoadAssetAsync<T>(string address, Action<AsyncOperationHandle<T>> completedCallback,
+        public async UniTask<T> LoadAssetAsync<T>(string address, Action<AsyncOperationHandle<T>> completedCallback,
             Action<AsyncOperationHandle> destroyedCallback, bool isAutoAddSuffix = true) where T : Object
         {
             if (string.IsNullOrEmpty(address))
@@ -102,12 +102,12 @@ namespace MFramework.Runtime
         }
 
 
-        public async Task<List<T>> LoadAssetsAsync<T>(List<string> addresses, bool isAutoAddSuffix = true) where T : Object
+        public async UniTask<List<T>> LoadAssetsAsync<T>(List<string> addresses, bool isAutoAddSuffix = true) where T : Object
         {
             return await LoadAssetsAsync<T>(addresses, null, null, isAutoAddSuffix);
         }
 
-        public async Task<List<T>> LoadAssetsAsync<T>(List<string> addresses, Action<AsyncOperationHandle<T>> completedCallback,
+        public async UniTask<List<T>> LoadAssetsAsync<T>(List<string> addresses, Action<AsyncOperationHandle<T>> completedCallback,
             Action<AsyncOperationHandle> destroyedCallback = null, bool isAutoAddSuffix = true) where T : Object
         {
             var results = new List<T>();
@@ -117,24 +117,31 @@ namespace MFramework.Runtime
 
             try
             {
-                var tasks = new List<Task<T>>();
+                var tasks = new List<UniTask<T>>();
 
                 foreach (var address in addresses)
                 {
                     tasks.Add(LoadAssetAsync<T>(address, completedCallback, destroyedCallback, isAutoAddSuffix));
                 }
 
-                await Task.WhenAll(tasks);
+				T[] taskResults =  await UniTask.WhenAll(tasks);
 
-                foreach (var task in tasks)
-                {
-                    if (task.IsCompletedSuccessfully && task.Result != null)
-                    {
-                        results.Add(task.Result);
-                    }
-                }
+				foreach (var result in taskResults)
+				{
+					if (result != null)
+					{
+						results.Add(result);
+					}
+				}
+				//foreach (var task in tasks)
+				//{
+				//    if (task.Status == UniTaskStatus.Succeeded && task.GetAwaiter().GetResult() != null)
+				//    {
+				//        results.Add(task.GetAwaiter().GetResult());
+				//    }
+				//}
 
-                return results;
+				return results;
             }
 
             catch (Exception ex)
@@ -147,7 +154,7 @@ namespace MFramework.Runtime
         /// <summary>
         /// 预加载资源
         /// </summary>
-        public async Task<List<T>> PreloadAssetsAsync<T>(List<string> addresses, bool isAutoAddSuffix = true) where T : Object
+        public async UniTask<List<T>> PreloadAssetsAsync<T>(List<string> addresses, bool isAutoAddSuffix = true) where T : Object
         {
             return await LoadAssetsAsync<T>(addresses, null, null, isAutoAddSuffix);
         }
@@ -174,7 +181,7 @@ namespace MFramework.Runtime
 
 
 
-        public async Task LoadSceneAsync(string sceneAddress)
+        public async UniTask LoadSceneAsync(string sceneAddress)
         {
             if (string.IsNullOrEmpty(sceneAddress))
             {
@@ -219,7 +226,7 @@ namespace MFramework.Runtime
         #endregion
 
         #region 实例化
-        public async Task<GameObject> InstantiateAsset(string address, bool isAutoAddSuffix = true)
+        public async UniTask<GameObject> InstantiateAsset(string address, bool isAutoAddSuffix = true)
         {
             if (isAutoAddSuffix)
             {

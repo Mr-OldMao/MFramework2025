@@ -1,4 +1,4 @@
-//using System.Threading.Tasks;
+//using Cysharp.Threading.Tasks;
 
 //namespace MFramework.Runtime
 //{
@@ -7,10 +7,10 @@
 //    /// </summary>
 //    public interface IDataManager : IGameModule
 //    {
-//        //Task<byte[]> LoadBytesAsync(string dataPath, DataSourceType dataSourceType);
-//        //Task<string> LoadTextAsync(string dataPath, DataSourceType dataSourceType);
-//        //Task<T> LoadDataAsync<T>(string dataName, DataSourceType dataSourceType) where T : class;
-//        //Task PreloadDataAsync(string dataName, DataSourceType dataSourceType);
+//        //UniTask<byte[]> LoadBytesAsync(string dataPath, DataSourceType dataSourceType);
+//        //UniTask<string> LoadTextAsync(string dataPath, DataSourceType dataSourceType);
+//        //UniTask<T> LoadDataAsync<T>(string dataName, DataSourceType dataSourceType) where T : class;
+//        //UniTask PreloadDataAsync(string dataName, DataSourceType dataSourceType);
 //        //void UnloadData(string dataName);
 //        //void UnloadAllData();
 

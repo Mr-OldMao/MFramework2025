@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MFramework.Runtime
@@ -12,11 +12,11 @@ namespace MFramework.Runtime
 
         private string _persistenceFolder = Path.Combine(Application.persistentDataPath, GAME_DATA);
 
-        public Task Init()
+        public UniTask Init()
         {
             if (!Directory.Exists(_persistenceFolder))
                 Directory.CreateDirectory(_persistenceFolder);
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public void SaveData<T>(string key, T data, bool isBytesData = true) where T : class
@@ -40,7 +40,7 @@ namespace MFramework.Runtime
             }
         }
 
-        public async Task SaveDataAsync<T>(string key, T data, bool isBytesData = true) where T : class
+        public async UniTask SaveDataAsync<T>(string key, T data, bool isBytesData = true) where T : class
         {
             try
             {
@@ -86,7 +86,7 @@ namespace MFramework.Runtime
             }
         }
 
-        public async Task<T> ReadDataAsync<T>(string key, bool isBytesData = true) where T : class
+        public async UniTask<T> ReadDataAsync<T>(string key, bool isBytesData = true) where T : class
         {
             try
             {

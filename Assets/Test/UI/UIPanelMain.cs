@@ -1,5 +1,5 @@
 using GameMain;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,11 +18,11 @@ namespace MFramework.Runtime.UI
         public Image imgItem1;
         public Image imgItem2;
         public Image imgItem3;
-        public override async Task Init()
+        public override async UniTask Init()
         {
             await base.Init();
             Debugger.Log($"{this.GetType()}, Initialize start (delay 500ms)");
-            await Task.Delay(500);
+            await UniTask.Delay(500);
             Debugger.Log($"{this.GetType()}, Initialize end  ");
         }
 
@@ -33,20 +33,20 @@ namespace MFramework.Runtime.UI
             txtTest.text = uIModelMain.Title;
         }
 
-        public override Task ShowPanel()
+        public override UniTask ShowPanel()
         {
             base.ShowPanel();
             Debugger.Log($"{this.GetType().Name},ShowPanel ");
             RefreshUI();
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
-        public override Task HidePanel()
+        public override UniTask HidePanel()
         {
             base.HidePanel();
             Debugger.Log($"{this.GetType().Name},HidePanel ");
             UnRegisterEvent();
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public override void Shutdown()

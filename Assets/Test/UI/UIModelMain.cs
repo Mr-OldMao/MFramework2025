@@ -1,5 +1,5 @@
 using MFramework.Runtime;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace GameMain
 {
@@ -12,10 +12,10 @@ namespace GameMain
 
         }
 
-        public override async Task Init()
+        public override async UniTask Init()
         {
             //模拟异步读表读数据
-            await Task.Delay(200);
+            await UniTask.Delay(200);
             Title = "UIModelMain_Init()";
         }
 

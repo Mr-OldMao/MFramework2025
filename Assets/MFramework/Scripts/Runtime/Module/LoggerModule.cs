@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MFramework.Runtime
@@ -81,10 +81,10 @@ namespace MFramework.Runtime
             return coloredContent;
         }
 
-        protected override Task OnInitialize()
+        protected override UniTask OnInitialize()
         {
             Debugger.Initialize(this);
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         protected override void OnShutdown()

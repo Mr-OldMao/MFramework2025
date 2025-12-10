@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -22,7 +22,7 @@ namespace MFramework.Runtime
         private string resFileTxt = $"Assets/Download/base/resFileTxt.txt";
         private string resFileJson = $"Assets/Download/config/language/resFileJson.json";
 
-        private string mainFont = "Assets/Download/font/mainFont.ttf";
+        private string mainFont = "Assets/Download/font/mainFont.otf";
         private string mainFontSDF = "Assets/Download/font/mainFontSDF.asset";
 
         private string Entity_Cube = "Assets/Download/prefab/entity/Entity_Cube";
@@ -40,7 +40,7 @@ namespace MFramework.Runtime
         private string temp = "Assets/Download/texture/atlas/temp.spriteatlas";
 
 
-        private async Task ShowAPI()
+        private async UniTask ShowAPI()
         {
             string resAddress = string.Empty;
             string resSceneName = string.Empty;
@@ -266,7 +266,7 @@ namespace MFramework.Runtime
 
                 while (res.Count > 0)
                 {
-                    await Task.Delay(1000);
+                    await UniTask.Delay(1000);
                     GameEntry.Resource.ReleaseInstance(res[0]);
                     res.Remove(res[0]);
                 }
@@ -300,7 +300,7 @@ namespace MFramework.Runtime
 
                 //for (int i = 0; i < 10000; i++)
                 //{
-                //    go = await Addressables.InstantiateAsync(Entity_Sphere).Task;
+                //    go = await Addressables.InstantiateAsync(Entity_Sphere).UniTask;
                 //}
                 //Debugger.Log("time3:" + System.DateTime.Now.ToString());
 
@@ -314,7 +314,7 @@ namespace MFramework.Runtime
                 //}
                 //Debugger.Log("time2:" + System.DateTime.Now.ToString());
 
-                //await Task.Delay(1000);
+                //await UniTask.Delay(1000);
                 //GameEntry.Resource.ReleaseAsset<GameObject>(UIPanelMain);
                 //var t = GameEntry.Resource.GetAssetHandle<GameObject>(UIPanelMain);      
             }

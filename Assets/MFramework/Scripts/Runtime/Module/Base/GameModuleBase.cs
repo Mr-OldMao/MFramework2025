@@ -1,6 +1,6 @@
 // GameModuleBase.cs - 模块基类
 using System.Diagnostics;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 namespace MFramework.Runtime
 {
     public abstract class GameModuleBase : IGameBase
@@ -9,7 +9,7 @@ namespace MFramework.Runtime
         protected ILoggerModule Logger => FrameworkManager.Instance.GetModule<ILoggerModule>();
         protected IEventManager EventManager => FrameworkManager.Instance.GetModule<IEventManager>();
 
-        public virtual async Task Init()
+        public virtual async UniTask Init()
         {
             Logger?.Log($"{GetType().Name} 开始初始化...", LogType.FrameNormal);
             await OnInitialize();
@@ -21,7 +21,7 @@ namespace MFramework.Runtime
             OnShutdown();
         }
 
-        protected abstract Task OnInitialize();
+        protected abstract UniTask OnInitialize();
         protected abstract void OnShutdown();
     }
 

@@ -1,6 +1,6 @@
 using MFramework.Runtime;
 using MFramework.Runtime.UI;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace GameMain
@@ -82,7 +82,7 @@ namespace GameMain
             curHeight += height;
         }
 
-        private async Task ShowAPI()
+        private async UniTask ShowAPI()
         {
             string key = "PlayerData";
             GameEntry.LocalData.SaveData(key, new PlayerData { }, true);

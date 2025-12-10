@@ -1,11 +1,12 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace MFramework.Runtime
 {
     public class TestAudioManager : MonoBehaviour
     {
-        private async Task ShowAPI()
+        private async UniTask ShowAPI()
         {
             string audioName = string.Empty;
             GameEntry.Audio.PlayBGM(audioName);
@@ -33,7 +34,7 @@ namespace MFramework.Runtime
         int audioBGMID = 0;
         int audioSoundID = 0;
 
-        private async Task OnGUI()
+        private async UniTask OnGUI()
         {
             GUIStyle style = new GUIStyle("Button");
             style.fontSize = 36;

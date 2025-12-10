@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MFramework.Runtime
 {
@@ -8,9 +8,9 @@ namespace MFramework.Runtime
 
         void HideView<T>() where T : UIViewBase;
 
-        Task<T> ShowViewAsync<T>() where T : UIViewBase;
+        UniTask<T> ShowViewAsync<T>() where T : UIViewBase;
 
-        Task HideViewAsync<T>() where T : UIViewBase;
+        UniTask HideViewAsync<T>() where T : UIViewBase;
 
         void RemoveView<T>() where T : UIViewBase;
         void RemoveView(IUIView view);

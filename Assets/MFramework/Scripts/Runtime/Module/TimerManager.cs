@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MFramework.Runtime
@@ -14,11 +14,11 @@ namespace MFramework.Runtime
 
         public bool IsStartingUp { get; set; }
 
-        public Task Init()
+        public UniTask Init()
         {
             IsStartingUp = true;
             m_CurTimerId = 0;
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public class TimerInfo
