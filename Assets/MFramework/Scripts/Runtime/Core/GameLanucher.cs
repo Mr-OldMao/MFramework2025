@@ -133,6 +133,8 @@ namespace MFramework.Runtime
             m_QueueGameModels.Enqueue(new AudioManager());
 
             m_QueueGameModels.Enqueue(new PoolManager());
+
+            m_QueueGameModels.Enqueue(new SceneManager());
             //// 3. 配置管理系统
             //var configManager = new ConfigManager();
             //m_QueueGameModels.Enqueue(new ConfigManager());

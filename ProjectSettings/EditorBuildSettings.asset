@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Download/scene/TestScene.unity
     guid: d52cd74bdc18fdd4ea538ae05b968f94
+  - enabled: 1
+    path: Assets/Download/scene/TestSubScene.unity
+    guid: e9dc8ebe0cae33745b9125c474c95aba
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 7797f342945c00348ba8e21b169c5e9f, type: 2}

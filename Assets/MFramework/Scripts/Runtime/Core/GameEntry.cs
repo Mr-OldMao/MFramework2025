@@ -16,9 +16,7 @@ namespace MFramework.Runtime
         public static TimerManager Timer => Framework?.GetModule<ITimerManager>() as TimerManager;
         public static AudioManager Audio => Framework?.GetModule<IAudioManager>() as AudioManager;
         public static PoolManager Pool => Framework?.GetModule<IPoolManager>() as PoolManager;
-
-        public static ISceneManager Scene => Framework?.GetModule<ISceneManager>();
-        //public static DataManager Data => Framework?.GetModule<IDataManager>() as DataManager;
+        public static SceneManager Scene => Framework?.GetModule<ISceneManager>() as SceneManager;
 
         // 框架状态
         public static bool IsInitialized => Framework != null;

@@ -16,8 +16,7 @@ namespace GameMain
         {
             Debugger.Log("框架启动完成,即将切换主场景");
             string sceneName = "TestScene";
-            SceneManager.LoadSceneAsync(sceneName);
-            Debugger.Log($"切换场景完成，{sceneName}");
+            GameEntry.Scene.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         }
-    } 
+    }
 }
