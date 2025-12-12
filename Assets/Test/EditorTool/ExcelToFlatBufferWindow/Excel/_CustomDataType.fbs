@@ -1,0 +1,30 @@
+﻿struct DictIntInt
+{
+	key:int;
+	value:int;
+}
+
+table DictIntString
+{
+	key:int;
+	value:string;
+}
+
+table DictStringString
+{
+	key:string;
+	value:string;
+}
+
+struct Vector3
+{
+	x:float;
+	y:float;
+	z:float;
+}
+
+struct Vector2
+{
+	x:float;
+	y:float;
+}
