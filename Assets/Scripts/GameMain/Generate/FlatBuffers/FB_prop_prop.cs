@@ -19,7 +19,7 @@ public struct FB_prop_prop : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public FB_prop_prop __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public int Id { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int ID { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public string Name { get { int o = __p.__offset(6); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
 #if ENABLE_SPAN_T
   public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(6, 1); }
@@ -29,16 +29,16 @@ public struct FB_prop_prop : IFlatbufferObject
   public byte[] GetNameArray() { return __p.__vector_as_array<byte>(6); }
 
   public static Offset<GameMain.Generate.FlatBuffers.FB_prop_prop> CreateFB_prop_prop(FlatBufferBuilder builder,
-      int id = 0,
+      int ID = 0,
       StringOffset NameOffset = default(StringOffset)) {
     builder.StartTable(2);
     FB_prop_prop.AddName(builder, NameOffset);
-    FB_prop_prop.AddId(builder, id);
+    FB_prop_prop.AddID(builder, ID);
     return FB_prop_prop.EndFB_prop_prop(builder);
   }
 
   public static void StartFB_prop_prop(FlatBufferBuilder builder) { builder.StartTable(2); }
-  public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
+  public static void AddID(FlatBufferBuilder builder, int iD) { builder.AddInt(0, iD, 0); }
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(1, nameOffset.Value, 0); }
   public static Offset<GameMain.Generate.FlatBuffers.FB_prop_prop> EndFB_prop_prop(FlatBufferBuilder builder) {
     int o = builder.EndTable();
@@ -52,7 +52,7 @@ static public class FB_prop_propVerify
   static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
   {
     return verifier.VerifyTableStart(tablePos)
-      && verifier.VerifyField(tablePos, 4 /*Id*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 4 /*ID*/, 4 /*int*/, 4, false)
       && verifier.VerifyString(tablePos, 6 /*Name*/, false)
       && verifier.VerifyTableEnd(tablePos);
   }
