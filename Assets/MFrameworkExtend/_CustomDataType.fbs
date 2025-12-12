@@ -4,6 +4,12 @@
 	value:int;
 }
 
+table DictIntFloat
+{
+	key:int;
+	value:float;
+}
+
 table DictIntString
 {
 	key:int;
