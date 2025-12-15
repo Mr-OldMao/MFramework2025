@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ad5dad7acd9904a40a1a24d981768559
+guid: 2f250ff5f2ff9f0458c1abfa066d86ed
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -123,169 +123,127 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: item_0
+      name: rewards_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 32
+        width: 30
+        height: 28
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 089578d75b2e6334b85d7437bf4d89c8
-      internalID: 1674804873
+      spriteID: 0d1df58ed761b5a4abe631e57e485984
+      internalID: 1827542512
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: item_1
+      name: rewards_1
       rect:
         serializedVersion: 2
-        x: 32
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b570b52325864f04a96bf972d1217edf
-      internalID: -1739139126
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: item_2
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2413f71293feadd4ba0eaf435207900f
-      internalID: -896703207
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: item_3
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ef2755bd7dfd973488bc33e943dd1491
-      internalID: -920474555
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: item_4
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b0b4564034ec9ca46ba13b467c4d8747
-      internalID: -2054449755
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: item_5
-      rect:
-        serializedVersion: 2
-        x: 160
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 46e9f9c2a4fea79418983c5143a58a46
-      internalID: -390169041
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: item_6
-      rect:
-        serializedVersion: 2
-        x: 193
+        x: 30
         y: 0
         width: 30
-        height: 32
+        height: 28
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0290635a4dcd3b948b3199d626be5a6d
-      internalID: 1835558862
+      spriteID: 87a04fbaeca2b274cb988cde23ee5d2e
+      internalID: 2127829448
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: item_7
+      name: rewards_2
       rect:
         serializedVersion: 2
-        x: 224
+        x: 60
         y: 0
-        width: 32
-        height: 32
+        width: 30
+        height: 28
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7f453e21d975355469c04907008475d7
-      internalID: 1565566056
+      spriteID: 4700317a883725b49a7f4827f7b5946c
+      internalID: -110444242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rewards_3
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 0
+        width: 30
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c73facd049361945ba08a4618e2aa83
+      internalID: -137411475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rewards_4
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 0
+        width: 30
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50f2a8ab57f3340449f71aa3d3e12a5a
+      internalID: 1672717773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rewards_5
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 0
+        width: 30
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65afa78d73448c84bb57314dac9b339b
+      internalID: -824475812
       vertices: []
       indices: 
       edges: []
@@ -301,14 +259,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      item_0: 1674804873
-      item_1: -1739139126
-      item_2: -896703207
-      item_3: -920474555
-      item_4: -2054449755
-      item_5: -390169041
-      item_6: 1835558862
-      item_7: 1565566056
+      rewards_0: 1827542512
+      rewards_1: 2127829448
+      rewards_2: -110444242
+      rewards_3: -137411475
+      rewards_4: 1672717773
+      rewards_5: -824475812
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

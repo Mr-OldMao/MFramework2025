@@ -16,7 +16,7 @@ namespace GameMain
         public override async void OnFrameworkInitialized()
         {
             Debugger.Log("框架启动完成,即将切换主场景");
-            string sceneName = "TestScene";
+            string sceneName = "MainScene";
 
             await DataTools.Init();
 
