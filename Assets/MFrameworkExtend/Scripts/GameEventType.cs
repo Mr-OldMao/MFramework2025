@@ -6,6 +6,8 @@ public enum GameEventType
     TestEvent = 0,
     TestUIEvent = 101,
 
+    LoadingProgress = 200,
+
     #region 框架层事件
     /// <summary>
     /// 场景加载开始
