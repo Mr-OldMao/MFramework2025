@@ -60,6 +60,7 @@ namespace MFramework.Runtime
                 m_IsRegisteredEvent = !m_IsRegisteredEvent;
                 RegisterEvent();
             }
+            RefreshUI(Controller.Model);
             return UniTask.CompletedTask;
         }
 
