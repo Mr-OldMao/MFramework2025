@@ -14,7 +14,10 @@ namespace MFramework.Runtime
         [Header("以下字段为运行时自动绑定，请勿手动修改")]
         [SerializeField]
         private UILayerType m_Layer;
+        [SerializeField]
+        private UIHideType m_HideType;
         public UILayerType Layer => m_Layer;
+        public UIHideType HideType => m_HideType;
         public bool IsActive => gameObject.activeInHierarchy;
 
         public GameObject UIForm { get => this.gameObject; }
@@ -26,6 +29,7 @@ namespace MFramework.Runtime
         {
             AutoBindComponents();
             SetLayer();
+            SetHideType();
         }
 
         public virtual UniTask Init()
@@ -54,19 +58,36 @@ namespace MFramework.Runtime
 
         public virtual UniTask ShowPanel()
         {
-            gameObject.SetActive(true);
+            if (!gameObject.activeSelf)
+            {
+                gameObject.SetActive(true);
+            }
+            if (m_HideType == UIHideType.CanvasGroup)
+            {
+                GetComponent<CanvasGroup>().alpha = 1;
+            }
             if (!m_IsRegisteredEvent)
             {
                 m_IsRegisteredEvent = !m_IsRegisteredEvent;
                 RegisterEvent();
             }
             RefreshUI(Controller.Model);
+            transform.SetAsLastSibling();
             return UniTask.CompletedTask;
         }
 
         public virtual UniTask HidePanel()
         {
-            gameObject.SetActive(false);
+            switch (m_HideType)
+            {
+                case UIHideType.SetActive:
+                    gameObject.SetActive(false);
+                    break;
+                case UIHideType.CanvasGroup:
+                    GetComponent<CanvasGroup>().alpha = 0;
+                    break;
+            }
+
             if (m_IsRegisteredEvent)
             {
                 m_IsRegisteredEvent = !m_IsRegisteredEvent;
@@ -94,6 +115,12 @@ namespace MFramework.Runtime
         {
             var layerArr = GetType().GetCustomAttribute<UILayerAttribute>();
             m_Layer = layerArr != null ? layerArr.Layer : UILayerType.Background;
+        }
+
+        private void SetHideType()
+        {
+            var hideTypeArr = GetType().GetCustomAttribute<UIHideAttribute>();
+            m_HideType = hideTypeArr != null ? hideTypeArr.hideType : UIHideType.SetActive;
         }
 
         private void AutoBindComponents()
@@ -129,7 +156,7 @@ namespace MFramework.Runtime
                 }
             }
         }
-    
+
         public virtual void Shutdown()
         {
             if (m_IsRegisteredEvent)

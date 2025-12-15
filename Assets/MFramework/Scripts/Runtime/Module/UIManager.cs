@@ -333,6 +333,16 @@ namespace MFramework.Runtime
             var go = GameObject.Instantiate(prefab);
             var viewBaseScript = go.AddComponent<T>();
 
+            if (go.GetComponent<Canvas>() ==  null)
+            {
+                go.AddComponent<Canvas>();
+            }
+
+            if (go.GetComponent<CanvasGroup>() == null)
+            {
+                go.AddComponent<CanvasGroup>();
+            }
+
             go.transform.SetParent(m_LayerContainer[viewBaseScript.Layer]);
             var rectTrans = go.GetComponent<RectTransform>();
             if (rectTrans != null)
