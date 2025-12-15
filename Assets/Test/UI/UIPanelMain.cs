@@ -37,7 +37,6 @@ namespace GameMain
         {
             base.ShowPanel();
             Debugger.Log($"{this.GetType().Name},ShowPanel ");
-            RefreshUI();
             return UniTask.CompletedTask;
         }
 
