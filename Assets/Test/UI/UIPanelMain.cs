@@ -1,10 +1,10 @@
-using GameMain;
 using Cysharp.Threading.Tasks;
+using MFramework.Runtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MFramework.Runtime.UI
+namespace GameMain
 {
     [UIBind(typeof(UIControlMain), typeof(UIModelMain))]
     [UILayer(UILayerType.Tips)]
@@ -17,7 +17,7 @@ namespace MFramework.Runtime.UI
 
         public Image imgItem1;
         public Image imgItem2;
-        public Image imgItem3;
+        public Image imgItem3; 
         public override async UniTask Init()
         {
             await base.Init();

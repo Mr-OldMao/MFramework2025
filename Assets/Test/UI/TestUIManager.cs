@@ -1,6 +1,5 @@
 using GameMain;
 using MFramework.Runtime;
-using MFramework.Runtime.UI;
 using UnityEngine;
 
 public class TestUIManager : MonoBehaviour
