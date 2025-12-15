@@ -90,6 +90,10 @@ namespace MFramework.Editor
             {
                 sb.AppendLine("            // btnClose.onClick.AddListener(OnCloseClick);");
             }
+            else
+            {
+                sb.AppendLine("            ");
+            }
             sb.AppendLine("        }");
             sb.AppendLine();
 
@@ -99,11 +103,14 @@ namespace MFramework.Editor
             {
                 sb.AppendLine("            // btnClose.onClick.RemoveListener(OnCloseClick);");
             }
+            else
+            {
+                sb.AppendLine("            ");
+            }
             sb.AppendLine("        }");
             sb.AppendLine();
 
             // 8. 私有方法区域
-            sb.AppendLine("        // 私有方法");
             if (uiFields.Any(f => f.ComponentType == typeof(Button)))
             {
                 sb.AppendLine("        private void OnCloseClick()");
