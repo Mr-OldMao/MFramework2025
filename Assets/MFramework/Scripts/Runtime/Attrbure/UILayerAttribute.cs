@@ -1,8 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static MFramework.Runtime.UIViewBase;
 
 namespace MFramework.Runtime
 {

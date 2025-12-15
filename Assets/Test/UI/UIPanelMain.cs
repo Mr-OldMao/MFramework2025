@@ -8,6 +8,7 @@ namespace GameMain
 {
     [UIBind(typeof(UIControlMain), typeof(UIModelMain))]
     [UILayer(UILayerType.Tips)]
+    [UIHide( UIHideType.CanvasGroup)]
     public class UIPanelMain : UIViewBase
     {
         public TextMeshProUGUI txtTest;
