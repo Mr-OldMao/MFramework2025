@@ -36,7 +36,10 @@ namespace MFramework.Editor
             "Image", "Button", "Text", "Text (TMP)", "RawImage", "Toggle",
             "Slider", "Scrollbar", "InputField", "Dropdown", "ScrollRect",
             "Panel", "Canvas", "EventSystem", "GameObject", "RectTransform", "Transform",
-            "LayoutGroup", "Mask", "TMP_InputField", "TMP_Dropdown", "TextMeshProUGUI"
+            "LayoutGroup", "Mask", "TMP_InputField", "TMP_Dropdown", "TextMeshProUGUI",
+            "Background","Checkmark","Label","Fill","Handle","Arrow","Template",
+            "Viewport","Content","Item","Item Background","Item Checkmark","Item Label",
+            "Sliding Area","Placeholder", 
         };
 
         // 组件优先级（从高到低）

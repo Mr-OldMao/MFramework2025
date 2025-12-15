@@ -48,7 +48,7 @@ namespace MFramework.Editor
                 sb.AppendLine("        // UI字段");
                 foreach (var field in uiFields)
                 {
-                    sb.AppendLine($"        public {field.FieldType} {field.FieldName};");
+                    sb.AppendLine($"        private {field.FieldType} {field.FieldName};");
                 }
                 sb.AppendLine();
             }
