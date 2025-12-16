@@ -31,7 +31,7 @@ namespace GameMain
                 GameEntry.UI.GetModel<UIModelLoad>().SetLoadingProgress(1f);
                 await GameEntry.UI.ShowViewAsync<UIPanelMap>();
                 GameEntry.UI.HideView<UIPanelLoad>();
-            },null,3f);
+            },null,1f);
         }
     }
 }
