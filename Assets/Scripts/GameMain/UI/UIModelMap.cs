@@ -14,9 +14,9 @@ namespace GameMain
         public const int ROW_NUM = 13;
         public const int COLUMN_NUM = 13;
         /// <summary>
-        /// 坐标映射比例 物理坐标 = 1格子坐标gridPos * posMappingRatio
+        /// 格子大小，坐标映射比例 物理坐标 = 1格子坐标gridPos * posMappingRatio
         /// </summary>
-        public const int POS_MAPPING_RATIO = 80;
+        public const int GRID_SIZE = 80;
 
         //地图网格数据
         private Dictionary<Vector2, GridDataInfo> m_DicMapGridData = new Dictionary<Vector2, GridDataInfo>();
@@ -26,12 +26,15 @@ namespace GameMain
 
         public int LevelID { get; private set; }
 
-        public List<Vector2> PosBornEnemyArr { get; private set; }
-        public Vector2 PosBornPlayer1 { get; private set; }
-        public Vector2 PosBornPlayer2 { get; private set; }
-        public Vector2 PosBrid { get; private set; }
+        public List<Vector2> GridPosBornEnemyArr { get; private set; }
+        public Vector2 GridPosBornPlayer1 { get; private set; }
+        public Vector2 GridPosBornPlayer2 { get; private set; }
+        public Vector2 GridPosBrid { get; private set; }
         //左、左上、上、右上、右
-        public List<Vector2> PosBridWall { get; private set; }
+        public List<Vector2> GridPosBridWallArr { get; private set; }
+
+
+
 
         public UIModelMap(IUIController controller) : base(controller)
         {
@@ -47,23 +50,23 @@ namespace GameMain
 
         private void SetFixedPos()
         {
-            PosBornEnemyArr = new List<Vector2>
+            GridPosBornEnemyArr = new List<Vector2>
             {
                 m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_LU).FirstOrDefault().Key,
                 m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_UM).FirstOrDefault().Key,
                 m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_RU).FirstOrDefault().Key
             };
-            PosBrid = m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_DM).FirstOrDefault().Key;
-            PosBridWall = new List<Vector2>
+            GridPosBrid = m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_DM).FirstOrDefault().Key;
+            GridPosBridWallArr = new List<Vector2>
             {
-                new Vector2(PosBrid.x - 1,PosBrid.y),
-                new Vector2(PosBrid.x - 1,PosBrid.y + 1),
-                new Vector2(PosBrid.x,PosBrid.y + 1),
-                new Vector2(PosBrid.x + 1,PosBrid.y + 1),
-                new Vector2(PosBrid.x + 1,PosBrid.y),
+                new Vector2(GridPosBrid.x - 1,GridPosBrid.y),
+                new Vector2(GridPosBrid.x - 1,GridPosBrid.y + 1),
+                new Vector2(GridPosBrid.x,GridPosBrid.y + 1),
+                new Vector2(GridPosBrid.x + 1,GridPosBrid.y + 1),
+                new Vector2(GridPosBrid.x + 1,GridPosBrid.y),
             };
-            PosBornPlayer1 = new Vector2(PosBrid.x - 2, PosBrid.y);
-            PosBornPlayer2 = new Vector2(PosBrid.x + 2, PosBrid.y);
+            GridPosBornPlayer1 = new Vector2(GridPosBrid.x - 2, GridPosBrid.y);
+            GridPosBornPlayer2 = new Vector2(GridPosBrid.x + 2, GridPosBrid.y);
         }
 
         public void GenerateMapData(int mapTypeID)
@@ -83,7 +86,7 @@ namespace GameMain
                     GridDataInfo gridDataInfo = new GridDataInfo
                     {
                         gridPos = gridPos,
-                        mapPos = gridPos * POS_MAPPING_RATIO,
+                        mapPos = gridPos * GRID_SIZE,
                         mapGridType = GetMapGridType(gridPos),
                         entityDataInfos = SetEntityDataInfos(gridPos, fB_Map_MapType)
                     };
@@ -110,7 +113,7 @@ namespace GameMain
         private List<EntityDataInfo> SetEntityDataInfos(Vector2 gridID, FB_map_mapType fB_Map_MapType)
         {
             List<EntityDataInfo> entityDataInfos = new List<EntityDataInfo>();
-            if (PosBornEnemyArr.Contains(gridID) || PosBornPlayer1 == gridID || PosBornPlayer2 == gridID)
+            if (GridPosBornEnemyArr.Contains(gridID) || GridPosBornPlayer1 == gridID || GridPosBornPlayer2 == gridID)
             {
                 entityDataInfos.Add(new EntityDataInfo
                 {
@@ -118,7 +121,7 @@ namespace GameMain
                     propEntity = null,
                 });
             }
-            else if (PosBrid == gridID)
+            else if (GridPosBrid == gridID)
             {
                 entityDataInfos.Add(new EntityDataInfo
                 {
@@ -126,9 +129,9 @@ namespace GameMain
                     propEntity = null,
                 });
             }
-            else if (PosBridWall.Contains(gridID))
+            else if (GridPosBridWallArr.Contains(gridID))
             {
-                if (gridID == PosBridWall.ElementAt(0))
+                if (gridID == GridPosBridWallArr.ElementAt(0))
                 {
                     entityDataInfos.Add(new EntityDataInfo
                     {
@@ -141,7 +144,7 @@ namespace GameMain
                         propEntity = null,
                     });
                 }
-                else if (gridID == PosBridWall.ElementAt(1))
+                else if (gridID == GridPosBridWallArr.ElementAt(1))
                 {
                     entityDataInfos.Add(new EntityDataInfo
                     {
@@ -149,7 +152,7 @@ namespace GameMain
                         propEntity = null,
                     });
                 }
-                else if (gridID == PosBridWall.ElementAt(2))
+                else if (gridID == GridPosBridWallArr.ElementAt(2))
                 {
                     entityDataInfos.Add(new EntityDataInfo
                     {
@@ -162,7 +165,7 @@ namespace GameMain
                         propEntity = null,
                     });
                 }
-                else if (gridID == PosBridWall.ElementAt(3))
+                else if (gridID == GridPosBridWallArr.ElementAt(3))
                 {
                     entityDataInfos.Add(new EntityDataInfo
                     {
@@ -170,7 +173,7 @@ namespace GameMain
                         propEntity = null,
                     });
                 }
-                else if (gridID == PosBridWall.ElementAt(4))
+                else if (gridID == GridPosBridWallArr.ElementAt(4))
                 {
                     entityDataInfos.Add(new EntityDataInfo
                     {
