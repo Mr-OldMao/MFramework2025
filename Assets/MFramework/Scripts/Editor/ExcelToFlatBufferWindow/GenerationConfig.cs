@@ -17,6 +17,7 @@ public class GenerationConfig
     private static string KEY_FIELD_COMMENT_INDEX = PREFS_KEY_PREFIX + "FieldCommentIndex";
     private static string KEY_FIELD_NAME_INDEX = PREFS_KEY_PREFIX + "FieldNameIndex";
     private static string KEY_FIELD_TYPE_INDEX = PREFS_KEY_PREFIX + "FieldTypeIndex";
+    private static string KEY_FIELD_TAG_INDEX = PREFS_KEY_PREFIX + "FieldTagIndex";
     private static string KEY_DATA_START_INDEX = PREFS_KEY_PREFIX + "DataStartIndex";
 
     // 默认值
@@ -30,7 +31,8 @@ public class GenerationConfig
     private int defaultFieldCommentIndex = 3;
     private int defaultFieldNameIndex = 5;
     private int defaultFieldTypeIndex = 6;
-    private int defaultDataStartIndex = 7;
+    private int defaultFieldTagIndex = 7;
+    private int defaultDataStartIndex = 8;
 
     // 属性封装，关联 EditorPrefs
     public string ExcelFolderPath
@@ -93,6 +95,12 @@ public class GenerationConfig
         set => EditorPrefs.SetInt(KEY_FIELD_TYPE_INDEX, value);
     }
 
+    public int FieldTagIndex
+    {
+        get => EditorPrefs.GetInt(KEY_FIELD_TAG_INDEX, defaultFieldTagIndex);
+        set => EditorPrefs.SetInt(KEY_FIELD_TAG_INDEX, value);
+    }
+    
     public int DataStartIndex
     {
         get => EditorPrefs.GetInt(KEY_DATA_START_INDEX, defaultDataStartIndex);
@@ -130,6 +138,7 @@ public class GenerationConfig
         EditorPrefs.DeleteKey(KEY_FIELD_COMMENT_INDEX);
         EditorPrefs.DeleteKey(KEY_FIELD_NAME_INDEX);
         EditorPrefs.DeleteKey(KEY_FIELD_TYPE_INDEX);
+        EditorPrefs.DeleteKey(KEY_FIELD_TAG_INDEX);
         EditorPrefs.DeleteKey(KEY_DATA_START_INDEX);
     }
 }
