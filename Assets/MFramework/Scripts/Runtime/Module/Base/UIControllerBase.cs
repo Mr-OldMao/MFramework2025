@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 
 namespace MFramework.Runtime
 {
@@ -11,8 +12,14 @@ namespace MFramework.Runtime
         {
             View = view;
             Model = model;
-            await Model.Init();
-            await View.Init();
+            if (!Model.IsUnityNull())
+            {
+                await Model.Init();
+            }
+            if (!View.IsUnityNull())
+            {
+                await View.Init();
+            }
         }
 
         public virtual void OnDestory() { }

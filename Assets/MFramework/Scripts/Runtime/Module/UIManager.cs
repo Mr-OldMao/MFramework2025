@@ -6,6 +6,7 @@ using System.Reflection;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace MFramework.Runtime
 {
@@ -76,19 +77,30 @@ namespace MFramework.Runtime
                 if (view != null)
                 {
                     var bindAttr = view.GetType().GetCustomAttribute<UIBindAttribute>();
+                    UIControllerBase newControl = null;
+                    UIModelBase newModel = null;
                     if (bindAttr == null)
                     {
-                        Debugger.LogError($"UIView {viewType.Name} 缺少UIBindAttribute", LogType.FrameCore);
-                        return default;
+                        Debugger.LogWarning($"UIView {viewType.Name} 缺少UIBindAttribute", LogType.FrameCore);
                     }
-                    var newControl = Activator.CreateInstance(bindAttr.ControllerType) as UIControllerBase;
-                    var newModel = Activator.CreateInstance(bindAttr.ModelType, newControl) as UIModelBase;
-                    view.Controller = newControl;
-                    newUIDataInfo.control = newControl;
-                    newUIDataInfo.model = newModel;
+                    else
+                    {
+                        newControl = Activator.CreateInstance(bindAttr.ControllerType) as UIControllerBase;
+                        newModel = Activator.CreateInstance(bindAttr.ModelType, newControl) as UIModelBase;
+                        view.Controller = newControl;
+                        newUIDataInfo.control = newControl;
+                        newUIDataInfo.model = newModel;
+                    }
                     newUIDataInfo.view = view;
                     SetState(view, UIStateProgressType.InitStart);
-                    await newControl.Init(view, newModel);
+                    if (newControl != null)
+                    {
+                        await newControl.Init(view, newModel);
+                    }
+                    else 
+                    {
+                        await view.Init();
+                    }
                     SetState(view, UIStateProgressType.InitEnd);
                     SetState(view, UIStateProgressType.ShowStart);
                     await view.ShowPanel();
@@ -260,6 +272,7 @@ namespace MFramework.Runtime
                 eventSystem.AddComponent<StandaloneInputModule>();
                 eventSystem.transform.SetParent(uiRoot.transform);
             }
+            eventSystem.transform.SetParent(uiRoot.transform);
 
             var layerValues = Enum.GetValues(typeof(UILayerType));
             var layerNames = Enum.GetNames(typeof(UILayerType));
@@ -343,6 +356,11 @@ namespace MFramework.Runtime
                 go.AddComponent<CanvasGroup>();
             }
 
+            if (go.GetComponent<GraphicRaycaster>() == null)
+            {
+                go.AddComponent<GraphicRaycaster>();
+            }
+
             go.transform.SetParent(m_LayerContainer[viewBaseScript.Layer]);
             var rectTrans = go.GetComponent<RectTransform>();
             if (rectTrans != null)
@@ -394,7 +412,7 @@ namespace MFramework.Runtime
             {
                 uiDataInfo.state = UIStateProgressType.DestoryStart;
                 uiDataInfo.view.Shutdown();
-                uiDataInfo.model.Shutdown();
+                uiDataInfo.model?.Shutdown();
                 GameEntry.Resource.ReleaseInstance(uiDataInfo.formPrefab);
                 m_DicUIDataInfos.Remove(type);
                 uiDataInfo.state = UIStateProgressType.DestoryEnd;

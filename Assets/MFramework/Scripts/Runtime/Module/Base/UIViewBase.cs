@@ -71,7 +71,7 @@ namespace MFramework.Runtime
                 m_IsRegisteredEvent = !m_IsRegisteredEvent;
                 RegisterEvent();
             }
-            RefreshUI(Controller.Model);
+            RefreshUI(Controller?.Model);
             transform.SetAsLastSibling();
             return UniTask.CompletedTask;
         }
@@ -164,7 +164,10 @@ namespace MFramework.Runtime
                 m_IsRegisteredEvent = !m_IsRegisteredEvent;
                 UnRegisterEvent();
             }
-            Destroy(gameObject);
+            if (this != null && gameObject != null)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

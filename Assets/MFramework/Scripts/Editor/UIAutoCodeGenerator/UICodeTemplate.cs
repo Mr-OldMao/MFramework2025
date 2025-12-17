@@ -73,12 +73,14 @@ namespace MFramework.Editor
             // 6. 显示/隐藏面板方法
             sb.AppendLine("        public override UniTask ShowPanel()");
             sb.AppendLine("        {");
+            sb.AppendLine("            base.ShowPanel();");
             sb.AppendLine("            return UniTask.CompletedTask;");
             sb.AppendLine("        }");
             sb.AppendLine();
 
             sb.AppendLine("        public override UniTask HidePanel()");
             sb.AppendLine("        {");
+            sb.AppendLine("            base.HidePanel();");
             sb.AppendLine("            return UniTask.CompletedTask;");
             sb.AppendLine("        }");
             sb.AppendLine();
