@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6589878447088587422}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Handle Slide Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7342573712183401902}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UIPanelLoad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -81,7 +81,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8710784283736060920}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: rootNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ GameObject:
   - component: {fileID: 2129121312788447423}
   - component: {fileID: 4548874727326013486}
   - component: {fileID: 6246569252676033074}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,7 +193,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8976648985421940461}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -231,7 +231,7 @@ GameObject:
   - component: {fileID: 3560142857365423078}
   - component: {fileID: 4359949634485899619}
   - component: {fileID: 4783065368721883397}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: imgBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -306,7 +306,7 @@ GameObject:
   - component: {fileID: 5688452469438723153}
   - component: {fileID: 860836317771380815}
   - component: {fileID: 4015984945852890013}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -382,7 +382,7 @@ GameObject:
   - component: {fileID: 8722665973535183646}
   - component: {fileID: 2107169755136816704}
   - component: {fileID: 8137625137482018962}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: txtLoading
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -531,7 +531,7 @@ GameObject:
   - component: {fileID: 7853437552476233723}
   - component: {fileID: 9074008522893969146}
   - component: {fileID: 7138621160717308225}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -605,7 +605,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1730927121075355065}
   - component: {fileID: 597383966156760897}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: sdrLoading
   m_TagString: Untagged
   m_Icon: {fileID: 0}

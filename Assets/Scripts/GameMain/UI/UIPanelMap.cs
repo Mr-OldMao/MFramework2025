@@ -22,8 +22,6 @@ namespace GameMain
         public RectTransform nodeHomeWall;
         public RectTransform nodeOther;
 
-        public Button btnRegenerateMap;
-
         public override async UniTask Init()
         {
             await base.Init();
@@ -73,18 +71,13 @@ namespace GameMain
 
         protected override void RegisterEvent()
         {
-            btnRegenerateMap.onClick.AddListener(() =>
-            {
-#pragma warning disable CS4014 
-                (Controller as UIControlMap).GenerateMap();
-#pragma warning restore CS4014
-            });
+            
         }
 
         protected override void UnRegisterEvent()
         {
-            btnRegenerateMap.onClick.RemoveAllListeners();
-        }
+
+         }
 
         // 私有方法
     }

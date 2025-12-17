@@ -23,19 +23,25 @@ namespace GameMain
 
         private async UniTask InitMapEntity()
         {
-            await GenerateMap();
+            int mapTypeID = DataTools.GetMapTypeIDByLevelID(((UIModelMap)Model).LevelID);
+            await GenerateMap(mapTypeID);
             Debugger.Log("InitMapEntity Completed ", LogType.Test);
         }
 
 
-        public async UniTask GenerateMap()
+        public async UniTask GenerateMap(int mapTypeID = 1)
         {
             if (isGenerateMap)
             {
                 return;
             }
+            if (mapTypeID <= 0 || mapTypeID > DataTools.GetMapTypeList().Count)
+            {
+                mapTypeID = 1;
+            }
+
             isGenerateMap = true;
-            ((UIModelMap)Model).GenerateMapData();
+            ((UIModelMap)Model).GenerateMapData(mapTypeID);
             await GenerateMapEntityByDataAsync();
             isGenerateMap = false;
         }

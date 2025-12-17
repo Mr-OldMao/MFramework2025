@@ -1,8 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
+using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameMain
 {
@@ -21,6 +24,7 @@ namespace GameMain
         //网格边界
         private Dictionary<Vector2, EMapGridBorderType> m_DicMapGridBorderType = new Dictionary<Vector2, EMapGridBorderType>();
 
+        public int LevelID { get; private set; }
 
         public List<Vector2> PosBornEnemyArr { get; private set; }
         public Vector2 PosBornPlayer1 { get; private set; }
@@ -35,6 +39,7 @@ namespace GameMain
         }
         public override async UniTask Init()
         {
+            LevelID = 1;
             SetMapGridType();
             SetFixedPos();
             await UniTask.CompletedTask;
@@ -61,14 +66,15 @@ namespace GameMain
             PosBornPlayer2 = new Vector2(PosBrid.x + 2, PosBrid.y);
         }
 
-        public void GenerateMapData()
+        public void GenerateMapData(int mapTypeID)
         {
-            SetMapGridData();
+            SetMapGridData(mapTypeID);
         }
 
-        private void SetMapGridData()
+        private void SetMapGridData(int mapTypeID)
         {
             m_DicMapGridData.Clear();
+            FB_map_mapType fB_Map_MapType = DataTools.GetMapType(mapTypeID);
             for (int i = 0; i < COLUMN_NUM; i++)
             {
                 for (int j = 0; j < ROW_NUM; j++)
@@ -79,15 +85,29 @@ namespace GameMain
                         gridPos = gridPos,
                         mapPos = gridPos * POS_MAPPING_RATIO,
                         mapGridType = GetMapGridType(gridPos),
-                        entityDataInfos = SetEntityDataInfos(gridPos)
+                        entityDataInfos = SetEntityDataInfos(gridPos, fB_Map_MapType)
                     };
                     m_DicMapGridData.Add(gridPos, gridDataInfo);
                 }
             }
+
+#if UNITY_EDITOR
+            string des = string.Empty;
+            for (int i = 0; i <  Enum.GetValues(typeof(EMapEntityType)).Length; i++)
+            {
+               var entityTypeArr = m_DicMapGridData.Values.Where(p => p.entityDataInfos.Find(k => k.mapEntityType == (EMapEntityType)i) != null).ToList();
+                if (entityTypeArr.Count > 0)
+                {
+                    des += $"{(EMapEntityType)i}:{entityTypeArr.Count}\n";
+                }
+            }
+            Debugger.Log($"---------------------- GenerateMapData，Des:{des}", LogType.Test);
+
+#endif
             Debugger.Log("SetMapGridData Completed ", LogType.Test);
         }
 
-        private List<EntityDataInfo> SetEntityDataInfos(Vector2 gridID)
+        private List<EntityDataInfo> SetEntityDataInfos(Vector2 gridID, FB_map_mapType fB_Map_MapType)
         {
             List<EntityDataInfo> entityDataInfos = new List<EntityDataInfo>();
             if (PosBornEnemyArr.Contains(gridID) || PosBornPlayer1 == gridID || PosBornPlayer2 == gridID)
@@ -168,11 +188,38 @@ namespace GameMain
             {
                 entityDataInfos.Add(new EntityDataInfo
                 {
-                    mapEntityType = (EMapEntityType)Random.Range(0, 6),
+                    mapEntityType = GetRandomEntityType(fB_Map_MapType),
                     propEntity = null,
                 });
             }
             return entityDataInfos;
+        }
+
+        private EMapEntityType GetRandomEntityType(FB_map_mapType fB_Map_MapType)
+        {
+            EMapEntityType res = EMapEntityType.None;
+            float randomValue = Random.Range(0f, 1f);
+            if (randomValue < fB_Map_MapType.PWall)
+            {
+                res = EMapEntityType.Wall;
+            }
+            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone)
+            {
+                res = EMapEntityType.Stone;
+            }
+            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone + fB_Map_MapType.PGress)
+            {
+                res = EMapEntityType.Grass;
+            }
+            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone + fB_Map_MapType.PGress + fB_Map_MapType.PWater)
+            {
+                res = EMapEntityType.Water;
+            }
+            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone + fB_Map_MapType.PGress + fB_Map_MapType.PWater + fB_Map_MapType.PSnow)
+            {
+                res = EMapEntityType.Snow;
+            }
+            return res;
         }
 
         public List<GridDataInfo> GetMapGridData()
@@ -274,11 +321,6 @@ namespace GameMain
                     }
                 }
             }
-
-
-
-
-
         }
     }
 
@@ -306,8 +348,6 @@ namespace GameMain
         Grass,
         Water,
         Snow,
-        Brid,
-        DeadBrid,
         #endregion
 
         #region 特殊地图道具
@@ -344,6 +384,9 @@ namespace GameMain
         /// </summary>
         Stone_RD,
         #endregion
+
+        Brid,
+        DeadBrid,
     }
 
     /// <summary>

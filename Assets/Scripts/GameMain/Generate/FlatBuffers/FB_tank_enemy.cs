@@ -20,16 +20,38 @@ public struct FB_tank_enemy : IFlatbufferObject
   public FB_tank_enemy __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public int ID { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int BulletID { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public float MoveSpeed { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
+  public int HP { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public string ResName { get { int o = __p.__offset(12); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetResNameBytes() { return __p.__vector_as_span<byte>(12, 1); }
+#else
+  public ArraySegment<byte>? GetResNameBytes() { return __p.__vector_as_arraysegment(12); }
+#endif
+  public byte[] GetResNameArray() { return __p.__vector_as_array<byte>(12); }
 
   public static Offset<GameMain.Generate.FlatBuffers.FB_tank_enemy> CreateFB_tank_enemy(FlatBufferBuilder builder,
-      int ID = 0) {
-    builder.StartTable(1);
+      int ID = 0,
+      int BulletID = 0,
+      float MoveSpeed = 0.0f,
+      int HP = 0,
+      StringOffset ResNameOffset = default(StringOffset)) {
+    builder.StartTable(5);
+    FB_tank_enemy.AddResName(builder, ResNameOffset);
+    FB_tank_enemy.AddHP(builder, HP);
+    FB_tank_enemy.AddMoveSpeed(builder, MoveSpeed);
+    FB_tank_enemy.AddBulletID(builder, BulletID);
     FB_tank_enemy.AddID(builder, ID);
     return FB_tank_enemy.EndFB_tank_enemy(builder);
   }
 
-  public static void StartFB_tank_enemy(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void StartFB_tank_enemy(FlatBufferBuilder builder) { builder.StartTable(5); }
   public static void AddID(FlatBufferBuilder builder, int iD) { builder.AddInt(0, iD, 0); }
+  public static void AddBulletID(FlatBufferBuilder builder, int bulletID) { builder.AddInt(1, bulletID, 0); }
+  public static void AddMoveSpeed(FlatBufferBuilder builder, float moveSpeed) { builder.AddFloat(2, moveSpeed, 0.0f); }
+  public static void AddHP(FlatBufferBuilder builder, int hP) { builder.AddInt(3, hP, 0); }
+  public static void AddResName(FlatBufferBuilder builder, StringOffset resNameOffset) { builder.AddOffset(4, resNameOffset.Value, 0); }
   public static Offset<GameMain.Generate.FlatBuffers.FB_tank_enemy> EndFB_tank_enemy(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<GameMain.Generate.FlatBuffers.FB_tank_enemy>(o);
@@ -43,6 +65,10 @@ static public class FB_tank_enemyVerify
   {
     return verifier.VerifyTableStart(tablePos)
       && verifier.VerifyField(tablePos, 4 /*ID*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 6 /*BulletID*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 8 /*MoveSpeed*/, 4 /*float*/, 4, false)
+      && verifier.VerifyField(tablePos, 10 /*HP*/, 4 /*int*/, 4, false)
+      && verifier.VerifyString(tablePos, 12 /*ResName*/, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }
