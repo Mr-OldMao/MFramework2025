@@ -188,6 +188,10 @@ namespace Game.Tool
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
             _config.FieldTypeIndex = EditorGUILayout.IntField("字段类型索引:", _config.FieldTypeIndex);
+            _config.FieldTagIndex = EditorGUILayout.IntField("字段标识索引:", _config.FieldTagIndex);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             _config.DataStartIndex = EditorGUILayout.IntField("数据起始行:", _config.DataStartIndex);
             EditorGUILayout.EndHorizontal();
 

@@ -62,22 +62,29 @@ public class ExcelDataProcessor
                     throw new System.Exception("Excel文件数据不足");
 
                 string tableName = Path.GetFileNameWithoutExtension(excelPath);
-                int columnCount = worksheet.Dimension.Columns;
+                //int columnCount = worksheet.Dimension.Columns;
                 int rowCount = worksheet.Dimension.Rows;
                 //校准有效列数量
-                int realColumnCount = 0;
-                for (int i = 1; i <= columnCount; i++)
+                //int realColumnCount = 0;
+                List<int> listRealColumn = new List<int>();//缓存有效列列号
+                string debugColmunDes = string.Empty;
+                for (int i = 1; i <= worksheet.Dimension.Columns; i++)
                 {
-                    if (!string.IsNullOrEmpty(worksheet.Cells[_config.FieldTypeIndex + 1, i].Text.Trim()))
+                    if (!string.IsNullOrEmpty(worksheet.Cells[_config.FieldTagIndex + 1, i].Text.Trim()))
                     {
-                        realColumnCount++;
+                        listRealColumn.Add(i);
+                        debugColmunDes += $"{i} ";
                     }
-                    else
-                    {
-                        break;
-                    }
+                    //if (!string.IsNullOrEmpty(worksheet.Cells[_config.FieldTypeIndex + 1, i].Text.Trim()))
+                    //{
+                    //    realColumnCount++;
+                    //}
+                    //else
+                    //{
+                    //    break;
+                    //}
                 }
-                columnCount = realColumnCount;
+                //columnCount = realColumnCount;
                 //校准有效行数
                 int realRowCount = _config.DataStartIndex;
                 for (int i = realRowCount + 1; i <= rowCount; i++)
@@ -92,28 +99,34 @@ public class ExcelDataProcessor
                     }
                 }
                 rowCount = realRowCount;
-                worksheet.DeleteColumn(columnCount + 1, worksheet.Dimension.Columns);
-                worksheet.DeleteRow(rowCount + 1, worksheet.Dimension.Rows);
+                //worksheet.DeleteColumn(columnCount + 1, worksheet.Dimension.Columns);
+                //worksheet.DeleteRow(rowCount + 1, worksheet.Dimension.Rows);
 
-                Debug.Log($"table:{tableName}，列数：{columnCount}，行数：{rowCount}");
+                Debug.Log($"table:{tableName}，行数：{rowCount}，列数：{listRealColumn.Count}，有效列：{debugColmunDes}");
 
                 var tableData = new ExcelTableData
                 {
                     tableName = tableName,
                     workbookName = worksheet.Name,
-                    fieldComments = new string[columnCount],
-                    fieldNames = new string[columnCount],
-                    fieldTypes = new string[columnCount],
+                    fieldComments = new string[listRealColumn.Count],
+                    fieldNames = new string[listRealColumn.Count],
+                    fieldTypes = new string[listRealColumn.Count],
                     dataRows = new string[rowCount - _config.DataStartIndex][]
                 };
                 tableDataArr.Add(tableData);
 
                 // 读取字段注释、名称、类型
-                for (int col = 1; col <= columnCount; col++)
+                int arrIndex = 0;
+                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                 {
-                    tableData.fieldComments[col - 1] = worksheet.Cells[_config.FieldCommentIndex + 1, col].Text?.Trim() ?? "";
-                    tableData.fieldNames[col - 1] = worksheet.Cells[_config.FieldNameIndex + 1, col].Text?.Trim() ?? $"Field{col}";
-                    tableData.fieldTypes[col - 1] = worksheet.Cells[_config.FieldTypeIndex + 1, col].Text?.Trim() ?? "string";
+                    if (!listRealColumn.Contains(col))
+                    {
+                        continue;
+                    }
+                    tableData.fieldComments[arrIndex] = worksheet.Cells[_config.FieldCommentIndex + 1, col].Text?.Trim() ?? "";
+                    tableData.fieldNames[arrIndex] = worksheet.Cells[_config.FieldNameIndex + 1, col].Text?.Trim() ?? $"Field{col}";
+                    tableData.fieldTypes[arrIndex] = worksheet.Cells[_config.FieldTypeIndex + 1, col].Text?.Trim() ?? "string";
+                    arrIndex++;
                 }
 
                 // 容错处理
@@ -130,8 +143,12 @@ public class ExcelDataProcessor
                 for (int row = _config.DataStartIndex + 1; row <= rowCount; row++)
                 {
                     List<string> values = new List<string>();
-                    for (int col = 1; col <= columnCount; col++)
+                    for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                     {
+                        if (!listRealColumn.Contains(col))
+                        {
+                            continue;
+                        }
                         var cell = worksheet.Cells[row, col];
                         string value = cell.Text?.Trim() ?? "";
                         values.Add(value);
@@ -181,6 +198,7 @@ public class ExcelDataProcessor
         int column = 1;
         worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "id";
         worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "男性";
+        worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "注释(不打进表)";
         worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "技能";
         worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "技能CD";
         worksheet.Cells[_config.FieldCommentIndex + 1, column++].Value = "技能描述";
@@ -193,6 +211,7 @@ public class ExcelDataProcessor
         column = 1;
         worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "id";
         worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "isMen";
+        worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "";
         worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "skills";
         worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "skillsCD";
         worksheet.Cells[_config.FieldNameIndex + 1, column++].Value = "skillsDes";
@@ -205,6 +224,7 @@ public class ExcelDataProcessor
         column = 1;
         worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "int";
         worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "bool";
+        worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "";
         worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[int]";
         worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[int]";
         worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[string]";
@@ -214,11 +234,18 @@ public class ExcelDataProcessor
         worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "Vector3";
         worksheet.Cells[_config.FieldTypeIndex + 1, column++].Value = "[Vector2]";
 
+        for (int i = 1; i <= 11; i++)
+        {
+            worksheet.Cells[_config.FieldTagIndex + 1, i].Value = i != 3 ? "C" : "";
+        }
+
+
         for (int i = _config.DataStartIndex + 1; i <= _config.DataStartIndex + 10; i++)
         {
             column = 1;
             worksheet.Cells[i, column++].Value = 10001000 + i;
             worksheet.Cells[i, column++].Value = Random.Range(0, 1f) > 0.5f;
+            worksheet.Cells[i, column++].Value = "此字段为注释不打进表" + i;
             worksheet.Cells[i, column++].Value = GenerateRandomIntData(4, ",");
             worksheet.Cells[i, column++].Value = GenerateRandomIntData(4, "，");
             worksheet.Cells[i, column++].Value = GenerateRandomStringData(4, ":");
