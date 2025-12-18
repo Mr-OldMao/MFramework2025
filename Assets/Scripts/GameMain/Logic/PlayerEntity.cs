@@ -8,12 +8,13 @@ namespace GameMain
     public partial class PlayerEntity : MonoBehaviour
     {
         private GameObject player;
-        private RectTransform imgTankIcon;
+        private Transform imgTankIcon;
 
         private void Awake()
         {
             player = this.gameObject;
-            imgTankIcon = player.transform.Find<RectTransform>("imgTankIcon");
+            //imgTankIcon = player.transform.Find<RectTransform>("imgTankIcon");
+            imgTankIcon = player.transform.GetChild(0).GetComponent<Transform>();
         }
 
         private void Init(Vector2 gridPos, Vector2 mapPos)

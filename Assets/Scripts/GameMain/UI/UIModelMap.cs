@@ -24,6 +24,10 @@ namespace GameMain
         //网格边界
         private Dictionary<Vector2, EMapGridBorderType> m_DicMapGridBorderType = new Dictionary<Vector2, EMapGridBorderType>();
 
+        //边界外空气墙
+        private List<Vector2> m_ListAirBorder = new List<Vector2>();
+
+
         public int LevelID { get; private set; }
 
         public List<Vector2> GridPosBornEnemyArr { get; private set; }
@@ -32,9 +36,6 @@ namespace GameMain
         public Vector2 GridPosBrid { get; private set; }
         //左、左上、上、右上、右
         public List<Vector2> GridPosBridWallArr { get; private set; }
-
-
-
 
         public UIModelMap(IUIController controller) : base(controller)
         {
@@ -45,34 +46,43 @@ namespace GameMain
             LevelID = 1;
             SetMapGridType();
             SetFixedPos();
+            SetAirBorder();
             await UniTask.CompletedTask;
         }
 
-        private void SetFixedPos()
+        public List<Vector2> GetAirBorder()
         {
-            GridPosBornEnemyArr = new List<Vector2>
-            {
-                m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_LU).FirstOrDefault().Key,
-                m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_UM).FirstOrDefault().Key,
-                m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_RU).FirstOrDefault().Key
-            };
-            GridPosBrid = m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_DM).FirstOrDefault().Key;
-            GridPosBridWallArr = new List<Vector2>
-            {
-                new Vector2(GridPosBrid.x - 1,GridPosBrid.y),
-                new Vector2(GridPosBrid.x - 1,GridPosBrid.y + 1),
-                new Vector2(GridPosBrid.x,GridPosBrid.y + 1),
-                new Vector2(GridPosBrid.x + 1,GridPosBrid.y + 1),
-                new Vector2(GridPosBrid.x + 1,GridPosBrid.y),
-            };
-            GridPosBornPlayer1 = new Vector2(GridPosBrid.x - 2, GridPosBrid.y);
-            GridPosBornPlayer2 = new Vector2(GridPosBrid.x + 2, GridPosBrid.y);
+            return m_ListAirBorder;
         }
 
         public void GenerateMapData(int mapTypeID)
         {
             SetMapGridData(mapTypeID);
         }
+
+        public List<GridDataInfo> GetMapGridData()
+        {
+            return m_DicMapGridData.Values.ToList();
+        }
+
+        public string GetMapPropAssetPath(EMapEntityType eMapEntityType)
+        {
+            if (eMapEntityType == EMapEntityType.None)
+            {
+                return string.Empty;
+            }
+            return "Assets/Download/prefab/entity/map/3d/" + eMapEntityType.ToString() + ".prefab";
+        }
+
+        public EMapGridBorderType GetMapGridType(Vector2 gridPos)
+        {
+            if (m_DicMapGridBorderType.TryGetValue(gridPos, out EMapGridBorderType res))
+            {
+                return res;
+            }
+            return EMapGridBorderType.None;
+        }
+
 
         private void SetMapGridData(int mapTypeID)
         {
@@ -96,9 +106,9 @@ namespace GameMain
 
 #if UNITY_EDITOR
             string des = string.Empty;
-            for (int i = 0; i <  Enum.GetValues(typeof(EMapEntityType)).Length; i++)
+            for (int i = 0; i < Enum.GetValues(typeof(EMapEntityType)).Length; i++)
             {
-               var entityTypeArr = m_DicMapGridData.Values.Where(p => p.entityDataInfos.Find(k => k.mapEntityType == (EMapEntityType)i) != null).ToList();
+                var entityTypeArr = m_DicMapGridData.Values.Where(p => p.entityDataInfos.Find(k => k.mapEntityType == (EMapEntityType)i) != null).ToList();
                 if (entityTypeArr.Count > 0)
                 {
                     des += $"{(EMapEntityType)i}:{entityTypeArr.Count}\n";
@@ -225,29 +235,6 @@ namespace GameMain
             return res;
         }
 
-        public List<GridDataInfo> GetMapGridData()
-        {
-            return m_DicMapGridData.Values.ToList();
-        }
-
-        public string GetMapPropAssetPath(EMapEntityType eMapEntityType)
-        {
-            if (eMapEntityType == EMapEntityType.None)
-            {
-                return string.Empty;
-            }
-            return "Assets/Download/prefab/entity/map/" + eMapEntityType.ToString() + ".prefab";
-        }
-
-        public EMapGridBorderType GetMapGridType(Vector2 gridPos)
-        {
-            if (m_DicMapGridBorderType.TryGetValue(gridPos, out EMapGridBorderType res))
-            {
-                return res;
-            }
-            return EMapGridBorderType.None;
-        }
-
         private void SetMapGridType()
         {
             for (int i = 0; i < COLUMN_NUM; i++)
@@ -325,6 +312,43 @@ namespace GameMain
                 }
             }
         }
+
+        private void SetAirBorder()
+        {
+            for (int i = -1; i <= COLUMN_NUM; i++)
+            {
+                m_ListAirBorder.Add(new Vector2(-1, i));
+                m_ListAirBorder.Add(new Vector2(ROW_NUM, i));
+            }
+
+            for (int i = 0; i < ROW_NUM; i++)
+            {
+                m_ListAirBorder.Add(new Vector2(i, -1));
+                m_ListAirBorder.Add(new Vector2(i, COLUMN_NUM));
+            }
+        }
+
+        private void SetFixedPos()
+        {
+            GridPosBornEnemyArr = new List<Vector2>
+            {
+                m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_LU).FirstOrDefault().Key,
+                m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_UM).FirstOrDefault().Key,
+                m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_RU).FirstOrDefault().Key
+            };
+            GridPosBrid = m_DicMapGridBorderType.Where(p => p.Value == EMapGridBorderType.Border_DM).FirstOrDefault().Key;
+            GridPosBridWallArr = new List<Vector2>
+            {
+                new Vector2(GridPosBrid.x - 1,GridPosBrid.y),
+                new Vector2(GridPosBrid.x - 1,GridPosBrid.y + 1),
+                new Vector2(GridPosBrid.x,GridPosBrid.y + 1),
+                new Vector2(GridPosBrid.x + 1,GridPosBrid.y + 1),
+                new Vector2(GridPosBrid.x + 1,GridPosBrid.y),
+            };
+            GridPosBornPlayer1 = new Vector2(GridPosBrid.x - 2, GridPosBrid.y);
+            GridPosBornPlayer2 = new Vector2(GridPosBrid.x + 2, GridPosBrid.y);
+        }
+
     }
 
 
@@ -388,6 +412,7 @@ namespace GameMain
         Stone_RD,
         #endregion
 
+        AirBorder,
         Brid,
         DeadBrid,
     }

@@ -15,7 +15,9 @@ namespace GameMain
         private GameObject rectNodeMap;
         private GameObject rectNodePlayer;
         private GameObject rectNodeEnemy;
+        private GameObject rectNodeBorder;
 
+        private Transform MapNode2D;
 
         public override async UniTask Init(IUIView view, IUIModel model)
         {
@@ -28,6 +30,8 @@ namespace GameMain
         private async UniTask InitMapEntity()
         {
             int mapTypeID = DataTools.GetMapTypeIDByLevelID(((UIModelMap)Model).LevelID);
+
+            MapNode2D = GameObject.Find("MapNode2D").transform;
             await GenerateMap(mapTypeID);
             Debugger.Log("InitMapEntity Completed ", LogType.Test);
         }
@@ -47,6 +51,7 @@ namespace GameMain
 
             ResetNodeContainer();
             await GenerateMapEntityByDataAsync();
+            await GenerateMapAirBorder();
             await GeneragetPlayerTank();
             await GeneragetEnemyTank();
             isGenerateMap = false;
@@ -58,7 +63,8 @@ namespace GameMain
             
             var player1 = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Player1.prefab", false);
             player1.transform.SetParent(rectNodePlayer.transform);
-            player1.transform.localPosition = model.GridPosBornPlayer1 * UIModelMap.GRID_SIZE;
+            //player1.transform.localPosition = model.GridPosBornPlayer1 * UIModelMap.GRID_SIZE;
+            player1.transform.localPosition = model.GridPosBornPlayer1;
         }
 
         private async UniTask GeneragetEnemyTank()
@@ -67,7 +73,33 @@ namespace GameMain
 
             var enemy = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Enemy.prefab", false);
             enemy.transform.SetParent(rectNodeEnemy.transform);
-            enemy.transform.localPosition = model.GridPosBornEnemyArr[0] * UIModelMap.GRID_SIZE;
+            //enemy.transform.localPosition = model.GridPosBornEnemyArr[0] * UIModelMap.GRID_SIZE;
+            enemy.transform.localPosition = model.GridPosBornEnemyArr[0];
+        }
+
+        private async UniTask GenerateMapAirBorder()
+        {
+            rectNodeBorder = MapNode2D.Find("rectNodeBorder")?.gameObject;
+            if (rectNodeBorder != null)
+            {
+                return;
+            }
+            rectNodeBorder = new GameObject("rectNodeBorder");
+            rectNodeBorder.transform.SetParent(MapNode2D);
+            rectNodeBorder.transform.localPosition = Vector3.zero;
+
+            model = (UIModelMap)Model;
+            List<Vector2> borderPos = model.GetAirBorder();
+            for (int i = 0; i < borderPos.Count; i++)
+            {
+                string assetPath = model.GetMapPropAssetPath( EMapEntityType.AirBorder);
+                if (!string.IsNullOrEmpty(assetPath))
+                {
+                    var go = await GameEntry.Resource.InstantiateAsset(assetPath);
+                    go.transform.SetParent(rectNodeBorder.transform);
+                    go.transform.localPosition = new Vector3(borderPos[i].x, 0, borderPos[i].y);
+                }
+            }
         }
 
         private async UniTask GenerateMapEntityByDataAsync()
@@ -84,42 +116,45 @@ namespace GameMain
                     {
                         var go = await GameEntry.Resource.InstantiateAsset(assetPath);
                         go.transform.SetParent(rectNodeMap.transform);
-                        go.transform.localPosition = gridDataInfos[i].mapPos;
+                        //go.transform.localPosition = gridDataInfos[i].mapPos;
+                        go.transform.localPosition = new Vector3(gridDataInfos[i].gridPos.x,0, gridDataInfos[i].gridPos.y);
                         gridDataInfos[i].entityDataInfos[j].propEntity = go;
                     }
                 }
             }
+
+
         }
 
         private void ResetNodeContainer()
         {
             view = (UIPanelMap)View;
 
-            rectNodeMap = view.NodeContainer.Find("rectNodeMap")?.gameObject;
+            rectNodeMap = MapNode2D.Find("rectNodeMap")?.gameObject;
             if (rectNodeMap != null)
             {
                 GameObject.Destroy(rectNodeMap);
             }
             rectNodeMap = new GameObject("rectNodeMap");
-            rectNodeMap.transform.SetParent(view.NodeContainer);
+            rectNodeMap.transform.SetParent(MapNode2D);
             rectNodeMap.transform.localPosition = Vector3.zero;
 
-            rectNodePlayer = view.NodeContainer.Find("rectNodePlayer")?.gameObject;
+            rectNodePlayer = MapNode2D.Find("rectNodePlayer")?.gameObject;
             if (rectNodePlayer != null)
             {
                 GameObject.Destroy(rectNodePlayer);
             }
             rectNodePlayer = new GameObject("rectNodePlayer");
-            rectNodePlayer.transform.SetParent(view.NodeContainer);
+            rectNodePlayer.transform.SetParent(MapNode2D);
             rectNodePlayer.transform.localPosition = Vector3.zero;
 
-            rectNodeEnemy = view.NodeContainer.Find("rectNodeEnemy")?.gameObject;
+            rectNodeEnemy = MapNode2D.Find("rectNodeEnemy")?.gameObject;
             if (rectNodeEnemy != null)
             {
                 GameObject.Destroy(rectNodeEnemy);
             }
             rectNodeEnemy = new GameObject("rectNodeEnemy");
-            rectNodeEnemy.transform.SetParent(view.NodeContainer);
+            rectNodeEnemy.transform.SetParent(MapNode2D);
             rectNodeEnemy.transform.localPosition = Vector3.zero;
         }
     }

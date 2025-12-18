@@ -35,42 +35,24 @@ namespace GameMain
 
         private void MovePC()
         {
-            //if (Input.GetKeyDown(KeyCode.W))
-            //{
-            //    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-            //}
-            //else if (Input.GetKeyDown(KeyCode.S))
-            //{
-            //    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 180));
-            //}
-            //else if (Input.GetKeyDown(KeyCode.A))
-            //{
-            //    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 90));
-            //}
-            //else if (Input.GetKeyDown(KeyCode.D))
-            //{
-            //    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 270));
-            //}
-
-
             if (Input.GetKey(KeyCode.W))
             {
-                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                player.transform.Translate(Vector3.up * Time.deltaTime * moveSpeed);
+                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 0, 0));
+                player.transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
             }
             else if ( Input.GetKey(KeyCode.S) )
             {
-                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 180));
-                player.transform.Translate(Vector3.down * Time.deltaTime * moveSpeed);
+                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 180, 0));
+                player.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed);
             }
             else if (Input.GetKey(KeyCode.A))
             {
-                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 90));
+                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 270, 0));
                 player.transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
             }
             else if (Input.GetKey(KeyCode.D))
             {
-                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(0, 0, 270));
+                imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 90, 0));
                 player.transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
             }
         }
