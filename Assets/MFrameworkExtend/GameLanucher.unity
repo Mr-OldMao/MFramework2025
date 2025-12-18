@@ -150,6 +150,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIRoot
       objectReference: {fileID: 0}
+    - target: {fileID: 4939364833261527709, guid: fe4e6fd33306f8d4aba7df29ecf6b745, type: 3}
+      propertyPath: m_RenderMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5942953206735049217, guid: fe4e6fd33306f8d4aba7df29ecf6b745, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
