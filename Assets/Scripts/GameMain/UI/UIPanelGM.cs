@@ -12,9 +12,14 @@ namespace GameMain
     {
         // UI字段
         private RectTransform rootNode;
-        private Button btnRegenerateMap;
         private TMP_InputField inputTxtMapTypeID;
+        private Button btnRegenerateMap;
+        private Button btnTankLevelAdd;
+        private Button btnTankLevelSub;
 
+
+
+        private PlayerEntity PlayerEntity;
         public override async UniTask Init()
         {
             await base.Init();
@@ -44,6 +49,13 @@ namespace GameMain
         protected override void RegisterEvent()
         {
             Debugger.Log("UIPanelGM RegisterEvent");
+            PlayerEntity = GameObject.Find("EntityPlayer1").GetComponent<PlayerEntity>();
+
+            GameEntry.Event.RegisterEvent(GameEventType.GameStart, () =>
+            {
+                PlayerEntity = GameObject.Find("EntityPlayer1").GetComponent<PlayerEntity>();
+            });
+
             btnRegenerateMap.onClick.AddListener(() =>
             {
                 if (int.TryParse(inputTxtMapTypeID.text , out int mapTypeID))
@@ -57,16 +69,24 @@ namespace GameMain
                     Debugger.LogError("MapTypeID is not a number");
                 }
             });
+
+            btnTankLevelAdd.onClick.AddListener(() =>
+            {
+                PlayerEntity.AddLevel();
+            });
+
+            btnTankLevelSub.onClick.AddListener(() =>
+            {
+                PlayerEntity.SubLevel();
+            });
         }
 
         protected override void UnRegisterEvent()
         {
             btnRegenerateMap.onClick.RemoveAllListeners();
+            btnTankLevelAdd.onClick.RemoveAllListeners();
+            btnTankLevelSub.onClick.RemoveAllListeners();
         }
 
-        private void OnCloseClick()
-        {
-            
-        }
     }
 }

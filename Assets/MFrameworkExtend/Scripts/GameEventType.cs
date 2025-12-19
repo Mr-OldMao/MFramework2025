@@ -8,6 +8,12 @@ public enum GameEventType
 
     LoadingProgress = 200,
 
+    GameStart = 300,
+    GameOver = 301,
+
+    
+
+
     #region 框架层事件
     /// <summary>
     /// 场景加载开始

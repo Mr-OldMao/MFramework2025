@@ -1,6 +1,9 @@
+using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GameMain
@@ -10,7 +13,7 @@ namespace GameMain
         public bool isCanMove = false;
 
         public MoveDirType bulletDirType;
-        public BulletOwnerType bulletOwnerType;
+        public TankOwnerType tankOwnerType;
         public float bulletSpeed;
         public bool isPlayer;
 
@@ -21,36 +24,44 @@ namespace GameMain
         private Vector3 m_bulletDir;
 
         private const float BulletSpeedConst = 3f;
-        public void InitFireBullet(MoveDirType bulletDirType, BulletOwnerType bulletOwnerType, float bulletSpeed, int m_PoolID)
+
+        private Action collCallback;
+        public FB_bullet_bullet BulletData { get; private set; }
+        public void InitFireBullet(TankOwnerType tankOwnerType, int m_PoolID)
         {
-            this.bulletDirType = bulletDirType;
-            this.bulletOwnerType = bulletOwnerType;
-            this.bulletSpeed = bulletSpeed * BulletSpeedConst;
+            this.tankOwnerType = tankOwnerType;
             this.m_PoolID = m_PoolID;
 
             m_MaxDis = Mathf.Max(GameEntry.UI.GetModel<UIModelMap>().COLUMN_NUM, GameEntry.UI.GetModel<UIModelMap>().ROW_NUM) + 1;
+        }
 
+        public void Fire(Vector3 startPos, MoveDirType bulletDirType, int bulletID,Action collCallback)
+        {
+            transform.position = startPos;
+            BulletData = DataTools.GetBulletBullet(bulletID);
+            bulletSpeed = BulletData.BulletSpeed * BulletSpeedConst;
+            isCanMove = true;
+            this.collCallback = collCallback;
+            this.bulletDirType = bulletDirType;
             switch (bulletDirType)
             {
                 case MoveDirType.Forward:
                     m_bulletDir = Vector3.forward;
+                    transform.localRotation = Quaternion.Euler(0, 0, 0);
                     break;
                 case MoveDirType.Back:
-                    m_bulletDir = Vector3.back;
+                    m_bulletDir = Vector3.forward;
+                    transform.localRotation = Quaternion.Euler(0, 180, 0);
                     break;
                 case MoveDirType.Left:
-                    m_bulletDir = Vector3.left;
+                    m_bulletDir = Vector3.forward;
+                    transform.localRotation = Quaternion.Euler(0, 270, 0);
                     break;
                 case MoveDirType.Right:
-                    m_bulletDir = Vector3.right;
+                    m_bulletDir = Vector3.forward;
+                    transform.localRotation = Quaternion.Euler(0, 90, 0);
                     break;
             }
-        }
-
-        public void Fire(Vector3 startPos)
-        {
-            transform.position = startPos;
-            isCanMove = true;
         }
 
         void Update()
@@ -70,14 +81,71 @@ namespace GameMain
                 || transform.localPosition.x > m_MaxDis
                 || transform.localPosition.z > m_MaxDis)
             {
-                HintEntity();
+                HintSelf();
             }
         }
 
-        private void HintEntity()
+        private void HintSelf()
         {
+            if (!isCanMove)
+            {
+                return;
+            }
             isCanMove = false;
             GameEntry.Pool.GetPool(m_PoolID).RecycleEntity(gameObject);
+        }
+
+
+        public async Task OnTriggerEnter(Collider other)
+        {
+            Debug.Log($"OnTriggerEnter : {other.name}");
+
+            TankEntityBase tankEntityBase = other.GetComponent<TankEntityBase>();
+            if (tankEntityBase != null)
+            {
+                if (tankEntityBase.TankOwnerType == this.tankOwnerType)
+                {
+                    return;
+                }
+                else
+                {
+                    Debug.Log($"当前子弹 :{tankOwnerType},击中坦克：{tankEntityBase.TankOwnerType},{other.name}");
+                }
+            }
+
+            MapEntity mapEntity = other.GetComponentInParent<MapEntity>();
+            if (mapEntity != null)
+            {
+                switch (mapEntity.mapEntityType)
+                {
+                    case EMapEntityType.None:
+                    case EMapEntityType.Grass:
+                    case EMapEntityType.Water:
+                    case EMapEntityType.Snow:
+
+                        break;
+                    case EMapEntityType.Wall:
+                    case EMapEntityType.Wall_LU:
+                    case EMapEntityType.Wall_LD:
+                    case EMapEntityType.Wall_RU:
+                    case EMapEntityType.Wall_RD:
+                    case EMapEntityType.Stone:
+                    case EMapEntityType.Stone_LU:
+                    case EMapEntityType.Stone_LD:
+                    case EMapEntityType.Stone_RU:
+                    case EMapEntityType.Stone_RD:
+                    case EMapEntityType.AirBorder:
+                    case EMapEntityType.Brid:
+                    case EMapEntityType.DeadBrid:
+                        mapEntity.BulletCollEvent(this, other.gameObject);
+
+                        //等待一帧
+                        await Task.Delay(1);
+                        HintSelf();
+                        collCallback?.Invoke();
+                        break;
+                }
+            }
         }
     }
 

@@ -9,15 +9,14 @@ namespace GameMain
     {
         public GameObject BulletContainer;
         public Transform NodePosBullet;
-        public float bulletSpeed;
 
         private List<GameObject> m_ListBullet = new List<GameObject>();
         private int m_PoolID;
-
-
-        private float m_BulletInterval;
+        public float m_BulletInterval;
         private bool m_IsCanFire;
         private float m_CurBulletTimer;
+
+
         public async UniTask InitFire()
         {
             BulletContainer = GameObject.Find("BulletContainer");
@@ -36,8 +35,7 @@ namespace GameMain
 
             m_IsCanFire = true;
             m_CurBulletTimer = 0;
-            UpdateBulletInterval();
-            UpdateBulletSpeed();
+            //UpdateBulletInterval();
 
             m_PoolID = GameEntry.Pool.CreatPool(new Pool(assets[0], (go, b) =>
             {
@@ -48,7 +46,7 @@ namespace GameMain
                     go.AddComponent<BulletEntity>();
                     m_ListBullet.Add(go);
                 }
-                go.GetComponent<BulletEntity>().InitFireBullet(moveDirType, BulletOwnerType.Player, bulletSpeed, m_PoolID);
+                go.GetComponent<BulletEntity>().InitFireBullet(TankOwnerType, m_PoolID);
             }, (go) =>
             {
                 Debug.Log("回收 " + go);
@@ -57,19 +55,11 @@ namespace GameMain
 
         private void UpdateBulletInterval()
         {
-            m_BulletInterval = DataTools.GetBulletBullet(tankLevel).BulletInterval;
-        }
-
-        private void UpdateBulletSpeed()
-        {
-            bulletSpeed = DataTools.GetBulletBullet(tankLevel).BulletSpeed;
+            m_BulletInterval = DataTools.GetBulletBullet(m_TankPlayerData.BulletID).BulletInterval;
         }
 
         public void Fire()
         {
-            //GameEntry.Pool.GetPool(m_PoolID).GetEntity().GetComponent<BulletEntity>().FireBullet(BulletDirType.Forward, 1f, true);
-
-
             if (!m_IsCanFire)
             {
                 m_CurBulletTimer += Time.deltaTime;
@@ -82,8 +72,24 @@ namespace GameMain
 
             if (m_IsCanFire && Input.GetKey(KeyCode.Space))
             {
-                GameEntry.Pool.GetPool(m_PoolID).GetEntity().GetComponent<BulletEntity>().Fire(NodePosBullet.position);
+                BulletEntity bulletEntity = GameEntry.Pool.GetPool(m_PoolID).GetEntity().GetComponent<BulletEntity>();
+                bulletEntity.Fire(NodePosBullet.position, moveDirType, DataTools.GetTankPlayer((int)TankType).BulletID, () =>
+                {
+                    ResetFireState();
+                });
                 m_IsCanFire = false;
+            }
+        }
+
+        private void ResetFireState()
+        {
+            /// <summary>
+            /// 碰撞后子弹重置最短时间
+            /// </summary>
+            float m_ResetBulletMinTimer = m_BulletInterval / 2;
+            if (!m_IsCanFire && m_CurBulletTimer < m_ResetBulletMinTimer)
+            {
+                m_CurBulletTimer = m_ResetBulletMinTimer;
             }
         }
     }

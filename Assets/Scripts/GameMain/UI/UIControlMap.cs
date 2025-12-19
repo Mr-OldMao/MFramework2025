@@ -54,6 +54,8 @@ namespace GameMain
             await GenerateMapAirBorder();
             await GeneragetPlayerTank();
             await GeneragetEnemyTank();
+
+            GameEntry.Event.DispatchEvent(GameEventType.GameStart);
             isGenerateMap = false;
         }
 
@@ -65,6 +67,8 @@ namespace GameMain
             player1.gameObject.SetActive(false);
             player1.transform.SetParent(rectNodePlayer.transform);
             player1.transform.localPosition = new Vector3(model.GridPosBornPlayer1.x, 0, model.GridPosBornPlayer1.y);
+            player1.AddComponent<PlayerEntity>();
+            player1.name = "EntityPlayer1";
             player1.gameObject.SetActive(true);
         }
 
@@ -76,6 +80,7 @@ namespace GameMain
             enemy.gameObject.SetActive(false);
             enemy.transform.SetParent(rectNodeEnemy.transform);
             enemy.transform.localPosition = new Vector3(model.GridPosBornEnemyArr[0].x, 0, model.GridPosBornEnemyArr[0].y);
+            enemy.AddComponent<EnemyEntity>();
             enemy.gameObject.SetActive(true);
         }
 
@@ -121,6 +126,7 @@ namespace GameMain
                         go.transform.SetParent(rectNodeMap.transform);
                         go.transform.localPosition = new Vector3(gridDataInfos[i].gridPos.x, 0, gridDataInfos[i].gridPos.y);
                         gridDataInfos[i].entityDataInfos[j].propEntity = go;
+                        go.AddComponent<MapEntity>().SetMapEntityType(gridDataInfos[i].entityDataInfos[j].mapEntityType);
                         go.SetActive(true);
                     }
                 }

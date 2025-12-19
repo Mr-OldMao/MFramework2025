@@ -130,6 +130,11 @@ namespace GameMain
         {
             return dicBulletBullet.Values.Where(x => x.ID == id).FirstOrDefault();
         }
+
+        public static FB_tank_player GetTankPlayer(int id)
+        {
+            return dicTankPlayer.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
         #endregion
 
     }

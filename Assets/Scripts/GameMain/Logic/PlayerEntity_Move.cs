@@ -7,7 +7,7 @@ namespace GameMain
 {
     public partial class PlayerEntity
     {
-        public float moveSpeed = 5f;
+        public float moveSpeed;
 
         public Vector2 gridPos;
         public Vector2 mapPos;
@@ -16,10 +16,12 @@ namespace GameMain
         private Vector2 MaxMapPos;
 
         public bool IsCanMove { get; set; } = true;
-
+        public bool IsMoving { get;private set; } = false;
+        private const float TankMoveSpeedConst = 3f;
         private void InitMove(Vector2 gridPos)
         {
             this.gridPos = gridPos;
+            UpdateTankMoveSpeed();
             //MaxGridPos = gridPos * UIModelMap.GRID_SIZE;
             //MaxMapPos = mapPos * UIModelMap.GRID_SIZE;
         }
@@ -32,6 +34,11 @@ namespace GameMain
             }
         }
 
+        private void UpdateTankMoveSpeed()
+         {
+            moveSpeed = DataTools.GetTankPlayer((int)TankType).MoveSpeed * TankMoveSpeedConst;
+        }
+
         private void MovePC()
         {
             if (Input.GetKey(KeyCode.W))
@@ -39,24 +46,32 @@ namespace GameMain
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 0, 0));
                 player.transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
                 moveDirType = MoveDirType.Forward;
+                IsMoving = true;
             }
             else if ( Input.GetKey(KeyCode.S) )
             {
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 180, 0));
                 player.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed);
                 moveDirType = MoveDirType.Back;
+                IsMoving = true;
             }
             else if (Input.GetKey(KeyCode.A))
             {
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 270, 0));
                 player.transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
                 moveDirType = MoveDirType.Left;
+                IsMoving = true;
             }
             else if (Input.GetKey(KeyCode.D))
             {
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 90, 0));
                 player.transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
                 moveDirType = MoveDirType.Right;
+                IsMoving = true;
+            }
+            else
+            {
+                IsMoving = false;
             }
         }
     }
