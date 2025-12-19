@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using System;
@@ -96,7 +97,7 @@ namespace GameMain
         }
 
 
-        public async Task OnTriggerEnter(Collider other)
+        public async UniTask OnTriggerEnter(Collider other)
         {
             Debug.Log($"OnTriggerEnter : {other.name}");
 
@@ -140,7 +141,7 @@ namespace GameMain
                         mapEntity.BulletCollEvent(this, other.gameObject);
 
                         //等待一帧
-                        await Task.Delay(1);
+                        await UniTask.Delay(1);
                         HintSelf();
                         collCallback?.Invoke();
                         break;

@@ -60,7 +60,7 @@ namespace GameMain
         }
         public static async UniTask SetRewardReward()
         {
-            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath( "reward_reward"));
+            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("reward_reward"));
             ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);
             var datas = FB_reward_reward_Array.GetRootAsFB_reward_reward_Array(byteBuffer);
             for (int i = 0; i < datas.DatasLength; i++)
@@ -90,7 +90,7 @@ namespace GameMain
         }
         public static async UniTask SetMapType()
         {
-            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("map_MapType"));
+            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("map_mapType"));
             ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);
             var datas = FB_map_mapType_Array.GetRootAsFB_map_mapType_Array(byteBuffer);
             for (int i = 0; i < datas.DatasLength; i++)
@@ -121,7 +121,7 @@ namespace GameMain
             int mapTypeID = 1;
             if (dicLevelLevel.ContainsKey(levelID))
             {
-                mapTypeID= dicLevelLevel[levelID].MapTypeID;
+                mapTypeID = dicLevelLevel[levelID].MapTypeID;
             }
             return mapTypeID;
         }
