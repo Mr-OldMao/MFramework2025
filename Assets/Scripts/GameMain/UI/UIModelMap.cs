@@ -47,6 +47,7 @@ namespace GameMain
             SetMapGridType();
             SetFixedPos();
             SetAirBorder();
+
             await UniTask.CompletedTask;
         }
 
@@ -71,7 +72,7 @@ namespace GameMain
             {
                 return string.Empty;
             }
-            return "Assets/Download/prefab/entity/map/3d/" + eMapEntityType.ToString() + ".prefab";
+            return "Assets/Download/prefab/entity/map/2d/" + eMapEntityType.ToString() + ".prefab";
         }
 
         public EMapGridBorderType GetMapGridType(Vector2 gridPos)

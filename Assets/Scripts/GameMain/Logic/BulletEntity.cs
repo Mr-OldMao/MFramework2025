@@ -2,9 +2,6 @@ using Cysharp.Threading.Tasks;
 using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GameMain
@@ -36,7 +33,7 @@ namespace GameMain
             m_MaxDis = Mathf.Max(GameEntry.UI.GetModel<UIModelMap>().COLUMN_NUM, GameEntry.UI.GetModel<UIModelMap>().ROW_NUM) + 1;
         }
 
-        public void Fire(Vector3 startPos, MoveDirType bulletDirType, int bulletID,Action collCallback)
+        public void Fire(Vector3 startPos, MoveDirType bulletDirType, int bulletID, Action collCallback)
         {
             transform.position = startPos;
             BulletData = DataTools.GetBulletBullet(bulletID);
@@ -94,6 +91,7 @@ namespace GameMain
             }
             isCanMove = false;
             GameEntry.Pool.GetPool(m_PoolID).RecycleEntity(gameObject);
+            GenerateEffNormalBomb(transform.position);
         }
 
 
@@ -147,6 +145,14 @@ namespace GameMain
                         break;
                 }
             }
+        }
+
+        private void GenerateEffNormalBomb(Vector3 pos)
+        {
+            GameObject go = GameMainLogic.Instance.GetPoolEffSmallBomb();
+            //GameObject go = GameEntry.UI.GetController<UIControlMap>().gameMainLogic.GetPoolEffSmallBomb();
+            go.transform.position = pos;
+            go.SetActive(true);
         }
     }
 

@@ -26,6 +26,10 @@ namespace MFramework.Runtime.Extend
         /// </summary>
         public const string PATH_PREFAB_ENTITY_ROOT = "Assets/Download/prefab/entity/";
 
+        /// <summary>
+        /// Addressable 特效预制体根节点路径
+        /// </summary>
+        public const string PATH_PREFAB_ENTITY_EFF_ROOT = "Assets/Download/prefab/entity/eff/";
 
         /// <summary>
         /// Addressable 打表bytes文件根节点路径

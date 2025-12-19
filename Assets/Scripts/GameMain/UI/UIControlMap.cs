@@ -12,10 +12,11 @@ namespace GameMain
 
         private bool isGenerateMap = false;
 
-        private GameObject rectNodeMap;
-        private GameObject rectNodePlayer;
-        private GameObject rectNodeEnemy;
-        private GameObject rectNodeBorder;
+        private GameObject NodeMap;
+        private GameObject NodePlayer;
+        private GameObject NodeEnemy;
+        private GameObject NodeBorder;
+        private GameObject NodeBomb;
 
         private Transform MapNode2D;
 
@@ -24,6 +25,9 @@ namespace GameMain
             await base.Init(view, model);
             model = (UIModelMap)Model;
             view = (UIPanelMap)View;
+
+            GameMainLogic.Instance = new GameMainLogic();
+            await GameMainLogic.Instance.Init();
             await InitMapEntity();
         }
 
@@ -32,6 +36,7 @@ namespace GameMain
             int mapTypeID = DataTools.GetMapTypeIDByLevelID(((UIModelMap)Model).LevelID);
 
             MapNode2D = GameObject.Find("MapNode2D").transform;
+            MapNode2D.SetParent(GameMainLogic.Instance.RootNode);
             await GenerateMap(mapTypeID);
             Debugger.Log("InitMapEntity Completed ", LogType.Test);
         }
@@ -65,7 +70,7 @@ namespace GameMain
 
             var player1 = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Player1.prefab", false);
             player1.gameObject.SetActive(false);
-            player1.transform.SetParent(rectNodePlayer.transform);
+            player1.transform.SetParent(NodePlayer.transform);
             player1.transform.localPosition = new Vector3(model.GridPosBornPlayer1.x, 0, model.GridPosBornPlayer1.y);
             player1.AddComponent<PlayerEntity>();
             player1.name = "EntityPlayer1";
@@ -78,7 +83,7 @@ namespace GameMain
 
             var enemy = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Enemy.prefab", false);
             enemy.gameObject.SetActive(false);
-            enemy.transform.SetParent(rectNodeEnemy.transform);
+            enemy.transform.SetParent(NodeEnemy.transform);
             enemy.transform.localPosition = new Vector3(model.GridPosBornEnemyArr[0].x, 0, model.GridPosBornEnemyArr[0].y);
             enemy.AddComponent<EnemyEntity>();
             enemy.gameObject.SetActive(true);
@@ -86,14 +91,14 @@ namespace GameMain
 
         private async UniTask GenerateMapAirBorder()
         {
-            rectNodeBorder = MapNode2D.Find("rectNodeBorder")?.gameObject;
-            if (rectNodeBorder != null)
+            NodeBorder = MapNode2D.Find("NodeBorder")?.gameObject;
+            if (NodeBorder != null)
             {
                 return;
             }
-            rectNodeBorder = new GameObject("rectNodeBorder");
-            rectNodeBorder.transform.SetParent(MapNode2D);
-            rectNodeBorder.transform.localPosition = Vector3.zero;
+            NodeBorder = new GameObject("NodeBorder");
+            NodeBorder.transform.SetParent(MapNode2D);
+            NodeBorder.transform.localPosition = Vector3.zero;
 
             model = (UIModelMap)Model;
             List<Vector2> borderPos = model.GetAirBorder();
@@ -103,7 +108,7 @@ namespace GameMain
                 if (!string.IsNullOrEmpty(assetPath))
                 {
                     var go = await GameEntry.Resource.InstantiateAsset(assetPath, false);
-                    go.transform.SetParent(rectNodeBorder.transform);
+                    go.transform.SetParent(NodeBorder.transform);
                     go.transform.localPosition = new Vector3(borderPos[i].x, 0, borderPos[i].y);
                 }
             }
@@ -121,9 +126,9 @@ namespace GameMain
                     string assetPath = model.GetMapPropAssetPath(gridDataInfos[i].entityDataInfos[j].mapEntityType);
                     if (!string.IsNullOrEmpty(assetPath))
                     {
-                        var go = await GameEntry.Resource.InstantiateAsset(assetPath,false);
+                        var go = await GameEntry.Resource.InstantiateAsset(assetPath, false);
                         go.SetActive(false);
-                        go.transform.SetParent(rectNodeMap.transform);
+                        go.transform.SetParent(NodeMap.transform);
                         go.transform.localPosition = new Vector3(gridDataInfos[i].gridPos.x, 0, gridDataInfos[i].gridPos.y);
                         gridDataInfos[i].entityDataInfos[j].propEntity = go;
                         go.AddComponent<MapEntity>().SetMapEntityType(gridDataInfos[i].entityDataInfos[j].mapEntityType);
@@ -131,40 +136,48 @@ namespace GameMain
                     }
                 }
             }
-
-
         }
 
         private void ResetNodeContainer()
         {
             view = (UIPanelMap)View;
 
-            rectNodeMap = MapNode2D.Find("rectNodeMap")?.gameObject;
-            if (rectNodeMap != null)
+            NodeMap = MapNode2D.Find("NodeMap")?.gameObject;
+            if (NodeMap != null)
             {
-                GameObject.Destroy(rectNodeMap);
+                GameObject.Destroy(NodeMap);
             }
-            rectNodeMap = new GameObject("rectNodeMap");
-            rectNodeMap.transform.SetParent(MapNode2D);
-            rectNodeMap.transform.localPosition = Vector3.zero;
+            NodeMap = new GameObject("NodeMap");
+            NodeMap.transform.SetParent(MapNode2D);
+            NodeMap.transform.localPosition = Vector3.zero;
 
-            rectNodePlayer = MapNode2D.Find("rectNodePlayer")?.gameObject;
-            if (rectNodePlayer != null)
+            NodePlayer = MapNode2D.Find("NodePlayer")?.gameObject;
+            if (NodePlayer != null)
             {
-                GameObject.Destroy(rectNodePlayer);
+                GameObject.Destroy(NodePlayer);
             }
-            rectNodePlayer = new GameObject("rectNodePlayer");
-            rectNodePlayer.transform.SetParent(MapNode2D);
-            rectNodePlayer.transform.localPosition = Vector3.zero;
+            NodePlayer = new GameObject("NodePlayer");
+            NodePlayer.transform.SetParent(MapNode2D);
+            NodePlayer.transform.localPosition = Vector3.zero;
 
-            rectNodeEnemy = MapNode2D.Find("rectNodeEnemy")?.gameObject;
-            if (rectNodeEnemy != null)
+            NodeEnemy = MapNode2D.Find("NodeEnemy")?.gameObject;
+            if (NodeEnemy != null)
             {
-                GameObject.Destroy(rectNodeEnemy);
+                GameObject.Destroy(NodeEnemy);
             }
-            rectNodeEnemy = new GameObject("rectNodeEnemy");
-            rectNodeEnemy.transform.SetParent(MapNode2D);
-            rectNodeEnemy.transform.localPosition = Vector3.zero;
+            NodeEnemy = new GameObject("NodeEnemy");
+            NodeEnemy.transform.SetParent(MapNode2D);
+            NodeEnemy.transform.localPosition = Vector3.zero;
+
+
+            NodeBomb = MapNode2D.Find("NodeBomb")?.gameObject;
+            if (NodeBomb != null)
+            {
+                GameObject.Destroy(NodeBomb);
+            }
+            NodeBomb = new GameObject("NodeBomb");
+            NodeBomb.transform.SetParent(MapNode2D);
+            NodeBomb.transform.localPosition = Vector3.zero;
         }
     }
 }

@@ -34,8 +34,6 @@ namespace GameMain
             InitMove(new Vector2(player.transform.localPosition.x, player.transform.localPosition.z));
             InitFire();
 
-
-
         }
 
         private void FixedUpdate()
