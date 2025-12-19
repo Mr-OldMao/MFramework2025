@@ -9,22 +9,30 @@ namespace GameMain
     {
         private GameObject player;
         private Transform imgTankIcon;
+        private int tankLevel;
+        private MoveDirType moveDirType = MoveDirType.Forward;
 
         private void Awake()
         {
             player = this.gameObject;
             //imgTankIcon = player.transform.Find<RectTransform>("imgTankIcon");
             imgTankIcon = player.transform.GetChild(0).GetComponent<Transform>();
+
+            tankLevel = 1;
+            Init(Vector2.zero);
         }
 
-        private void Init(Vector2 gridPos, Vector2 mapPos)
+        private void Init(Vector2 gridPos)
         {
-            InitMove(gridPos, mapPos);
+            InitMove(gridPos);
+            InitFire();
         }
 
         private void FixedUpdate()
         {
             Move();
+
+            Fire();
         }
     }
 }

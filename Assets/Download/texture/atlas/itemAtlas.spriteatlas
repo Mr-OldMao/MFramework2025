@@ -71,6 +71,7 @@ SpriteAtlas:
     - 58c1ff47f904ca94f9d4a671f1220b99: 1015342827
     - 58c1ff47f904ca94f9d4a671f1220b99: 663092305
     - 58c1ff47f904ca94f9d4a671f1220b99: -140521853
+    - 0d404779bba8b9c4aab24d2be6cf6155: 21300000
     - ad5dad7acd9904a40a1a24d981768559: -920474555
     - ad5dad7acd9904a40a1a24d981768559: -896703207
     - ad5dad7acd9904a40a1a24d981768559: -1739139126
@@ -115,6 +116,7 @@ SpriteAtlas:
   - {fileID: 1015342827, guid: 58c1ff47f904ca94f9d4a671f1220b99, type: 3}
   - {fileID: 663092305, guid: 58c1ff47f904ca94f9d4a671f1220b99, type: 3}
   - {fileID: -140521853, guid: 58c1ff47f904ca94f9d4a671f1220b99, type: 3}
+  - {fileID: 21300000, guid: 0d404779bba8b9c4aab24d2be6cf6155, type: 3}
   - {fileID: -920474555, guid: ad5dad7acd9904a40a1a24d981768559, type: 3}
   - {fileID: -896703207, guid: ad5dad7acd9904a40a1a24d981768559, type: 3}
   - {fileID: -1739139126, guid: ad5dad7acd9904a40a1a24d981768559, type: 3}
@@ -158,6 +160,7 @@ SpriteAtlas:
   - stone_2
   - stone_1
   - stone_0
+  - buttle
   - item_3
   - item_2
   - item_1

@@ -17,12 +17,11 @@ namespace GameMain
 
         public bool IsCanMove { get; set; } = true;
 
-        private void InitMove(Vector2 gridPos, Vector2 mapPos)
+        private void InitMove(Vector2 gridPos)
         {
             this.gridPos = gridPos;
-            this.mapPos = mapPos;
-            MaxGridPos = gridPos * UIModelMap.GRID_SIZE;
-            MaxMapPos = mapPos * UIModelMap.GRID_SIZE;
+            //MaxGridPos = gridPos * UIModelMap.GRID_SIZE;
+            //MaxMapPos = mapPos * UIModelMap.GRID_SIZE;
         }
 
         private void Move()
@@ -39,22 +38,34 @@ namespace GameMain
             {
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 0, 0));
                 player.transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
+                moveDirType = MoveDirType.Forward;
             }
             else if ( Input.GetKey(KeyCode.S) )
             {
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 180, 0));
                 player.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed);
+                moveDirType = MoveDirType.Back;
             }
             else if (Input.GetKey(KeyCode.A))
             {
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 270, 0));
                 player.transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
+                moveDirType = MoveDirType.Left;
             }
             else if (Input.GetKey(KeyCode.D))
             {
                 imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 90, 0));
                 player.transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
+                moveDirType = MoveDirType.Right;
             }
         }
+    }
+
+    public enum MoveDirType
+    {
+        Forward,
+        Back,
+        Left,
+        Right
     }
 }

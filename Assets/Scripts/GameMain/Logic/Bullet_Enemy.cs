@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GameMain
 {
-    public partial class PlayerEntity : MonoBehaviour
+    public partial class BulletEntity
     {
 
     }

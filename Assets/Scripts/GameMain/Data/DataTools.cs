@@ -125,6 +125,11 @@ namespace GameMain
             }
             return mapTypeID;
         }
+
+        public static FB_bullet_bullet GetBulletBullet(int id)
+        {
+            return dicBulletBullet.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
         #endregion
 
     }

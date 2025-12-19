@@ -11,8 +11,8 @@ namespace GameMain
 {
     public class UIModelMap : UIModelBase
     {
-        public const int ROW_NUM = 13;
-        public const int COLUMN_NUM = 13;
+        public readonly int ROW_NUM = 13;
+        public readonly int COLUMN_NUM = 13;
         /// <summary>
         /// 格子大小，坐标映射比例 物理坐标 = 1格子坐标gridPos * posMappingRatio
         /// </summary>

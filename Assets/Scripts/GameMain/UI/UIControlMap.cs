@@ -60,11 +60,12 @@ namespace GameMain
         private async UniTask GeneragetPlayerTank()
         {
             model = (UIModelMap)Model;
-            
+
             var player1 = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Player1.prefab", false);
+            player1.gameObject.SetActive(false);
             player1.transform.SetParent(rectNodePlayer.transform);
-            //player1.transform.localPosition = model.GridPosBornPlayer1 * UIModelMap.GRID_SIZE;
-            player1.transform.localPosition = model.GridPosBornPlayer1;
+            player1.transform.localPosition = new Vector3(model.GridPosBornPlayer1.x, 0, model.GridPosBornPlayer1.y);
+            player1.gameObject.SetActive(true);
         }
 
         private async UniTask GeneragetEnemyTank()
@@ -72,9 +73,10 @@ namespace GameMain
             model = (UIModelMap)Model;
 
             var enemy = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Enemy.prefab", false);
+            enemy.gameObject.SetActive(false);
             enemy.transform.SetParent(rectNodeEnemy.transform);
-            //enemy.transform.localPosition = model.GridPosBornEnemyArr[0] * UIModelMap.GRID_SIZE;
-            enemy.transform.localPosition = model.GridPosBornEnemyArr[0];
+            enemy.transform.localPosition = new Vector3(model.GridPosBornEnemyArr[0].x, 0, model.GridPosBornEnemyArr[0].y);
+            enemy.gameObject.SetActive(true);
         }
 
         private async UniTask GenerateMapAirBorder()
@@ -92,10 +94,10 @@ namespace GameMain
             List<Vector2> borderPos = model.GetAirBorder();
             for (int i = 0; i < borderPos.Count; i++)
             {
-                string assetPath = model.GetMapPropAssetPath( EMapEntityType.AirBorder);
+                string assetPath = model.GetMapPropAssetPath(EMapEntityType.AirBorder);
                 if (!string.IsNullOrEmpty(assetPath))
                 {
-                    var go = await GameEntry.Resource.InstantiateAsset(assetPath);
+                    var go = await GameEntry.Resource.InstantiateAsset(assetPath, false);
                     go.transform.SetParent(rectNodeBorder.transform);
                     go.transform.localPosition = new Vector3(borderPos[i].x, 0, borderPos[i].y);
                 }
@@ -114,11 +116,12 @@ namespace GameMain
                     string assetPath = model.GetMapPropAssetPath(gridDataInfos[i].entityDataInfos[j].mapEntityType);
                     if (!string.IsNullOrEmpty(assetPath))
                     {
-                        var go = await GameEntry.Resource.InstantiateAsset(assetPath);
+                        var go = await GameEntry.Resource.InstantiateAsset(assetPath,false);
+                        go.SetActive(false);
                         go.transform.SetParent(rectNodeMap.transform);
-                        //go.transform.localPosition = gridDataInfos[i].mapPos;
-                        go.transform.localPosition = new Vector3(gridDataInfos[i].gridPos.x,0, gridDataInfos[i].gridPos.y);
+                        go.transform.localPosition = new Vector3(gridDataInfos[i].gridPos.x, 0, gridDataInfos[i].gridPos.y);
                         gridDataInfos[i].entityDataInfos[j].propEntity = go;
+                        go.SetActive(true);
                     }
                 }
             }
