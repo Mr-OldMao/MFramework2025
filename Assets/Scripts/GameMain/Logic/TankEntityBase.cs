@@ -1,11 +1,6 @@
-using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
-using MFramework.Runtime.Extend;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.U2D;
 
 namespace GameMain
 {
@@ -21,21 +16,39 @@ namespace GameMain
 
         public ETankState eTankState { get; protected set; }
 
+        private Animator _animator;
+        public bool IsMoving { get; protected set; } = false;
 
-        public void InitData(TankOwnerType tankOwnerType , int tankTypeID, int entityID)
+
+        public void InitData(TankOwnerType tankOwnerType, int tankTypeID, int entityID)
         {
             TankOwnerType = tankOwnerType;
             TankTypeID = tankTypeID;
             EntityID = entityID;
             HP = tankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).HP : DataTools.GetTankPlayer(tankTypeID).HP;
             NodeSpriteRenderer = transform.GetComponentInChildren<SpriteRenderer>();
+            _animator = GetComponentInChildren<Animator>();
             eTankState = ETankState.Idle;
+
+            UpdateTankAnim();
             Init();
         }
 
         protected abstract void Init();
 
-        public void TankBeAttacked(BulletEntity bulletEntity,Action<bool> tankDeadCallback)
+        protected virtual void FixedUpdate()
+        {
+            if (IsMoving)
+            {
+                PauseAnim(false);
+            }
+            else
+            {
+                PauseAnim(true);
+            }
+        }
+
+        public void TankBeAttacked(BulletEntity bulletEntity, Action<bool> tankDeadCallback)
         {
             if (bulletEntity?.BulletData != null)
             {
@@ -59,11 +72,26 @@ namespace GameMain
         protected void UpdateTankData(int tankTypeID)
         {
             TankTypeID = tankTypeID;
-            GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas",(p)=>
+            UpdateTankAnim();
+        }
+
+
+
+        public void UpdateTankAnim()
+        {
+            string animName = "move" + TankTypeID;
+            _animator.Play(animName);
+        }
+        public void PauseAnim(bool isPause)
+        {
+            if (isPause)
             {
-                string spriteName = TankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).ResName : DataTools.GetTankPlayer(tankTypeID).ResName;
-                NodeSpriteRenderer.sprite = p.GetSprite(spriteName);
-            },false);
+                _animator.speed = 0;
+            }
+            else
+            {
+                _animator.speed = 1;
+            }
         }
 
         protected abstract void OnTankDead();

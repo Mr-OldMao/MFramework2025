@@ -1,8 +1,13 @@
 using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
 using MFramework.Runtime.Extend;
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.U2D;
+using static UnityEngine.EventSystems.EventTrigger;
+using Random = UnityEngine.Random;
 
 namespace GameMain
 {
@@ -15,43 +20,44 @@ namespace GameMain
         private Transform NodePool;
         private Transform NodePoolEff;
         private Transform NodePoolBulletPlayer1;
+        private Transform NodePoolTankEnemy;
 
         private int m_PoolIdEffSmallBomb;
         private int m_PoolIdEffNormallBomb;
         private int m_PoolIdBulletPlayer1;
+        public int PoolIdTankEnemy { get; private set; }
 
 
-
+        private int m_CurEnemyEntityID;
         public async UniTask Init()
         {
-            RootNode = GameObject.Find("RootNode")?.transform;
-            if (RootNode == null)
-            {
-                RootNode = new GameObject("RootNode").transform;
-            }
+            RootNode = InitNodePool("RootNode");
 
-            NodePool = GameObject.Find("NodePool")?.transform;
-            if (NodePool == null)
-            {
-                NodePool = new GameObject("NodePool").transform;
-            }
-            NodePool.transform.SetParent(RootNode);
+            NodePool = InitNodePool("NodePool", RootNode);
 
-            NodePoolEff = GameObject.Find("NodePoolEff")?.transform;
-            if (NodePoolEff == null)
-            {
-                NodePoolEff = new GameObject("NodePoolEff").transform;
-            }
-            NodePoolEff.SetParent(NodePool);
+            NodePoolEff = InitNodePool("NodePoolEff");
 
-            NodePoolBulletPlayer1 = GameObject.Find("NodePoolBulletPlayer1")?.transform;
-            if (NodePoolBulletPlayer1 == null)
-            {
-                NodePoolBulletPlayer1 = new GameObject("NodePoolBulletPlayer1").transform;
-            }
-            NodePoolBulletPlayer1.SetParent(NodePool);
+            NodePoolBulletPlayer1 = InitNodePool("NodePoolBulletPlayer1");
 
+            NodePoolTankEnemy = InitNodePool("NodePoolTankEnemy");
+
+            m_CurEnemyEntityID = 0;
             await GeneratePool();
+        }
+
+        private Transform InitNodePool(string nodePoolName, Transform parentNode = null)
+        {
+            Transform nodePool = GameObject.Find(nodePoolName)?.transform;
+            if (nodePool == null)
+            {
+                nodePool = new GameObject(nodePoolName).transform;
+            }
+            if (parentNode == null && NodePool != null)
+            {
+                parentNode = NodePool;
+            }
+            nodePool.SetParent(parentNode);
+            return nodePool;
         }
 
         private async UniTask GeneratePool()
@@ -91,6 +97,7 @@ namespace GameMain
             }, 1));
 
             var bulletPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "map/2d/Bullet.prefab", false);
+            bulletPrefab.gameObject.name = "123";
             m_PoolIdBulletPlayer1 = GameEntry.Pool.CreatPool(new Pool(bulletPrefab, (go, b) =>
             {
                 if (b)
@@ -104,6 +111,41 @@ namespace GameMain
             {
                 Debug.Log("回收子弹TODO " + go);
             }, 1, 50));
+
+
+            var enemyTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas", false);
+            var entmyTankPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "tank/Enemy.prefab", false);
+            PoolDataInfo tankEnemyPoolDataInfo = new PoolDataInfo
+            {
+                templateObj = entmyTankPrefab,
+                getObjCallback = (enemy, b) =>
+                {
+                    if (b)
+                    {
+                        enemy.transform.SetParent(NodePoolTankEnemy);
+                        enemy.GetOrAddComponent<EnemyEntity>();
+                    }
+                    enemy.gameObject.SetActive(true);
+                    bool isRedTank = Random.Range(0f, 1f) > 0.7f;
+                    int tankTypeID = isRedTank ? Random.Range(301, 304) : Random.Range(201, 206);
+                    string spriteName = DataTools.GetTankEnemy(tankTypeID).ResName;
+                    enemy.GetComponentInChildren<SpriteRenderer>().sprite = enemyTankAtlas.GetSprite(spriteName);
+                    Vector2 posBornEnemy = GameEntry.UI.GetModel<UIModelMap>().GetRandomGridPosBornEnemy();
+                    enemy.transform.localPosition = new Vector3(posBornEnemy.x, 0, posBornEnemy.y);
+                    enemy.GetComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurEnemyEntityID);
+                    enemy.name = "entmy" + m_CurEnemyEntityID;
+                    Debugger.Log($"generate enemy tank {m_CurEnemyEntityID}");
+                },
+                recycleObjCallback = (go) => Debug.Log("回收坦克 " + go),
+                preloadObjCallback = (go) =>
+                {
+                    go.transform.SetParent(NodePoolTankEnemy);
+                    go.GetOrAddComponent<EnemyEntity>();
+                },
+                initCount = 1,
+                maxCount = 50
+            };
+            PoolIdTankEnemy = GameEntry.Pool.CreatPool(new Pool(tankEnemyPoolDataInfo));
         }
 
 
@@ -132,6 +174,11 @@ namespace GameMain
                     break;
             }
             return go;
+        }
+
+        public GameObject GetPoolTankEnemy()
+        {
+            return GameEntry.Pool.GetPool(PoolIdTankEnemy).GetEntity();
         }
     }
 }

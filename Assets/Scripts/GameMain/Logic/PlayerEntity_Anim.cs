@@ -7,29 +7,29 @@ namespace GameMain
 {
     public partial class PlayerEntity
     {
-        private Animator _animator;
+        //private Animator _animator;
 
-        private void InitAnim()
-        {
-            _animator = GetComponentInChildren<Animator>();
-        }
+        //private void InitAnim()
+        //{
+        //    _animator = GetComponentInChildren<Animator>();
+        //}
 
-        private void UpdateTankAnim()
-        {
-            string animName = "move" + TankTypeID;
-            _animator.Play(animName);
-        }
+        //private void UpdateTankAnim()
+        //{
+        //    string animName = "move" + TankTypeID;
+        //    _animator.Play(animName);
+        //}
 
-        private void PauseAnim(bool isPause)
-        {
-            if (isPause)
-            {
-                _animator.speed = 0;
-            }
-            else
-            {
-                _animator.speed = 1;
-            }
-        }
+        //private void PauseAnim(bool isPause)
+        //{
+        //    if (isPause)
+        //    {
+        //        _animator.speed = 0;
+        //    }
+        //    else
+        //    {
+        //        _animator.speed = 1;
+        //    }
+        //}
     }
 }

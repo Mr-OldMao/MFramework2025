@@ -22,7 +22,7 @@ namespace GameMain
             player = this.gameObject;
             imgTankIcon = player.transform.GetChild(0).GetComponent<Transform>();
 
-            InitAnim();
+            //InitAnim();
 
             ChangeTankType(TankTypeID);
 
@@ -31,34 +31,26 @@ namespace GameMain
 
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+
             Move();
 
             Fire();
-
-            if (IsMoving)
-            {
-                PauseAnim(false);
-            }
-            else
-            {
-                PauseAnim(true);
-            }
         }
 
         private void ChangeTankType(int id)
         {
-            if (DataTools.GetTankPlayer(TankTypeID).ByteBuffer == null)
+            if (DataTools.GetTankPlayer(id).ByteBuffer == null)
             {
                 Debugger.LogError($"没有该坦克数据 id:{id}");
                 return;
             }
-            TankTypeID = id;
+            UpdateTankData(id);
             m_TankPlayerData = DataTools.GetTankPlayer(TankTypeID);
             UpdateBulletInterval();
             UpdateTankMoveSpeed();
-            UpdateTankAnim();
 
         }
 

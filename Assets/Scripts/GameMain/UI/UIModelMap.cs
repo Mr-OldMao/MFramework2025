@@ -85,6 +85,12 @@ namespace GameMain
         }
 
 
+        public Vector2 GetRandomGridPosBornEnemy()
+        {
+            Vector2 gridPos = GridPosBornEnemyArr[Random.Range(0, GridPosBornEnemyArr.Count)];
+            return gridPos;
+        }
+
         private void SetMapGridData(int mapTypeID)
         {
             m_DicMapGridData.Clear();

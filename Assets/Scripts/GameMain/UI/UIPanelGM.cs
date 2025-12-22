@@ -8,7 +8,7 @@ namespace GameMain
 {
     //[UIBind(typeof(UIControlGM), typeof(UIModelGM))]
     [UILayer(UILayerType.Tips)]
-    public  class UIPanelGM : UIViewBase
+    public class UIPanelGM : UIViewBase
     {
         // UI字段
         private RectTransform rootNode;
@@ -30,7 +30,7 @@ namespace GameMain
         {
             if (model is not null)
             {
-                
+
             }
         }
 
@@ -59,7 +59,7 @@ namespace GameMain
 
             btnRegenerateMap.onClick.AddListener(() =>
             {
-                if (int.TryParse(inputTxtMapTypeID.text , out int mapTypeID))
+                if (int.TryParse(inputTxtMapTypeID.text, out int mapTypeID))
                 {
 #pragma warning disable CS4014
                     GameEntry.UI.GetController<UIControlMap>().GenerateMap(mapTypeID);
@@ -79,6 +79,11 @@ namespace GameMain
             btnTankLevelSub.onClick.AddListener(() =>
             {
                 PlayerEntity.SubLevel();
+            });
+
+            btnGenerateEntmyTank.onClick.AddListener(() =>
+            {
+                GameMainLogic.Instance.GetPoolTankEnemy();
             });
         }
 

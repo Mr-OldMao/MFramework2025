@@ -6,7 +6,7 @@ namespace GameMain
     {
         private void Awake()
         {
-
+            IsMoving = true;
         }
 
         protected override void Init()
@@ -17,7 +17,8 @@ namespace GameMain
         protected override void OnTankDead()
         {
             Debugger.Log($"OnTankDead, id:{EntityID}, {this.gameObject.name}");
-            Destroy(this.gameObject);
+
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).RecycleEntity(gameObject);
         }
 
         protected override void OnTankHit()
@@ -26,6 +27,11 @@ namespace GameMain
 
             int nextID = DataTools.GetTankEnemy(TankTypeID).NextID;
             UpdateTankData(nextID);
+        }
+
+        protected override void FixedUpdate()
+        {
+            base.FixedUpdate();
         }
     }
 }

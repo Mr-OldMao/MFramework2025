@@ -70,7 +70,7 @@ namespace GameMain
             isGenerateMap = false;
 
 #pragma warning disable CS4014
-            AutoGeneragetEnemyTank(20);
+            AutoGeneragetEnemyTank(3);
 #pragma warning restore CS4014
         }
 
@@ -79,7 +79,7 @@ namespace GameMain
             model = (UIModelMap)Model;
 
             var player1 = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Player1.prefab", false);
-            player1.gameObject.SetActive(false);
+            player1.gameObject.SetActive(true);
             player1.transform.SetParent(NodePlayer.transform);
             player1.transform.localPosition = new Vector3(model.GridPosBornPlayer1.x, 0, model.GridPosBornPlayer1.y);
 
@@ -87,7 +87,6 @@ namespace GameMain
             int tankTypeID = Random.Range(101, 105);
             player1.AddComponent<PlayerEntity>().InitData(TankOwnerType.Player1, tankTypeID, ++m_CurEnemyPlayerID); ;
             player1.name = "EntityPlayer1";
-            player1.gameObject.SetActive(true);
         }
 
         private async UniTask GeneragetFirstEnemyTank(int count)
@@ -104,21 +103,7 @@ namespace GameMain
 
             for (int i = 0; i < count; i++)
             {
-                var enemy = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Enemy.prefab", false);
-                enemy.gameObject.SetActive(false);
-
-                bool isRedTank = Random.Range(0f, 1f) > 0.7f;
-                int tankTypeID = isRedTank ? Random.Range(301, 304) : Random.Range(201, 206);
-
-                string spriteName = DataTools.GetTankEnemy(tankTypeID).ResName;
-                enemy.GetComponentInChildren<SpriteRenderer>().sprite = enemyTankAtlas.GetSprite(spriteName);
-
-                enemy.transform.SetParent(NodeEnemy.transform);
-                Vector2 posBornEnemy = model.GridPosBornEnemyArr[i % model.GridPosBornEnemyArr.Count];
-                enemy.transform.localPosition = new Vector3(posBornEnemy.x, 0, posBornEnemy.y);
-                enemy.AddComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurEnemyEntityID);
-                enemy.name = "entmy" + m_CurEnemyEntityID;
-                enemy.gameObject.SetActive(true);
+                var enemy = GameMainLogic.Instance.GetPoolTankEnemy();
                 await UniTask.Delay(1000);
             }
         }
