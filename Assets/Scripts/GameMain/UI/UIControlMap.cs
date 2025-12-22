@@ -2,6 +2,8 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
+using MFramework.Runtime.Extend;
 
 namespace GameMain
 {
@@ -19,6 +21,10 @@ namespace GameMain
         private GameObject NodeBomb;
 
         private Transform MapNode2D;
+
+
+        private int m_CurEnemyPlayerID;
+        private int m_CurEnemyEntityID;
 
         public override async UniTask Init(IUIView view, IUIModel model)
         {
@@ -58,10 +64,14 @@ namespace GameMain
             await GenerateMapEntityByDataAsync();
             await GenerateMapAirBorder();
             await GeneragetPlayerTank();
-            await GeneragetEnemyTank();
+            await GeneragetFirstEnemyTank(1);
 
             GameEntry.Event.DispatchEvent(GameEventType.GameStart);
             isGenerateMap = false;
+
+#pragma warning disable CS4014
+            AutoGeneragetEnemyTank(20);
+#pragma warning restore CS4014
         }
 
         private async UniTask GeneragetPlayerTank()
@@ -72,21 +82,45 @@ namespace GameMain
             player1.gameObject.SetActive(false);
             player1.transform.SetParent(NodePlayer.transform);
             player1.transform.localPosition = new Vector3(model.GridPosBornPlayer1.x, 0, model.GridPosBornPlayer1.y);
-            player1.AddComponent<PlayerEntity>();
+
+            m_CurEnemyPlayerID = 1000;
+            int tankTypeID = Random.Range(101, 105);
+            player1.AddComponent<PlayerEntity>().InitData(TankOwnerType.Player1, tankTypeID, ++m_CurEnemyPlayerID); ;
             player1.name = "EntityPlayer1";
             player1.gameObject.SetActive(true);
         }
 
-        private async UniTask GeneragetEnemyTank()
+        private async UniTask GeneragetFirstEnemyTank(int count)
         {
             model = (UIModelMap)Model;
+            m_CurEnemyEntityID = 1000;
+            await AutoGeneragetEnemyTank(count);
+        }
 
-            var enemy = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Enemy.prefab", false);
-            enemy.gameObject.SetActive(false);
-            enemy.transform.SetParent(NodeEnemy.transform);
-            enemy.transform.localPosition = new Vector3(model.GridPosBornEnemyArr[0].x, 0, model.GridPosBornEnemyArr[0].y);
-            enemy.AddComponent<EnemyEntity>();
-            enemy.gameObject.SetActive(true);
+        private async UniTask AutoGeneragetEnemyTank(int count)
+        {
+            var enemyTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas", false);
+
+
+            for (int i = 0; i < count; i++)
+            {
+                var enemy = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Enemy.prefab", false);
+                enemy.gameObject.SetActive(false);
+
+                bool isRedTank = Random.Range(0f, 1f) > 0.7f;
+                int tankTypeID = isRedTank ? Random.Range(301, 304) : Random.Range(201, 206);
+
+                string spriteName = DataTools.GetTankEnemy(tankTypeID).ResName;
+                enemy.GetComponentInChildren<SpriteRenderer>().sprite = enemyTankAtlas.GetSprite(spriteName);
+
+                enemy.transform.SetParent(NodeEnemy.transform);
+                Vector2 posBornEnemy = model.GridPosBornEnemyArr[i % model.GridPosBornEnemyArr.Count];
+                enemy.transform.localPosition = new Vector3(posBornEnemy.x, 0, posBornEnemy.y);
+                enemy.AddComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurEnemyEntityID);
+                enemy.name = "entmy" + m_CurEnemyEntityID;
+                enemy.gameObject.SetActive(true);
+                await UniTask.Delay(1000);
+            }
         }
 
         private async UniTask GenerateMapAirBorder()

@@ -16,7 +16,7 @@ namespace GameMain
 
         private void UpdateTankAnim()
         {
-            string animName = "move" + (int)TankType;
+            string animName = "move" + TankTypeID;
             _animator.Play(animName);
         }
 

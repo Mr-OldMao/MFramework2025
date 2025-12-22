@@ -36,7 +36,7 @@ namespace GameMain
 
         private void UpdateTankMoveSpeed()
          {
-            moveSpeed = DataTools.GetTankPlayer((int)TankType).MoveSpeed * TankMoveSpeedConst;
+            moveSpeed = DataTools.GetTankPlayer(TankTypeID).MoveSpeed * TankMoveSpeedConst;
         }
 
         private void MovePC()

@@ -16,6 +16,7 @@ namespace GameMain
         private Button btnRegenerateMap;
         private Button btnTankLevelAdd;
         private Button btnTankLevelSub;
+        private Button btnGenerateEntmyTank;
 
 
 

@@ -17,6 +17,7 @@ namespace GameMain
         private Transform NodePoolBulletPlayer1;
 
         private int m_PoolIdEffSmallBomb;
+        private int m_PoolIdEffNormallBomb;
         private int m_PoolIdBulletPlayer1;
 
 
@@ -49,17 +50,14 @@ namespace GameMain
                 NodePoolBulletPlayer1 = new GameObject("NodePoolBulletPlayer1").transform;
             }
             NodePoolBulletPlayer1.SetParent(NodePool);
-            
+
             await GeneratePool();
         }
 
         private async UniTask GeneratePool()
         {
-
-            string EffSmallBomb = SystemConstantData.PATH_PREFAB_ENTITY_EFF_ROOT + "EffSmallBomb.prefab";
-            GameObject go = await GameEntry.Resource.LoadAssetAsync<GameObject>(EffSmallBomb, false);
-
-            m_PoolIdEffSmallBomb = GameEntry.Pool.CreatPool(new Pool(go, (go, b) =>
+            GameObject goEffSmallBomb = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_EFF_ROOT + "EffSmallBomb.prefab", false);
+            m_PoolIdEffSmallBomb = GameEntry.Pool.CreatPool(new Pool(goEffSmallBomb, (go, b) =>
             {
                 if (b)
                 {
@@ -75,8 +73,24 @@ namespace GameMain
 
             }, 1));
 
+            GameObject goEffNormalBomb = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_EFF_ROOT + "EffNormalBomb.prefab", false);
+            m_PoolIdEffNormallBomb = GameEntry.Pool.CreatPool(new Pool(goEffNormalBomb, (go, b) =>
+            {
+                if (b)
+                {
+                    //go.SetActive(false);
+                    go.transform.SetParent(NodePoolEff);
+                }
+                GameEntry.Timer.AddDelayTimer(0.2f, () =>
+                {
+                    GameEntry.Pool.GetPool(m_PoolIdEffNormallBomb).RecycleEntity(go);
+                });
+            }, (go) =>
+            {
 
-            var bulletPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>("Assets/Download/prefab/entity/map/2d/Bullet.prefab", false);
+            }, 1));
+
+            var bulletPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "map/2d/Bullet.prefab", false);
             m_PoolIdBulletPlayer1 = GameEntry.Pool.CreatPool(new Pool(bulletPrefab, (go, b) =>
             {
                 if (b)
@@ -85,7 +99,7 @@ namespace GameMain
                     go.transform.localPosition = Vector3.zero;
                     go.AddComponent<BulletEntity>();
                 }
-                go.GetComponent<BulletEntity>().InitFireBullet( TankOwnerType.Player1, m_PoolIdBulletPlayer1);
+                go.GetComponent<BulletEntity>().InitFireBullet(TankOwnerType.Player1, m_PoolIdBulletPlayer1);
             }, (go) =>
             {
                 Debug.Log("回收子弹TODO " + go);
@@ -97,6 +111,11 @@ namespace GameMain
         public GameObject GetPoolEffSmallBomb()
         {
             return GameEntry.Pool.GetPool(m_PoolIdEffSmallBomb).GetEntity();
+        }
+
+        public GameObject GetPoolEffNormalBomb()
+        {
+            return GameEntry.Pool.GetPool(m_PoolIdEffNormallBomb).GetEntity();
         }
 
         public GameObject GetPoolBullet(TankOwnerType tankOwnerType)

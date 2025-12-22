@@ -11,8 +11,15 @@ public enum GameEventType
     GameStart = 300,
     GameOver = 301,
 
-    
+    /// <summary>
+    /// 坦克被击中
+    /// </summary>
+    TankHit = 400,
 
+    /// <summary>
+    /// 坦克死亡
+    /// </summary>
+    TankDead =410,
 
     #region 框架层事件
     /// <summary>

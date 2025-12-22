@@ -9,8 +9,6 @@ namespace GameMain
 {
     public partial class PlayerEntity : TankEntityBase
     {
-        public override TankOwnerType TankOwnerType => TankOwnerType.Player1;
-
         private GameObject player;
         private Transform imgTankIcon;
 
@@ -18,18 +16,15 @@ namespace GameMain
 
         private FB_tank_player m_TankPlayerData;
 
-        private void Awake()
+
+        protected override void Init()
         {
             player = this.gameObject;
             imgTankIcon = player.transform.GetChild(0).GetComponent<Transform>();
-            Init();
-        }
 
-        private void Init()
-        {
             InitAnim();
 
-            ChangeTankType(ETankType.TankType1);
+            ChangeTankType(TankTypeID);
 
             InitMove(new Vector2(player.transform.localPosition.x, player.transform.localPosition.z));
             InitFire();
@@ -52,10 +47,15 @@ namespace GameMain
             }
         }
 
-        private void ChangeTankType(ETankType eTankType)
+        private void ChangeTankType(int id)
         {
-            TankType = eTankType;
-            m_TankPlayerData = DataTools.GetTankPlayer((int)TankType);
+            if (DataTools.GetTankPlayer(TankTypeID).ByteBuffer == null)
+            {
+                Debugger.LogError($"没有该坦克数据 id:{id}");
+                return;
+            }
+            TankTypeID = id;
+            m_TankPlayerData = DataTools.GetTankPlayer(TankTypeID);
             UpdateBulletInterval();
             UpdateTankMoveSpeed();
             UpdateTankAnim();
@@ -66,52 +66,14 @@ namespace GameMain
 
         public void AddLevel()
         {
-            int tankTypeInt = (int)TankType + 1;
-            if (DataTools.GetTankPlayer(tankTypeInt).ByteBuffer != null)
-            {
-                ChangeTankType((ETankType)tankTypeInt);
-            }
-            else
-            {
-                Debug.Log("已经达到最高等级");
-            }
+            int id = TankTypeID + 1;
+            ChangeTankType(id);
         }
         public void SubLevel()
         {
-            int tankTypeInt = (int)TankType - 1;
-            if (DataTools.GetTankPlayer(tankTypeInt).ByteBuffer != null)
-            {
-                ChangeTankType((ETankType)tankTypeInt);
-            }
-            else
-            {
-                Debug.Log("已经达到最低等级");
-            }
+            int id = TankTypeID - 1;
+            ChangeTankType(id);
         }
         #endregion
-
-
-        [ContextMenu("一星坦克")]
-        public void SetBulletLevel1()
-        {
-            ChangeTankType(ETankType.TankType1);
-        }
-        [ContextMenu("二星坦克")]
-        public void SetBulletLevel2()
-        {
-            ChangeTankType(ETankType.TankType2);
-        }
-        [ContextMenu("三星坦克")]
-        public void SetBulletLevel3()
-        {
-            ChangeTankType(ETankType.TankType3);
-        }
-        [ContextMenu("四星坦克")]
-        public void SetBulletLevel4()
-        {
-            ChangeTankType(ETankType.TankType4);
-        }
-
-
     }
 }

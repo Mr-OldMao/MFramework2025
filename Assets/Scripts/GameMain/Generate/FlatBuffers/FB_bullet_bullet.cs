@@ -22,23 +22,26 @@ public struct FB_bullet_bullet : IFlatbufferObject
   public int ID { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public float BulletSpeed { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
   public float BulletInterval { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
-  public bool IsCanStone { get { int o = __p.__offset(10); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
-  public string ResName { get { int o = __p.__offset(12); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+  public int BulletATK { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public bool IsCanStone { get { int o = __p.__offset(12); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public string ResName { get { int o = __p.__offset(14); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
 #if ENABLE_SPAN_T
-  public Span<byte> GetResNameBytes() { return __p.__vector_as_span<byte>(12, 1); }
+  public Span<byte> GetResNameBytes() { return __p.__vector_as_span<byte>(14, 1); }
 #else
-  public ArraySegment<byte>? GetResNameBytes() { return __p.__vector_as_arraysegment(12); }
+  public ArraySegment<byte>? GetResNameBytes() { return __p.__vector_as_arraysegment(14); }
 #endif
-  public byte[] GetResNameArray() { return __p.__vector_as_array<byte>(12); }
+  public byte[] GetResNameArray() { return __p.__vector_as_array<byte>(14); }
 
   public static Offset<GameMain.Generate.FlatBuffers.FB_bullet_bullet> CreateFB_bullet_bullet(FlatBufferBuilder builder,
       int ID = 0,
       float bulletSpeed = 0.0f,
       float bulletInterval = 0.0f,
+      int bulletATK = 0,
       bool IsCanStone = false,
       StringOffset resNameOffset = default(StringOffset)) {
-    builder.StartTable(5);
+    builder.StartTable(6);
     FB_bullet_bullet.AddResName(builder, resNameOffset);
+    FB_bullet_bullet.AddBulletATK(builder, bulletATK);
     FB_bullet_bullet.AddBulletInterval(builder, bulletInterval);
     FB_bullet_bullet.AddBulletSpeed(builder, bulletSpeed);
     FB_bullet_bullet.AddID(builder, ID);
@@ -46,12 +49,13 @@ public struct FB_bullet_bullet : IFlatbufferObject
     return FB_bullet_bullet.EndFB_bullet_bullet(builder);
   }
 
-  public static void StartFB_bullet_bullet(FlatBufferBuilder builder) { builder.StartTable(5); }
+  public static void StartFB_bullet_bullet(FlatBufferBuilder builder) { builder.StartTable(6); }
   public static void AddID(FlatBufferBuilder builder, int iD) { builder.AddInt(0, iD, 0); }
   public static void AddBulletSpeed(FlatBufferBuilder builder, float bulletSpeed) { builder.AddFloat(1, bulletSpeed, 0.0f); }
   public static void AddBulletInterval(FlatBufferBuilder builder, float bulletInterval) { builder.AddFloat(2, bulletInterval, 0.0f); }
-  public static void AddIsCanStone(FlatBufferBuilder builder, bool isCanStone) { builder.AddBool(3, isCanStone, false); }
-  public static void AddResName(FlatBufferBuilder builder, StringOffset resNameOffset) { builder.AddOffset(4, resNameOffset.Value, 0); }
+  public static void AddBulletATK(FlatBufferBuilder builder, int bulletATK) { builder.AddInt(3, bulletATK, 0); }
+  public static void AddIsCanStone(FlatBufferBuilder builder, bool isCanStone) { builder.AddBool(4, isCanStone, false); }
+  public static void AddResName(FlatBufferBuilder builder, StringOffset resNameOffset) { builder.AddOffset(5, resNameOffset.Value, 0); }
   public static Offset<GameMain.Generate.FlatBuffers.FB_bullet_bullet> EndFB_bullet_bullet(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<GameMain.Generate.FlatBuffers.FB_bullet_bullet>(o);
@@ -67,8 +71,9 @@ static public class FB_bullet_bulletVerify
       && verifier.VerifyField(tablePos, 4 /*ID*/, 4 /*int*/, 4, false)
       && verifier.VerifyField(tablePos, 6 /*BulletSpeed*/, 4 /*float*/, 4, false)
       && verifier.VerifyField(tablePos, 8 /*BulletInterval*/, 4 /*float*/, 4, false)
-      && verifier.VerifyField(tablePos, 10 /*IsCanStone*/, 1 /*bool*/, 1, false)
-      && verifier.VerifyString(tablePos, 12 /*ResName*/, false)
+      && verifier.VerifyField(tablePos, 10 /*BulletATK*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 12 /*IsCanStone*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyString(tablePos, 14 /*ResName*/, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }

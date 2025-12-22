@@ -135,6 +135,12 @@ namespace GameMain
         {
             return dicTankPlayer.Values.Where(x => x.ID == id).FirstOrDefault();
         }
+
+        public static FB_tank_enemy GetTankEnemy(int id)
+        {
+            return dicTankEnemy.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
+         
         #endregion
 
     }

@@ -79,11 +79,11 @@ namespace GameMain
                 || transform.localPosition.x > m_MaxDis
                 || transform.localPosition.z > m_MaxDis)
             {
-                HintSelf();
+                HintSelf(BulletCollisionType.None);
             }
         }
 
-        private void HintSelf()
+        private void HintSelf(BulletCollisionType bulletCollisionType, Vector3? hitPos = null)
         {
             if (!isCanMove)
             {
@@ -91,7 +91,11 @@ namespace GameMain
             }
             isCanMove = false;
             GameEntry.Pool.GetPool(m_PoolID).RecycleEntity(gameObject);
-            GenerateEffNormalBomb(transform.position);
+            if (hitPos == null)
+            {
+                hitPos = transform.position;
+            }
+            GenerateEffNormalBomb((Vector3)hitPos, bulletCollisionType);
         }
 
 
@@ -109,6 +113,17 @@ namespace GameMain
                 else
                 {
                     Debug.Log($"当前子弹 :{tankOwnerType},击中坦克：{tankEntityBase.TankOwnerType},{other.name}");
+                    tankEntityBase.TankBeAttacked(this, (isDead) =>
+                    {
+                        if (isDead)
+                        {
+                            HintSelf(BulletCollisionType.TankDead, tankEntityBase.NodeSpriteRenderer.transform.position);
+                        }
+                        else
+                        {
+                            HintSelf(BulletCollisionType.TankHit);
+                        }
+                    });
                 }
             }
 
@@ -140,19 +155,36 @@ namespace GameMain
 
                         //等待一帧
                         await UniTask.Delay(1);
-                        HintSelf();
+                        HintSelf(BulletCollisionType.Map);
                         collCallback?.Invoke();
                         break;
                 }
             }
         }
 
-        private void GenerateEffNormalBomb(Vector3 pos)
+        private void GenerateEffNormalBomb(Vector3 pos, BulletCollisionType bulletCollisionType)
         {
-            GameObject go = GameMainLogic.Instance.GetPoolEffSmallBomb();
-            //GameObject go = GameEntry.UI.GetController<UIControlMap>().gameMainLogic.GetPoolEffSmallBomb();
-            go.transform.position = pos;
-            go.SetActive(true);
+            GameObject go = null;
+
+            switch (bulletCollisionType)
+            {
+                case BulletCollisionType.None:
+                    break;
+                case BulletCollisionType.TankHit:
+                    go = GameMainLogic.Instance.GetPoolEffSmallBomb();
+                    break;
+                case BulletCollisionType.TankDead:
+                    go = GameMainLogic.Instance.GetPoolEffNormalBomb();
+                    break;
+                case BulletCollisionType.Map:
+                    go = GameMainLogic.Instance.GetPoolEffSmallBomb();
+                    break;
+            }
+            if (go != null)
+            {
+                go.transform.position = pos;
+                go.SetActive(true);
+            }
         }
     }
 
@@ -174,5 +206,16 @@ namespace GameMain
     {
         Player,
         Enemy
+    }
+
+    /// <summary>
+    /// 子弹碰撞效果类型
+    /// </summary>
+    public enum BulletCollisionType
+    {
+        None,
+        TankHit,
+        TankDead,
+        Map
     }
 }
