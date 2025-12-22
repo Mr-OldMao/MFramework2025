@@ -43,6 +43,12 @@ namespace MFramework.Runtime
             RegisterEvent((int)gameEventType, callback);
         }
 
+        public void RegisterEvent<T>(GameEventType gameEventType, Action<T> callback)
+        {
+            RegisterEvent((int)gameEventType, callback);
+        }
+
+
         public void UnRegisterEvent(int eventId, Action callback)
         {
             if (m_DicEventHandlers.ContainsKey(eventId))
@@ -106,6 +112,11 @@ namespace MFramework.Runtime
                     m_DicEventTHandlers.Remove(eventId);
                 }
             }
+        }
+
+        public void DispatchEvent<T>(GameEventType eventId, T eventData)
+        {
+            DispatchEvent<T>((int)eventId, eventData);
         }
 
         public void DispatchEvent<T>(int eventId, T eventData)
