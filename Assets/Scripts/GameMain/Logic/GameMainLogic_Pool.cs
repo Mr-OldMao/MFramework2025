@@ -1,12 +1,9 @@
 using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
 using MFramework.Runtime.Extend;
-using System;
-using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D;
-using static UnityEngine.EventSystems.EventTrigger;
 using Random = UnityEngine.Random;
 
 namespace GameMain
@@ -29,7 +26,7 @@ namespace GameMain
 
 
         private int m_CurEnemyEntityID;
-        public async UniTask Init()
+        public async UniTask InitPool()
         {
             RootNode = InitNodePool("RootNode");
 
@@ -97,7 +94,6 @@ namespace GameMain
             }, 1));
 
             var bulletPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "map/2d/Bullet.prefab", false);
-            bulletPrefab.gameObject.name = "123";
             m_PoolIdBulletPlayer1 = GameEntry.Pool.CreatPool(new Pool(bulletPrefab, (go, b) =>
             {
                 if (b)
@@ -109,7 +105,7 @@ namespace GameMain
                 go.GetComponent<BulletEntity>().InitFireBullet(TankOwnerType.Player1, m_PoolIdBulletPlayer1);
             }, (go) =>
             {
-                Debug.Log("回收子弹TODO " + go);
+                //Debug.Log("回收子弹TODO " + go);
             }, 1, 50));
 
 

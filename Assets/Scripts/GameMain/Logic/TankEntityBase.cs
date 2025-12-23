@@ -18,6 +18,8 @@ namespace GameMain
 
         private Animator _animator;
         public bool IsMoving { get; protected set; } = false;
+        public bool IsCanMove { get; set; } = true;
+        protected Rigidbody m_Rigidbody;
 
 
         public void InitData(TankOwnerType tankOwnerType, int tankTypeID, int entityID)
@@ -28,6 +30,7 @@ namespace GameMain
             HP = tankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).HP : DataTools.GetTankPlayer(tankTypeID).HP;
             NodeSpriteRenderer = transform.GetComponentInChildren<SpriteRenderer>();
             _animator = GetComponentInChildren<Animator>();
+            m_Rigidbody = GetComponentInChildren<Rigidbody>();
             eTankState = ETankState.Idle;
 
             UpdateTankAnim();
@@ -38,7 +41,7 @@ namespace GameMain
 
         protected virtual void FixedUpdate()
         {
-            if (IsMoving)
+            if (IsCanMove && IsMoving)
             {
                 PauseAnim(false);
             }
@@ -120,4 +123,12 @@ namespace GameMain
         Dead
     }
 
+
+    public enum MoveDirType
+    {
+        Forward,
+        Back,
+        Left,
+        Right
+    }
 }

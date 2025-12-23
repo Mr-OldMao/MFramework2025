@@ -101,7 +101,7 @@ namespace GameMain
 
         public async UniTask OnTriggerEnter(Collider other)
         {
-            Debug.Log($"OnTriggerEnter : {other.name}");
+            //Debug.Log($"OnTriggerEnter : {other.name}");
 
             TankEntityBase tankEntityBase = other.GetComponent<TankEntityBase>();
             if (tankEntityBase != null)

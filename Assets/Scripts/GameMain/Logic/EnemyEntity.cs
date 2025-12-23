@@ -1,17 +1,26 @@
+using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
+using UnityEngine;
 
 namespace GameMain
 {
-    public class EnemyEntity : TankEntityBase
+    public partial class EnemyEntity : TankEntityBase
     {
+        public GameObject enemy;
+
+        private FB_tank_enemy m_TankEnemyData;
+
+
         private void Awake()
         {
-            IsMoving = true;
+            enemy = gameObject;
         }
 
         protected override void Init()
         {
+            m_TankEnemyData = DataTools.GetTankEnemy(TankTypeID);
 
+            InitAIMove();
         }
 
         protected override void OnTankDead()
@@ -27,11 +36,15 @@ namespace GameMain
 
             int nextID = DataTools.GetTankEnemy(TankTypeID).NextID;
             UpdateTankData(nextID);
+
+            m_TankEnemyData = DataTools.GetTankEnemy(TankTypeID);
+            moveSpeed = m_TankEnemyData.MoveSpeed;
         }
 
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
+            AIMoveUpdate();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace GameMain
             isGenerateMap = false;
 
 #pragma warning disable CS4014
-            AutoGeneragetEnemyTank(3);
+            AutoGeneragetEnemyTank(5);
 #pragma warning restore CS4014
         }
 
@@ -85,7 +85,8 @@ namespace GameMain
 
             m_CurEnemyPlayerID = 1000;
             int tankTypeID = Random.Range(101, 105);
-            player1.AddComponent<PlayerEntity>().InitData(TankOwnerType.Player1, tankTypeID, ++m_CurEnemyPlayerID); ;
+            player1.AddComponent<PlayerEntity>().InitData(TankOwnerType.Player1, tankTypeID, ++m_CurEnemyPlayerID);
+            GameMainLogic.Instance.Player1Entity = player1.GetComponent<PlayerEntity>();
             player1.name = "EntityPlayer1";
         }
 
@@ -152,6 +153,7 @@ namespace GameMain
                         gridDataInfos[i].entityDataInfos[j].propEntity = go;
                         go.AddComponent<MapEntity>().SetMapEntityType(gridDataInfos[i].entityDataInfos[j].mapEntityType);
                         go.SetActive(true);
+                        go.name = $"{gridDataInfos[i].entityDataInfos[j].mapEntityType}_{gridDataInfos[i].gridPos.x}_{gridDataInfos[i].gridPos.y}";
                     }
                 }
             }
