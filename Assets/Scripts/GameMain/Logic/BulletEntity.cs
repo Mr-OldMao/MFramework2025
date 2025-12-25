@@ -126,7 +126,7 @@ namespace GameMain
                     {
                         if (isDead)
                         {
-                            HintSelf(BulletCollisionType.TankDead, tankEntityBase.NodeSpriteRenderer.transform.position);
+                            HintSelf(BulletCollisionType.TankDead, tankEntityBase.RectAnimTank.transform.position);
                         }
                         else
                         {

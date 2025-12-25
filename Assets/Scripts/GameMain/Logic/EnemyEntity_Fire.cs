@@ -25,7 +25,7 @@ namespace GameMain
         private bool m_IsCanFire;
         public void InitFire()
         {
-            NodePosBullet = transform.Find("spriteRenderer/NodePosBullet");
+            NodePosBullet = transform.Find<Transform>("NodePosBullet");
             IsAutoFire = true;
             m_IsCanFire = false;
             SetNextFireBulletCountdown();

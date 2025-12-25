@@ -10,7 +10,7 @@ namespace GameMain
 
         public MoveDirType MoveDirType { get; protected set; }
 
-        public SpriteRenderer NodeSpriteRenderer { get; private set; }
+        public SpriteRenderer RectAnimTank { get; private set; }
     
 
         [SerializeField]
@@ -36,7 +36,7 @@ namespace GameMain
             TankTypeID = tankTypeID;
             EntityID = entityID;
             HP = tankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).HP : DataTools.GetTankPlayer(tankTypeID).HP;
-            NodeSpriteRenderer = transform.GetComponentInChildren<SpriteRenderer>();
+            RectAnimTank = transform.Find<SpriteRenderer>("rectAnimTank");
             m_Animator = GetComponentInChildren<Animator>();
             m_Rigidbody = GetComponentInChildren<Rigidbody>();
             eTankState = ETankState.Idle;

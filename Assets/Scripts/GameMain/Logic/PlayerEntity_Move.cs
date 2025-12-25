@@ -45,7 +45,7 @@ namespace GameMain
             {
                 if (Input.GetKey(KeyCode.W))
                 {
-                    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 0, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
                     //player.transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.forward * Time.deltaTime * moveSpeed);
                     MoveDirType = MoveDirType.Forward;
@@ -53,7 +53,7 @@ namespace GameMain
                 }
                 else if (Input.GetKey(KeyCode.S))
                 {
-                    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 180, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 180));
                     //player.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.back * Time.deltaTime * moveSpeed);
                     MoveDirType = MoveDirType.Back;
@@ -61,7 +61,7 @@ namespace GameMain
                 }
                 else if (Input.GetKey(KeyCode.A))
                 {
-                    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 270, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 90));
                     //player.transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.left * Time.deltaTime * moveSpeed);
 
@@ -70,7 +70,7 @@ namespace GameMain
                 }
                 else if (Input.GetKey(KeyCode.D))
                 {
-                    imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 90, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 270));
                     //player.transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.right * Time.deltaTime * moveSpeed);
                     MoveDirType = MoveDirType.Right;

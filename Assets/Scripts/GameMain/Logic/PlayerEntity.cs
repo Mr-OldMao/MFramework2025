@@ -10,7 +10,6 @@ namespace GameMain
     public partial class PlayerEntity : TankEntityBase
     {
         private GameObject player;
-        private Transform imgTankIcon;
 
 
         private FB_tank_player m_TankPlayerData;
@@ -19,15 +18,11 @@ namespace GameMain
         protected override void Init()
         {
             player = this.gameObject;
-            imgTankIcon = player.transform.GetChild(0).GetComponent<Transform>();
             MoveDirType = MoveDirType.Forward;
-            //InitAnim();
-
             ChangeTankType(TankTypeID);
 
             InitMove(new Vector2(player.transform.localPosition.x, player.transform.localPosition.z));
             InitFire();
-
         }
 
         protected override void FixedUpdate()

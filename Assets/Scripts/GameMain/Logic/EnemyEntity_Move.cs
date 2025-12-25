@@ -47,7 +47,7 @@ namespace GameMain
         {
             if (nodeRayPoint == null)
             {
-                nodeRayPoint = transform.Find("nodeRayPoint");
+                nodeRayPoint = transform.Find<Transform>("nodeRayPoint");
             }
 
             SetAIMoveState(EAIMoveState.Idle);
@@ -328,22 +328,22 @@ namespace GameMain
                 case MoveDirType.Forward:
                     moveDir = Vector3.forward;
                     MoveDirType = MoveDirType.Forward;
-                    NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 0, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
                     break;
                 case MoveDirType.Back:
                     moveDir = Vector3.back;
                     MoveDirType = MoveDirType.Back;
-                    NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 180, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 180));
                     break;
                 case MoveDirType.Left:
                     moveDir = Vector3.left;
                     MoveDirType = MoveDirType.Left;
-                    NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 270, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 90));
                     break;
                 case MoveDirType.Right:
                     moveDir = Vector3.right;
                     MoveDirType = MoveDirType.Right;
-                    NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 90, 0));
+                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 270));
                     break;
             }
             m_Rigidbody.MovePosition(enemy.transform.position + moveDir * Time.deltaTime * moveSpeed);

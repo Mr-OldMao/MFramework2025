@@ -1,3 +1,4 @@
+using MFramework.Runtime;
 using UnityEngine;
 
 namespace GameMain
@@ -13,7 +14,7 @@ namespace GameMain
 
         public void InitFire()
         {
-            NodePosBullet = transform.Find("spriteRenderer/NodePosBullet");
+            NodePosBullet = transform.Find<Transform>("NodePosBullet");
             m_IsCanFire = true;
             m_CurBulletTimer = 0;
         }
