@@ -9,12 +9,17 @@ namespace GameMain
     {
         protected override void OnTankDead()
         {
-            Debugger.Log($"OnTankDead, id:{EntityID}, {this.gameObject.name}");
+            Debugger.Log($"PlayerEntity_Hit OnTankDead, id:{EntityID}, {this.gameObject.name}");
+
+            Revive();
         }
 
-        protected override void OnTankHit()
+        protected override void OnTankHit(int hitValue)
         {
-            Debugger.Log($"OnTankHit, id:{EntityID}, {this.gameObject.name}");
+            Debugger.Log($"PlayerEntity_Hit OnTankHit, id:{EntityID}, {this.gameObject.name}");
+
+            SubLevel(hitValue);
+            
         }
     }
 }

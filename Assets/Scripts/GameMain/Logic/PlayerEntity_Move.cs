@@ -48,7 +48,7 @@ namespace GameMain
                     imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 0, 0));
                     //player.transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.forward * Time.deltaTime * moveSpeed);
-                    moveDirType = MoveDirType.Forward;
+                    MoveDirType = MoveDirType.Forward;
                     IsMoving = true;
                 }
                 else if (Input.GetKey(KeyCode.S))
@@ -56,7 +56,7 @@ namespace GameMain
                     imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 180, 0));
                     //player.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.back * Time.deltaTime * moveSpeed);
-                    moveDirType = MoveDirType.Back;
+                    MoveDirType = MoveDirType.Back;
                     IsMoving = true;
                 }
                 else if (Input.GetKey(KeyCode.A))
@@ -65,7 +65,7 @@ namespace GameMain
                     //player.transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.left * Time.deltaTime * moveSpeed);
 
-                    moveDirType = MoveDirType.Left;
+                    MoveDirType = MoveDirType.Left;
                     IsMoving = true;
                 }
                 else if (Input.GetKey(KeyCode.D))
@@ -73,7 +73,7 @@ namespace GameMain
                     imgTankIcon.localRotation = Quaternion.Euler(new Vector3(90, 90, 0));
                     //player.transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
                     m_Rigidbody.MovePosition(player.transform.position + Vector3.right * Time.deltaTime * moveSpeed);
-                    moveDirType = MoveDirType.Right;
+                    MoveDirType = MoveDirType.Right;
                     IsMoving = true;
                 }
                 else

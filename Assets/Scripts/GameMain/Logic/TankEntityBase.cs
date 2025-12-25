@@ -8,17 +8,25 @@ namespace GameMain
     {
         public TankOwnerType TankOwnerType { get; private set; }
 
+        public MoveDirType MoveDirType { get; protected set; }
+
         public SpriteRenderer NodeSpriteRenderer { get; private set; }
+    
 
-        public int TankTypeID { get; protected set; }
-        public int HP { get; protected set; }
-        public int EntityID { get; set; }
+        [SerializeField]
+        protected int EntityID;
+        [SerializeField]
+        protected int HP;
+        [SerializeField]
+        protected int TankTypeID;
+        [SerializeField]
+        public bool IsCanMove = true;
 
-        public ETankState eTankState { get; protected set; }
+        protected ETankState eTankState;
 
-        private Animator _animator;
+        private Animator m_Animator;
         public bool IsMoving { get; protected set; } = false;
-        public bool IsCanMove { get; set; } = true;
+
         protected Rigidbody m_Rigidbody;
 
 
@@ -29,7 +37,7 @@ namespace GameMain
             EntityID = entityID;
             HP = tankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).HP : DataTools.GetTankPlayer(tankTypeID).HP;
             NodeSpriteRenderer = transform.GetComponentInChildren<SpriteRenderer>();
-            _animator = GetComponentInChildren<Animator>();
+            m_Animator = GetComponentInChildren<Animator>();
             m_Rigidbody = GetComponentInChildren<Rigidbody>();
             eTankState = ETankState.Idle;
 
@@ -51,7 +59,7 @@ namespace GameMain
             }
         }
 
-        public void TankBeAttacked(BulletEntity bulletEntity, Action<bool> tankDeadCallback)
+        public void TankBeHit(BulletEntity bulletEntity, Action<bool> tankDeadCallback)
         {
             if (bulletEntity?.BulletData != null)
             {
@@ -65,12 +73,15 @@ namespace GameMain
                 }
                 else
                 {
-                    OnTankHit();
-                    GameEntry.Event.DispatchEvent(GameEventType.TankHit, EntityID);
+                    OnTankHit(bulletEntity.BulletData.BulletATK);
+                    GameEntry.Event.DispatchEvent(GameEventType.TankBeHit, EntityID);
                     tankDeadCallback?.Invoke(false);
                 }
             }
         }
+
+
+
 
         protected void UpdateTankData(int tankTypeID)
         {
@@ -83,23 +94,23 @@ namespace GameMain
         public void UpdateTankAnim()
         {
             string animName = "move" + TankTypeID;
-            _animator.Play(animName);
+            m_Animator.Play(animName);
         }
         public void PauseAnim(bool isPause)
         {
             if (isPause)
             {
-                _animator.speed = 0;
+                m_Animator.speed = 0;
             }
             else
             {
-                _animator.speed = 1;
+                m_Animator.speed = 1;
             }
         }
 
         protected abstract void OnTankDead();
 
-        protected abstract void OnTankHit();
+        protected abstract void OnTankHit(int hitValue);
     }
 
     /// <summary>

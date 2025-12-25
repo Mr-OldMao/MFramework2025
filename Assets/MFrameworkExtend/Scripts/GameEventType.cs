@@ -14,7 +14,7 @@ public enum GameEventType
     /// <summary>
     /// 坦克被击中
     /// </summary>
-    TankHit = 400,
+    TankBeHit = 400,
 
     /// <summary>
     /// 坦克死亡

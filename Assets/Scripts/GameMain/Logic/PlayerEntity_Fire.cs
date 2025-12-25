@@ -4,8 +4,7 @@ namespace GameMain
 {
     public partial class PlayerEntity
     {
-        public GameObject BulletContainer;
-        public Transform NodePosBullet;
+        private Transform NodePosBullet;
 
         public float m_BulletInterval;
         private bool m_IsCanFire;
@@ -39,7 +38,7 @@ namespace GameMain
             if (m_IsCanFire && Input.GetKey(KeyCode.Space))
             {
                 BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
-                bulletEntity.Fire(NodePosBullet.position, moveDirType, DataTools.GetTankPlayer(TankTypeID).BulletID, () =>
+                bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(TankTypeID).BulletID, () =>
                 {
                     ResetFireState();
                 });

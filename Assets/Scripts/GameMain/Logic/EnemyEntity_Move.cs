@@ -31,6 +31,7 @@ namespace GameMain
         private float m_NextAutoMoveTime;
         private bool m_IsArrivedTargetPoint;
 
+        private Vector3 moveDir;
 
         /// <summary>
         /// 单次移动的时间最长长度
@@ -321,23 +322,27 @@ namespace GameMain
         public void MoveToTarget(AIMoveData targetPosition, Action arriveCallback)
         {
             IsMoving = true;
-            Vector3 moveDir = Vector3.zero;
+
             switch (targetPosition.MoveDir)
             {
                 case MoveDirType.Forward:
                     moveDir = Vector3.forward;
+                    MoveDirType = MoveDirType.Forward;
                     NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 0, 0));
                     break;
                 case MoveDirType.Back:
                     moveDir = Vector3.back;
+                    MoveDirType = MoveDirType.Back;
                     NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 180, 0));
                     break;
                 case MoveDirType.Left:
                     moveDir = Vector3.left;
+                    MoveDirType = MoveDirType.Left;
                     NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 270, 0));
                     break;
                 case MoveDirType.Right:
                     moveDir = Vector3.right;
+                    MoveDirType = MoveDirType.Right;
                     NodeSpriteRenderer.transform.localRotation = Quaternion.Euler(new Vector3(90, 90, 0));
                     break;
             }

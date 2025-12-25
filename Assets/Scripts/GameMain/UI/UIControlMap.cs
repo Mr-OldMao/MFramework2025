@@ -69,9 +69,9 @@ namespace GameMain
             GameEntry.Event.DispatchEvent(GameEventType.GameStart);
             isGenerateMap = false;
 
-#pragma warning disable CS4014
-            AutoGeneragetEnemyTank(5);
-#pragma warning restore CS4014
+//#pragma warning disable CS4014
+//            AutoGeneragetEnemyTank(5);
+//#pragma warning restore CS4014
         }
 
         private async UniTask GeneragetPlayerTank()

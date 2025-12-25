@@ -12,7 +12,6 @@ namespace GameMain
         private GameObject player;
         private Transform imgTankIcon;
 
-        private MoveDirType moveDirType = MoveDirType.Forward;
 
         private FB_tank_player m_TankPlayerData;
 
@@ -21,7 +20,7 @@ namespace GameMain
         {
             player = this.gameObject;
             imgTankIcon = player.transform.GetChild(0).GetComponent<Transform>();
-
+            MoveDirType = MoveDirType.Forward;
             //InitAnim();
 
             ChangeTankType(TankTypeID);
@@ -49,22 +48,41 @@ namespace GameMain
             }
             UpdateTankData(id);
             m_TankPlayerData = DataTools.GetTankPlayer(TankTypeID);
+            UpdateHP();
             UpdateBulletInterval();
             UpdateTankMoveSpeed();
-
         }
 
         #region Public
 
-        public void AddLevel()
+        public void AddLevel(int addNum =1)
         {
-            int id = TankTypeID + 1;
+            int id = TankTypeID + addNum;
             ChangeTankType(id);
         }
-        public void SubLevel()
+        public void SubLevel(int subNum = 1)
         {
-            int id = TankTypeID - 1;
+            int id = TankTypeID - subNum;
             ChangeTankType(id);
+        }
+
+        public void UpdateHP()
+        {
+            HP = m_TankPlayerData.HP;
+        }
+
+        public void Revive()
+        {
+            Dead();
+
+            HP = m_TankPlayerData.HP;
+            player.transform.position = new Vector3(GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer1.x, 0, GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer1.y);
+            player.SetActive(true);
+        }
+
+        public void Dead()
+        {
+            player.SetActive(false);
         }
         #endregion
     }

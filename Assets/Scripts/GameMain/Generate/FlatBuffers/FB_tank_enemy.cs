@@ -40,13 +40,21 @@ public struct FB_tank_enemy : IFlatbufferObject
   public ArraySegment<byte>? GetTargetProbabilityBytes() { return __p.__vector_as_arraysegment(16); }
 #endif
   public float[] GetTargetProbabilityArray() { return __p.__vector_as_array<float>(16); }
-  public string ResName { get { int o = __p.__offset(18); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+  public float AutoFireInterval(int j) { int o = __p.__offset(18); return o != 0 ? __p.bb.GetFloat(__p.__vector(o) + j * 4) : (float)0; }
+  public int AutoFireIntervalLength { get { int o = __p.__offset(18); return o != 0 ? __p.__vector_len(o) : 0; } }
 #if ENABLE_SPAN_T
-  public Span<byte> GetResNameBytes() { return __p.__vector_as_span<byte>(18, 1); }
+  public Span<float> GetAutoFireIntervalBytes() { return __p.__vector_as_span<float>(18, 4); }
 #else
-  public ArraySegment<byte>? GetResNameBytes() { return __p.__vector_as_arraysegment(18); }
+  public ArraySegment<byte>? GetAutoFireIntervalBytes() { return __p.__vector_as_arraysegment(18); }
 #endif
-  public byte[] GetResNameArray() { return __p.__vector_as_array<byte>(18); }
+  public float[] GetAutoFireIntervalArray() { return __p.__vector_as_array<float>(18); }
+  public string ResName { get { int o = __p.__offset(20); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetResNameBytes() { return __p.__vector_as_span<byte>(20, 1); }
+#else
+  public ArraySegment<byte>? GetResNameBytes() { return __p.__vector_as_arraysegment(20); }
+#endif
+  public byte[] GetResNameArray() { return __p.__vector_as_array<byte>(20); }
 
   public static Offset<GameMain.Generate.FlatBuffers.FB_tank_enemy> CreateFB_tank_enemy(FlatBufferBuilder builder,
       int ID = 0,
@@ -56,9 +64,11 @@ public struct FB_tank_enemy : IFlatbufferObject
       int NextID = 0,
       VectorOffset AutoMoveIntervalOffset = default(VectorOffset),
       VectorOffset TargetProbabilityOffset = default(VectorOffset),
+      VectorOffset AutoFireIntervalOffset = default(VectorOffset),
       StringOffset ResNameOffset = default(StringOffset)) {
-    builder.StartTable(8);
+    builder.StartTable(9);
     FB_tank_enemy.AddResName(builder, ResNameOffset);
+    FB_tank_enemy.AddAutoFireInterval(builder, AutoFireIntervalOffset);
     FB_tank_enemy.AddTargetProbability(builder, TargetProbabilityOffset);
     FB_tank_enemy.AddAutoMoveInterval(builder, AutoMoveIntervalOffset);
     FB_tank_enemy.AddNextID(builder, NextID);
@@ -69,7 +79,7 @@ public struct FB_tank_enemy : IFlatbufferObject
     return FB_tank_enemy.EndFB_tank_enemy(builder);
   }
 
-  public static void StartFB_tank_enemy(FlatBufferBuilder builder) { builder.StartTable(8); }
+  public static void StartFB_tank_enemy(FlatBufferBuilder builder) { builder.StartTable(9); }
   public static void AddID(FlatBufferBuilder builder, int iD) { builder.AddInt(0, iD, 0); }
   public static void AddBulletID(FlatBufferBuilder builder, int bulletID) { builder.AddInt(1, bulletID, 0); }
   public static void AddMoveSpeed(FlatBufferBuilder builder, float moveSpeed) { builder.AddFloat(2, moveSpeed, 0.0f); }
@@ -87,7 +97,13 @@ public struct FB_tank_enemy : IFlatbufferObject
   public static VectorOffset CreateTargetProbabilityVectorBlock(FlatBufferBuilder builder, ArraySegment<float> data) { builder.StartVector(4, data.Count, 4); builder.Add(data); return builder.EndVector(); }
   public static VectorOffset CreateTargetProbabilityVectorBlock(FlatBufferBuilder builder, IntPtr dataPtr, int sizeInBytes) { builder.StartVector(1, sizeInBytes, 1); builder.Add<float>(dataPtr, sizeInBytes); return builder.EndVector(); }
   public static void StartTargetProbabilityVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
-  public static void AddResName(FlatBufferBuilder builder, StringOffset resNameOffset) { builder.AddOffset(7, resNameOffset.Value, 0); }
+  public static void AddAutoFireInterval(FlatBufferBuilder builder, VectorOffset autoFireIntervalOffset) { builder.AddOffset(7, autoFireIntervalOffset.Value, 0); }
+  public static VectorOffset CreateAutoFireIntervalVector(FlatBufferBuilder builder, float[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddFloat(data[i]); return builder.EndVector(); }
+  public static VectorOffset CreateAutoFireIntervalVectorBlock(FlatBufferBuilder builder, float[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateAutoFireIntervalVectorBlock(FlatBufferBuilder builder, ArraySegment<float> data) { builder.StartVector(4, data.Count, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateAutoFireIntervalVectorBlock(FlatBufferBuilder builder, IntPtr dataPtr, int sizeInBytes) { builder.StartVector(1, sizeInBytes, 1); builder.Add<float>(dataPtr, sizeInBytes); return builder.EndVector(); }
+  public static void StartAutoFireIntervalVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
+  public static void AddResName(FlatBufferBuilder builder, StringOffset resNameOffset) { builder.AddOffset(8, resNameOffset.Value, 0); }
   public static Offset<GameMain.Generate.FlatBuffers.FB_tank_enemy> EndFB_tank_enemy(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<GameMain.Generate.FlatBuffers.FB_tank_enemy>(o);
@@ -107,7 +123,8 @@ static public class FB_tank_enemyVerify
       && verifier.VerifyField(tablePos, 12 /*NextID*/, 4 /*int*/, 4, false)
       && verifier.VerifyVectorOfData(tablePos, 14 /*AutoMoveInterval*/, 4 /*float*/, false)
       && verifier.VerifyVectorOfData(tablePos, 16 /*TargetProbability*/, 4 /*float*/, false)
-      && verifier.VerifyString(tablePos, 18 /*ResName*/, false)
+      && verifier.VerifyVectorOfData(tablePos, 18 /*AutoFireInterval*/, 4 /*float*/, false)
+      && verifier.VerifyString(tablePos, 20 /*ResName*/, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }

@@ -17,11 +17,13 @@ namespace GameMain
         private Transform NodePool;
         private Transform NodePoolEff;
         private Transform NodePoolBulletPlayer1;
+        private Transform NodePoolBulletEnemy;
         private Transform NodePoolTankEnemy;
 
         private int m_PoolIdEffSmallBomb;
         private int m_PoolIdEffNormallBomb;
         private int m_PoolIdBulletPlayer1;
+        private int m_PoolIdBulletEnemy;
         public int PoolIdTankEnemy { get; private set; }
 
 
@@ -35,6 +37,7 @@ namespace GameMain
             NodePoolEff = InitNodePool("NodePoolEff");
 
             NodePoolBulletPlayer1 = InitNodePool("NodePoolBulletPlayer1");
+            NodePoolBulletEnemy = InitNodePool("NodePoolBulletEnemy");
 
             NodePoolTankEnemy = InitNodePool("NodePoolTankEnemy");
 
@@ -108,6 +111,20 @@ namespace GameMain
                 //Debug.Log("回收子弹TODO " + go);
             }, 1, 50));
 
+            m_PoolIdBulletEnemy = GameEntry.Pool.CreatPool(new Pool(bulletPrefab, (go, b) =>
+            {
+                if (b)
+                {
+                    go.transform.SetParent(NodePoolBulletEnemy);
+                    go.transform.localPosition = Vector3.zero;
+                    go.AddComponent<BulletEntity>();
+                }
+                go.GetComponent<BulletEntity>().InitFireBullet(TankOwnerType.Enemy, m_PoolIdBulletEnemy);
+            }, (go) =>
+            {
+                //Debug.Log("回收子弹TODO " + go);
+            }, 1, 50));
+            
 
             var enemyTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas", false);
             var entmyTankPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "tank/Enemy.prefab", false);
@@ -167,6 +184,7 @@ namespace GameMain
                 case TankOwnerType.Player2:
                     break;
                 case TankOwnerType.Enemy:
+                    go = GameEntry.Pool.GetPool(m_PoolIdBulletEnemy).GetEntity();
                     break;
             }
             return go;

@@ -103,6 +103,15 @@ namespace GameMain
         {
             //Debug.Log($"OnTriggerEnter : {other.name}");
 
+            BulletEntity bulletEntity = other.GetComponent<BulletEntity>();
+            if (bulletEntity != null && bulletEntity.tankOwnerType != tankOwnerType)
+            {
+                HintSelf(BulletCollisionType.None);
+                Debug.Log($"当前子弹 :{gameObject}, 敌方子弹：{other.name}");
+                return;
+            }
+
+
             TankEntityBase tankEntityBase = other.GetComponent<TankEntityBase>();
             if (tankEntityBase != null)
             {
@@ -113,7 +122,7 @@ namespace GameMain
                 else
                 {
                     Debug.Log($"当前子弹 :{tankOwnerType},击中坦克：{tankEntityBase.TankOwnerType},{other.name}");
-                    tankEntityBase.TankBeAttacked(this, (isDead) =>
+                    tankEntityBase.TankBeHit(this, (isDead) =>
                     {
                         if (isDead)
                         {
