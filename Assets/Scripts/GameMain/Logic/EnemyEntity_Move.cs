@@ -336,7 +336,7 @@ namespace GameMain
                     RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 270));
                     break;
             }
-            m_Rigidbody.MovePosition(enemy.transform.position + moveDir * Time.deltaTime * moveSpeed);
+            m_Rigidbody.MovePosition(entity.transform.position + moveDir * Time.deltaTime * moveSpeed);
 
             if (IsArriveTarget(transform.position, targetPosition.Pos))
             {

@@ -6,14 +6,13 @@ namespace GameMain
 {
     public partial class EnemyEntity : TankEntityBase
     {
-        public GameObject enemy;
 
         private FB_tank_enemy m_TankEnemyData;
 
 
         private void Awake()
         {
-            enemy = gameObject;
+            //entity = gameObject;
         }
 
         protected override void Init()

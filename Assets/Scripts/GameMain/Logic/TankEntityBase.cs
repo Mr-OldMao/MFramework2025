@@ -3,11 +3,14 @@ using MFramework.Runtime;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace GameMain
 {
     public abstract class TankEntityBase : MonoBehaviour
     {
+        public GameObject entity;
+
         public TankOwnerType TankOwnerType { get; private set; }
 
         public MoveDirType MoveDirType { get; protected set; }
@@ -39,6 +42,7 @@ namespace GameMain
 
         public async UniTask InitData(TankOwnerType tankOwnerType, int tankTypeID, int entityID)
         {
+            entity = this.gameObject;
             TankOwnerType = tankOwnerType;
             TankTypeID = tankTypeID;
             EntityID = entityID;
@@ -48,12 +52,9 @@ namespace GameMain
             m_AnimInvincible = transform.Find<Animator>("rectAnimInvincible");
             m_AnimBorn = transform.Find<Animator>("rectAnimBorn");
             m_Rigidbody = GetComponentInChildren<Rigidbody>();
-            eTankState = ETankState.Born;
 
-            IsCanMove = false;
-            await TankBorn();
-            IsCanMove = true;
-            eTankState = ETankState.Idle;
+
+            await TankBorn(tankOwnerType);
 
             UpdateTankAnim();
             Init();
@@ -61,8 +62,29 @@ namespace GameMain
 
         protected abstract void Init();
 
-        private async UniTask TankBorn()
+        protected async UniTask TankBorn(TankOwnerType tankOwnerType)
         {
+            eTankState = ETankState.Born;
+
+            Vector3 bornPos = Vector3.zero;
+            switch (tankOwnerType)
+            {
+                case TankOwnerType.Player1:
+                    bornPos = new Vector3(GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer1.x, 0, GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer1.y);
+                    break;
+                case TankOwnerType.Player2:
+                    bornPos = new Vector3(GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer2.x, 0, GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer2.y);
+
+                    break;
+                case TankOwnerType.Enemy:
+                    Vector2 posBornEnemy = GameEntry.UI.GetModel<UIModelMap>().GetRandomGridPosBornEnemy();
+                    bornPos = new Vector3(posBornEnemy.x, 0, posBornEnemy.y);
+                    break;
+            }
+            entity.transform.localPosition = bornPos;
+            entity.SetActive(true);
+
+            IsCanMove = false;
             m_AnimTank.gameObject.SetActive(false);
             m_AnimInvincible.gameObject.SetActive(false);
             m_AnimBorn.gameObject.SetActive(true);
@@ -70,6 +92,8 @@ namespace GameMain
             m_AnimBorn.gameObject.SetActive(false);
             m_AnimTank.gameObject.SetActive(true);
             SetInvincible(2f);
+            IsCanMove = true;
+            eTankState = ETankState.Idle;
         }
 
         protected virtual void FixedUpdate()

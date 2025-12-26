@@ -143,8 +143,8 @@ namespace GameMain
                     int tankTypeID = isRedTank ? Random.Range(301, 304) : Random.Range(201, 206);
                     string spriteName = DataTools.GetTankEnemy(tankTypeID).ResName;
                     enemy.GetComponentInChildren<SpriteRenderer>().sprite = enemyTankAtlas.GetSprite(spriteName);
-                    Vector2 posBornEnemy = GameEntry.UI.GetModel<UIModelMap>().GetRandomGridPosBornEnemy();
-                    enemy.transform.localPosition = new Vector3(posBornEnemy.x, 0, posBornEnemy.y);
+                    //Vector2 posBornEnemy = GameEntry.UI.GetModel<UIModelMap>().GetRandomGridPosBornEnemy();
+                    //enemy.transform.localPosition = new Vector3(posBornEnemy.x, 0, posBornEnemy.y);
                     enemy.GetComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurEnemyEntityID);
                     enemy.name = "entmy" + m_CurEnemyEntityID;
                     Debugger.Log($"generate enemy tank {m_CurEnemyEntityID}");

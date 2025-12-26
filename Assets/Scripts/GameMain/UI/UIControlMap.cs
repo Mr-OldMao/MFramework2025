@@ -80,8 +80,8 @@ namespace GameMain
 
             var player1 = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Player1.prefab", false);
             player1.gameObject.SetActive(true);
-            player1.transform.SetParent(NodePlayer.transform);
-            player1.transform.localPosition = new Vector3(model.GridPosBornPlayer1.x, 0, model.GridPosBornPlayer1.y);
+            //player1.transform.SetParent(NodePlayer.transform);
+            //player1.transform.localPosition = new Vector3(model.GridPosBornPlayer1.x, 0, model.GridPosBornPlayer1.y);
 
             m_CurEnemyPlayerID = 1000;
             int tankTypeID = Random.Range(101, 105);
