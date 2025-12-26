@@ -14,5 +14,11 @@ namespace GameMain
         {
             await InitPool();
         }
+
+        public void GameParse()
+        {
+            Debug.Log("GameParse");
+            Time.timeScale = Time.timeScale == 0 ? 1 : 0;
+        }
     }
 }

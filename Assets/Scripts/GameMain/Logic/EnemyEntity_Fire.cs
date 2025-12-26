@@ -39,20 +39,23 @@ namespace GameMain
 
         private void AutoFireUpdate()
         {
-            if (IsAutoFire)
+            if (eTankState != ETankState.Born && eTankState != ETankState.Dead)
             {
-                m_NextFireBulletCountdown -= Time.deltaTime;
-                if (m_NextFireBulletCountdown <= 0)
+                if (IsAutoFire)
                 {
-                    m_IsCanFire = true;
-                    SetNextFireBulletCountdown();
+                    m_NextFireBulletCountdown -= Time.deltaTime;
+                    if (m_NextFireBulletCountdown <= 0)
+                    {
+                        m_IsCanFire = true;
+                        SetNextFireBulletCountdown();
+                    }
                 }
-            }
 
-            if (m_IsCanFire)
-            {
-                m_IsCanFire = false;
-                Fire();
+                if (m_IsCanFire)
+                {
+                    m_IsCanFire = false;
+                    Fire();
+                } 
             }
         }
 
@@ -60,6 +63,7 @@ namespace GameMain
         {
             Debug.Log("Fire");
             BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
+            eTankState = ETankState.Attack;
             bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankEnemy(TankTypeID).BulletID, () =>
             {
                 ResetFireState();

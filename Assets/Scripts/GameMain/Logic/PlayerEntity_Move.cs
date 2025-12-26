@@ -15,7 +15,7 @@ namespace GameMain
         private Vector2 MaxGridPos;
         private Vector2 MaxMapPos;
 
-        public bool IsCanMove { get; set; } = true;
+        //public bool IsCanMove { get; set; } = true;
         private const float TankMoveSpeedConst = 3f;
 
         private void InitMove(Vector2 gridPos)

@@ -70,6 +70,7 @@ namespace GameMain
         {
             Dead();
 
+
             HP = m_TankPlayerData.HP;
             player.transform.position = new Vector3(GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer1.x, 0, GameEntry.UI.GetModel<UIModelMap>().GridPosBornPlayer1.y);
             player.SetActive(true);

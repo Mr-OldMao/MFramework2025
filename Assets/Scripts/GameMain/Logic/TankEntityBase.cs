@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GameMain
@@ -11,7 +13,7 @@ namespace GameMain
         public MoveDirType MoveDirType { get; protected set; }
 
         public SpriteRenderer RectAnimTank { get; private set; }
-    
+
 
         [SerializeField]
         protected int EntityID;
@@ -20,25 +22,37 @@ namespace GameMain
         [SerializeField]
         protected int TankTypeID;
         [SerializeField]
-        public bool IsCanMove = true;
+        public bool IsCanMove;
 
         protected ETankState eTankState;
 
-        private Animator m_Animator;
+        private Animator m_AnimTank;
+        private Animator m_AnimInvincible;
+        private Animator m_AnimBorn;
         public bool IsMoving { get; protected set; } = false;
 
         protected Rigidbody m_Rigidbody;
 
+        [SerializeField]
+        protected bool m_IsInvincible;
+        private int m_InvincibleTimerID;
 
-        public void InitData(TankOwnerType tankOwnerType, int tankTypeID, int entityID)
+        public async UniTask InitData(TankOwnerType tankOwnerType, int tankTypeID, int entityID)
         {
             TankOwnerType = tankOwnerType;
             TankTypeID = tankTypeID;
             EntityID = entityID;
             HP = tankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).HP : DataTools.GetTankPlayer(tankTypeID).HP;
             RectAnimTank = transform.Find<SpriteRenderer>("rectAnimTank");
-            m_Animator = GetComponentInChildren<Animator>();
+            m_AnimTank = transform.Find<Animator>("rectAnimTank");
+            m_AnimInvincible = transform.Find<Animator>("rectAnimInvincible");
+            m_AnimBorn = transform.Find<Animator>("rectAnimBorn");
             m_Rigidbody = GetComponentInChildren<Rigidbody>();
+            eTankState = ETankState.Born;
+
+            IsCanMove = false;
+            await TankBorn();
+            IsCanMove = true;
             eTankState = ETankState.Idle;
 
             UpdateTankAnim();
@@ -47,15 +61,26 @@ namespace GameMain
 
         protected abstract void Init();
 
+        private async UniTask TankBorn()
+        {
+            m_AnimTank.gameObject.SetActive(false);
+            m_AnimInvincible.gameObject.SetActive(false);
+            m_AnimBorn.gameObject.SetActive(true);
+            await UniTask.Delay(2000);
+            m_AnimBorn.gameObject.SetActive(false);
+            m_AnimTank.gameObject.SetActive(true);
+            SetInvincible(2f);
+        }
+
         protected virtual void FixedUpdate()
         {
             if (IsCanMove && IsMoving)
             {
-                PauseAnim(false);
+                PauseMoveAnim(false);
             }
             else
             {
-                PauseAnim(true);
+                PauseMoveAnim(true);
             }
         }
 
@@ -67,20 +92,18 @@ namespace GameMain
                 if (HP <= 0)
                 {
                     eTankState = ETankState.Dead;
+                    tankDeadCallback?.Invoke(true);
                     OnTankDead();
                     GameEntry.Event.DispatchEvent(GameEventType.TankDead, EntityID);
-                    tankDeadCallback?.Invoke(true);
                 }
                 else
                 {
+                    tankDeadCallback?.Invoke(false);
                     OnTankHit(bulletEntity.BulletData.BulletATK);
                     GameEntry.Event.DispatchEvent(GameEventType.TankBeHit, EntityID);
-                    tankDeadCallback?.Invoke(false);
                 }
             }
         }
-
-
 
 
         protected void UpdateTankData(int tankTypeID)
@@ -89,23 +112,40 @@ namespace GameMain
             UpdateTankAnim();
         }
 
-
-
         public void UpdateTankAnim()
         {
             string animName = "move" + TankTypeID;
-            m_Animator.Play(animName);
+            m_AnimTank.Play(animName);
         }
-        public void PauseAnim(bool isPause)
+        public void PauseMoveAnim(bool isPause)
         {
             if (isPause)
             {
-                m_Animator.speed = 0;
+                m_AnimTank.speed = 0;
             }
             else
             {
-                m_Animator.speed = 1;
+                m_AnimTank.speed = 1;
             }
+        }
+
+        public void SetInvincible(float durationTime)
+        {
+            Debug.Log($"SetInvincible {gameObject.name} {durationTime}");
+            m_IsInvincible = true;
+            m_AnimInvincible.gameObject.SetActive(true);
+
+            if (m_InvincibleTimerID >0)
+            {
+                Debug.Log($"SetInvincible RemoveDelayTimer{gameObject.name} {durationTime}");
+                GameEntry.Timer.RemoveDelayTimer(m_InvincibleTimerID);
+            }
+            m_InvincibleTimerID = GameEntry.Timer.AddDelayTimer(durationTime, () =>
+            {
+                m_InvincibleTimerID = -1;
+                m_IsInvincible = false;
+                m_AnimInvincible.gameObject.SetActive(false);
+            } );
         }
 
         protected abstract void OnTankDead();
@@ -128,12 +168,12 @@ namespace GameMain
     /// </summary>
     public enum ETankState
     {
+        Born,
         Idle,
         Attack,
         Move,
         Dead
     }
-
 
     public enum MoveDirType
     {

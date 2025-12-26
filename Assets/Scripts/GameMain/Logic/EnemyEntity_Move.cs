@@ -1,6 +1,7 @@
 using MFramework.Runtime;
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
@@ -9,7 +10,6 @@ namespace GameMain
 {
     public partial class EnemyEntity
     {
-        public bool IsCanAIMove = true;
         /// <summary>
         /// 判定到达目标点的距离
         /// </summary>
@@ -19,7 +19,7 @@ namespace GameMain
         /// </summary>
         public float rayOffsetDis = 0.1f;
         public EAIMoveTargetType MoveTargetType;
-        public EAIMoveState MoveState;
+        //public EAIMoveState MoveState;
 
         public float moveSpeed;
         public Vector3 targetPos;
@@ -50,12 +50,11 @@ namespace GameMain
                 nodeRayPoint = transform.Find<Transform>("nodeRayPoint");
             }
 
-            SetAIMoveState(EAIMoveState.Idle);
+            SetAIMoveState(ETankState.Idle);
             SetAIMoveTargetType(EAIMoveTargetType.None);
             moveSpeed = m_TankEnemyData.MoveSpeed;
             SetNextAutoMoveTime();
             m_IsArrivedTargetPoint = true;
-            IsCanAIMove = true;
         }
 
         private void SetNextAutoMoveTime()
@@ -63,7 +62,7 @@ namespace GameMain
             m_NextAutoMoveTime = Random.Range(m_TankEnemyData.AutoMoveInterval(0), m_TankEnemyData.AutoMoveInterval(1));
         }
 
-        [ContextMenu("移动到玩家旁")]
+        [ContextMenu("自动寻找目标并移动")]
         public void AutoMove()
         {
             Debugger.Log("MoveToPlayer");
@@ -92,22 +91,16 @@ namespace GameMain
 
             //Debug.Log("eAIMoveTargetType " + eAIMoveTargetType);
             SetAIMoveTargetType(eAIMoveTargetType);
-            SetAIMoveState(EAIMoveState.Moving);
+            SetAIMoveState(ETankState.Move);
         }
-
-        //public void MoveToBrid()
-        //{
-        //    m_IsArrivedTargetPoint = false;
-        //    SetAIMoveTargetType(EAIMoveTargetType.Player);
-        //    SetAIMoveState(EAIMoveState.Moving);
-        //}
 
         [ContextMenu("终止移动")]
         public void StopMove()
         {
             IsMoving = false;
+            eTankState = ETankState.Idle;
             SetAIMoveTargetType(EAIMoveTargetType.None);
-            SetAIMoveState(EAIMoveState.Idle);
+            SetAIMoveState(ETankState.Idle);
         }
 
         public void RestartMove()
@@ -115,34 +108,31 @@ namespace GameMain
             StopMove();
             SetNextAutoMoveTime();
             m_IsArrivedTargetPoint = true;
-            IsCanAIMove = true;
+            IsCanMove = true;
         }
 
-        public void SetAIMoveState(EAIMoveState state)
+        public void SetAIMoveState(ETankState state)
         {
-            MoveState = state;
-            switch (state)
+            eTankState = state;
+            switch (eTankState)
             {
-                case EAIMoveState.Idle:
-                    IsCanAIMove = false;
+                case ETankState.Born:
                     break;
-                case EAIMoveState.Moving:
-                    IsCanAIMove = true;
+                case ETankState.Idle:
+                    break;
+                case ETankState.Attack:
+                    break;
+                case ETankState.Move:
                     FindTargetPosPath();
                     break;
-                case EAIMoveState.Attack:
-                    IsCanAIMove = false;
-                    break;
-                case EAIMoveState.MovingAndAttack:
-                    IsCanAIMove = true;
-                    FindTargetPosPath();
+                case ETankState.Dead:
                     break;
             }
         }
 
         void AIMoveUpdate()
         {
-            if (IsCanAIMove)
+            if (IsCanMove)
             {
                 if (m_ListAiMoveData?.Count > 0)
                 {
@@ -159,7 +149,7 @@ namespace GameMain
                         m_CurMovingTimer = 0;
                         m_ListAiMoveData.Clear();
                         RestartMove();
-                        //Debugger.Log("单词移动超时，强制重新移动");
+                        //Debugger.Log("单次移动超时，强制重新移动");
                     }
                 }
 
@@ -385,11 +375,11 @@ namespace GameMain
         PlayerOrBrid
     }
 
-    public enum EAIMoveState
-    {
-        Idle,
-        Moving,
-        Attack,
-        MovingAndAttack,
-    }
+    //public enum EAIMoveState
+    //{
+    //    Idle,
+    //    Moving,
+    //    Attack,
+    //    MovingAndAttack,
+    //}
 }

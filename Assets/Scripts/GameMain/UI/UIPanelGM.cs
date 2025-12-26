@@ -17,7 +17,7 @@ namespace GameMain
         private Button btnTankLevelAdd;
         private Button btnTankLevelSub;
         private Button btnGenerateEntmyTank;
-
+        private Button btnGameParse;
 
 
         private PlayerEntity PlayerEntity;
@@ -84,6 +84,11 @@ namespace GameMain
             btnGenerateEntmyTank.onClick.AddListener(() =>
             {
                 GameMainLogic.Instance.GetPoolTankEnemy();
+            });
+
+            btnGameParse.onClick.AddListener(() =>
+            {
+                GameMainLogic.Instance.GameParse();
             });
         }
 
