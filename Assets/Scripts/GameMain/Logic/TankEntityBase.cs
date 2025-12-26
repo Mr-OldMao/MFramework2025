@@ -1,9 +1,7 @@
 using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace GameMain
 {
@@ -52,7 +50,6 @@ namespace GameMain
             m_AnimInvincible = transform.Find<Animator>("rectAnimInvincible");
             m_AnimBorn = transform.Find<Animator>("rectAnimBorn");
             m_Rigidbody = GetComponentInChildren<Rigidbody>();
-
 
             await TankBorn(tankOwnerType);
 

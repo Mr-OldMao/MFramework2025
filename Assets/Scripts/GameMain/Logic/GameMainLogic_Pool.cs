@@ -19,29 +19,28 @@ namespace GameMain
         private Transform NodePoolBulletPlayer1;
         private Transform NodePoolBulletEnemy;
         private Transform NodePoolTankEnemy;
+        private Transform NodePoolPlayer1Enemy;
 
         private int m_PoolIdEffSmallBomb;
         private int m_PoolIdEffNormallBomb;
         private int m_PoolIdBulletPlayer1;
         private int m_PoolIdBulletEnemy;
         public int PoolIdTankEnemy { get; private set; }
+        public int PoolIdPlayerEnemy { get; private set; }
 
 
-        private int m_CurEnemyEntityID;
+        private int m_CurTankID;
         public async UniTask InitPool()
         {
             RootNode = InitNodePool("RootNode");
-
             NodePool = InitNodePool("NodePool", RootNode);
-
             NodePoolEff = InitNodePool("NodePoolEff");
-
             NodePoolBulletPlayer1 = InitNodePool("NodePoolBulletPlayer1");
             NodePoolBulletEnemy = InitNodePool("NodePoolBulletEnemy");
-
             NodePoolTankEnemy = InitNodePool("NodePoolTankEnemy");
+            NodePoolPlayer1Enemy = InitNodePool("NodePoolPlayer1Enemy");
 
-            m_CurEnemyEntityID = 0;
+            m_CurTankID = 0;
             await GeneratePool();
         }
 
@@ -143,11 +142,9 @@ namespace GameMain
                     int tankTypeID = isRedTank ? Random.Range(301, 304) : Random.Range(201, 206);
                     string spriteName = DataTools.GetTankEnemy(tankTypeID).ResName;
                     enemy.GetComponentInChildren<SpriteRenderer>().sprite = enemyTankAtlas.GetSprite(spriteName);
-                    //Vector2 posBornEnemy = GameEntry.UI.GetModel<UIModelMap>().GetRandomGridPosBornEnemy();
-                    //enemy.transform.localPosition = new Vector3(posBornEnemy.x, 0, posBornEnemy.y);
-                    enemy.GetComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurEnemyEntityID);
-                    enemy.name = "entmy" + m_CurEnemyEntityID;
-                    Debugger.Log($"generate enemy tank {m_CurEnemyEntityID}");
+                    enemy.GetOrAddComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurTankID);
+                    enemy.name = "entmy" + m_CurTankID;
+                    Debugger.Log($"generate enemy tank {m_CurTankID}");
                 },
                 recycleObjCallback = (go) => Debug.Log("回收坦克 " + go),
                 preloadObjCallback = (go) =>
@@ -159,6 +156,40 @@ namespace GameMain
                 maxCount = 50
             };
             PoolIdTankEnemy = GameEntry.Pool.CreatPool(new Pool(tankEnemyPoolDataInfo));
+
+            var playerTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "playerTankAtlas.spriteatlas", false);
+            var player1TankPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "tank/Player1.prefab", false);
+            PoolDataInfo tankPlayer1PoolDataInfo = new PoolDataInfo
+            {
+                templateObj = player1TankPrefab,
+                getObjCallback = (playerObj, b) =>
+                {
+                    if (b)
+                    {
+                        playerObj.transform.SetParent(NodePoolPlayer1Enemy);
+                        playerObj.GetOrAddComponent<PlayerEntity>();
+                    }
+                    playerObj.gameObject.SetActive(true);
+                    int tankTypeID = Random.Range(101, 105);
+                    Player1Entity = playerObj.GetOrAddComponent<PlayerEntity>();
+                    Player1Entity.InitData(TankOwnerType.Player1, tankTypeID, ++m_CurTankID);
+                    playerObj.name = "Player1" + m_CurTankID;
+                    Debugger.Log($"generate player tank {m_CurTankID}");
+                },
+                recycleObjCallback = (go) =>
+                {
+                    Debug.Log("回收坦克 " + go);
+                },
+                preloadObjCallback = (go) =>
+                {
+                    go.transform.SetParent(NodePoolPlayer1Enemy);
+                    go.GetOrAddComponent<PlayerEntity>();
+                },
+                initCount = 1,
+                maxCount = 1
+            };
+            PoolIdPlayerEnemy = GameEntry.Pool.CreatPool(new Pool(tankPlayer1PoolDataInfo));
+
         }
 
 
@@ -188,11 +219,6 @@ namespace GameMain
                     break;
             }
             return go;
-        }
-
-        public GameObject GetPoolTankEnemy()
-        {
-            return GameEntry.Pool.GetPool(PoolIdTankEnemy).GetEntity();
-        }
+        } 
     }
 }

@@ -63,16 +63,22 @@ namespace GameMain
             HP = m_TankPlayerData.HP;
         }
 
-        public async Task Revive()
+        public void Revive()
         {
             Dead();
-            await TankBorn(TankOwnerType);
-            HP = m_TankPlayerData.HP;
+            //判定能否复活
+            bool isCanRevive = true;
+            if (isCanRevive)
+            {
+                GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdPlayerEnemy).GetEntity();
+                //await TankBorn(TankOwnerType);
+            }
+
         }
 
         public void Dead()
         {
-            entity.SetActive(false);
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdPlayerEnemy).RecycleEntity(entity);
         }
         #endregion
     }

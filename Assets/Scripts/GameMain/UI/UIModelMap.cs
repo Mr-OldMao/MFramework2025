@@ -28,7 +28,6 @@ namespace GameMain
         private List<Vector2> m_ListAirBorder = new List<Vector2>();
 
 
-        public int LevelID { get; private set; }
 
         public List<Vector2> GridPosBornEnemyArr { get; private set; }
         public Vector2 GridPosBornPlayer1 { get; private set; }
@@ -43,7 +42,6 @@ namespace GameMain
         }
         public override async UniTask Init()
         {
-            LevelID = 1;
             SetMapGridType();
             SetFixedPos();
             SetAirBorder();

@@ -9,15 +9,15 @@ using global::System;
 using global::System.Collections.Generic;
 using global::Google.FlatBuffers;
 
-public struct FB_level_level : IFlatbufferObject
+public struct FB_stage_stage : IFlatbufferObject
 {
   private Table __p;
   public ByteBuffer ByteBuffer { get { return __p.bb; } }
   public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_25_2_10(); }
-  public static FB_level_level GetRootAsFB_level_level(ByteBuffer _bb) { return GetRootAsFB_level_level(_bb, new FB_level_level()); }
-  public static FB_level_level GetRootAsFB_level_level(ByteBuffer _bb, FB_level_level obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public static FB_stage_stage GetRootAsFB_stage_stage(ByteBuffer _bb) { return GetRootAsFB_stage_stage(_bb, new FB_stage_stage()); }
+  public static FB_stage_stage GetRootAsFB_stage_stage(ByteBuffer _bb, FB_stage_stage obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
-  public FB_level_level __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+  public FB_stage_stage __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public int ID { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int TankNum { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
@@ -26,22 +26,22 @@ public struct FB_level_level : IFlatbufferObject
   public int LevelDuration { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int MapTypeID { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
 
-  public static Offset<GameMain.Generate.FlatBuffers.FB_level_level> CreateFB_level_level(FlatBufferBuilder builder,
+  public static Offset<GameMain.Generate.FlatBuffers.FB_stage_stage> CreateFB_stage_stage(FlatBufferBuilder builder,
       int ID = 0,
       int TankNum = 0,
       VectorOffset EnemyProbabilityOffset = default(VectorOffset),
       int LevelDuration = 0,
       int mapTypeID = 0) {
     builder.StartTable(5);
-    FB_level_level.AddMapTypeID(builder, mapTypeID);
-    FB_level_level.AddLevelDuration(builder, LevelDuration);
-    FB_level_level.AddEnemyProbability(builder, EnemyProbabilityOffset);
-    FB_level_level.AddTankNum(builder, TankNum);
-    FB_level_level.AddID(builder, ID);
-    return FB_level_level.EndFB_level_level(builder);
+    FB_stage_stage.AddMapTypeID(builder, mapTypeID);
+    FB_stage_stage.AddLevelDuration(builder, LevelDuration);
+    FB_stage_stage.AddEnemyProbability(builder, EnemyProbabilityOffset);
+    FB_stage_stage.AddTankNum(builder, TankNum);
+    FB_stage_stage.AddID(builder, ID);
+    return FB_stage_stage.EndFB_stage_stage(builder);
   }
 
-  public static void StartFB_level_level(FlatBufferBuilder builder) { builder.StartTable(5); }
+  public static void StartFB_stage_stage(FlatBufferBuilder builder) { builder.StartTable(5); }
   public static void AddID(FlatBufferBuilder builder, int iD) { builder.AddInt(0, iD, 0); }
   public static void AddTankNum(FlatBufferBuilder builder, int tankNum) { builder.AddInt(1, tankNum, 0); }
   public static void AddEnemyProbability(FlatBufferBuilder builder, VectorOffset enemyProbabilityOffset) { builder.AddOffset(2, enemyProbabilityOffset.Value, 0); }
@@ -52,14 +52,14 @@ public struct FB_level_level : IFlatbufferObject
   public static void StartEnemyProbabilityVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
   public static void AddLevelDuration(FlatBufferBuilder builder, int levelDuration) { builder.AddInt(3, levelDuration, 0); }
   public static void AddMapTypeID(FlatBufferBuilder builder, int mapTypeID) { builder.AddInt(4, mapTypeID, 0); }
-  public static Offset<GameMain.Generate.FlatBuffers.FB_level_level> EndFB_level_level(FlatBufferBuilder builder) {
+  public static Offset<GameMain.Generate.FlatBuffers.FB_stage_stage> EndFB_stage_stage(FlatBufferBuilder builder) {
     int o = builder.EndTable();
-    return new Offset<GameMain.Generate.FlatBuffers.FB_level_level>(o);
+    return new Offset<GameMain.Generate.FlatBuffers.FB_stage_stage>(o);
   }
 }
 
 
-static public class FB_level_levelVerify
+static public class FB_stage_stageVerify
 {
   static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
   {

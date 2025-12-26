@@ -50,11 +50,10 @@ namespace GameMain
         protected override void RegisterEvent()
         {
             Debugger.Log("UIPanelGM RegisterEvent");
-            PlayerEntity = GameObject.Find("EntityPlayer1").GetComponent<PlayerEntity>();
 
             GameEntry.Event.RegisterEvent(GameEventType.GameStart, () =>
             {
-                PlayerEntity = GameObject.Find("EntityPlayer1").GetComponent<PlayerEntity>();
+
             });
 
             btnRegenerateMap.onClick.AddListener(() =>
@@ -62,7 +61,7 @@ namespace GameMain
                 if (int.TryParse(inputTxtMapTypeID.text, out int mapTypeID))
                 {
 #pragma warning disable CS4014
-                    GameEntry.UI.GetController<UIControlMap>().GenerateMap(mapTypeID);
+                    GameEntry.UI.GetController<UIControlMap>().GenerateMapByMapTypeID(mapTypeID);
 #pragma warning restore CS4014
                 }
                 else
@@ -73,17 +72,17 @@ namespace GameMain
 
             btnTankLevelAdd.onClick.AddListener(() =>
             {
-                PlayerEntity.AddLevel();
+                GameMainLogic.Instance.Player1Entity.AddLevel();
             });
 
             btnTankLevelSub.onClick.AddListener(() =>
             {
-                PlayerEntity.SubLevel();
+                GameMainLogic.Instance.Player1Entity.SubLevel();
             });
 
             btnGenerateEntmyTank.onClick.AddListener(() =>
             {
-                GameMainLogic.Instance.GetPoolTankEnemy();
+                GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).GetEntity();
             });
 
             btnGameParse.onClick.AddListener(() =>

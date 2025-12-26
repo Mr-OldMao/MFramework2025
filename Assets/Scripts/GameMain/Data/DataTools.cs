@@ -15,7 +15,7 @@ namespace GameMain
     public class DataTools
     {
         private static readonly Dictionary<int, FB_bullet_bullet> dicBulletBullet = new Dictionary<int, FB_bullet_bullet>();
-        private static readonly Dictionary<int, FB_level_level> dicLevelLevel = new Dictionary<int, FB_level_level>();
+        private static readonly Dictionary<int, FB_stage_stage> dicStageStage = new Dictionary<int, FB_stage_stage>();
         private static readonly Dictionary<int, FB_reward_reward> dicRewardReward = new Dictionary<int, FB_reward_reward>();
         private static readonly Dictionary<int, FB_tank_player> dicTankPlayer = new Dictionary<int, FB_tank_player>();
         private static readonly Dictionary<int, FB_tank_enemy> dicTankEnemy = new Dictionary<int, FB_tank_enemy>();
@@ -50,12 +50,12 @@ namespace GameMain
 
         public static async UniTask SetLevelLevel()
         {
-            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("level_level"));
+            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("stage_stage"));
             ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);
-            var datas = FB_level_level_Array.GetRootAsFB_level_level_Array(byteBuffer);
+            var datas = FB_stage_stage_Array.GetRootAsFB_stage_stage_Array(byteBuffer);
             for (int i = 0; i < datas.DatasLength; i++)
             {
-                dicLevelLevel.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
+                dicStageStage.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
             }
         }
         public static async UniTask SetRewardReward()
@@ -116,12 +116,12 @@ namespace GameMain
             return dicMapMapType.Values.ToList();
         }
 
-        public static int GetMapTypeIDByLevelID(int levelID)
+        public static int GetMapTypeIDByStageID(int levelID)
         {
             int mapTypeID = 1;
-            if (dicLevelLevel.ContainsKey(levelID))
+            if (dicStageStage.ContainsKey(levelID))
             {
-                mapTypeID = dicLevelLevel[levelID].MapTypeID;
+                mapTypeID = dicStageStage[levelID].MapTypeID;
             }
             return mapTypeID;
         }
@@ -141,6 +141,10 @@ namespace GameMain
             return dicTankEnemy.Values.Where(x => x.ID == id).FirstOrDefault();
         }
          
+        public static FB_stage_stage GetStageData(int id)
+        {
+            return dicStageStage.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
         #endregion
 
     }

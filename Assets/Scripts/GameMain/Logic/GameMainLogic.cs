@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace GameMain
@@ -9,6 +10,8 @@ namespace GameMain
     public partial class GameMainLogic
     {
         public static GameMainLogic Instance;
+
+        public int StageID { get; set; } = 1;
 
         public async UniTask Init()
         {
