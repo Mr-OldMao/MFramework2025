@@ -24,7 +24,7 @@ namespace GameMain
             m_BulletInterval = DataTools.GetBulletBullet(m_TankPlayerData.BulletID).BulletInterval;
         }
 
-        public void Fire()
+        public void FireByKeyCode()
         {
             if (!m_IsCanFire)
             {
@@ -36,7 +36,20 @@ namespace GameMain
                 }
             }
 
-            if (m_IsCanFire && Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Space))
+            {
+                Fire();
+            }
+        }
+
+        public void FireByTouch( )
+        {
+            Fire();
+        }
+
+        private void Fire()
+        {
+            if (m_IsCanFire)
             {
                 BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
                 bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(TankTypeID).BulletID, () =>

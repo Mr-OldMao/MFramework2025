@@ -1,7 +1,9 @@
 using MFramework.Runtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GameMain
 {
@@ -18,12 +20,28 @@ namespace GameMain
         //public bool IsCanMove { get; set; } = true;
         private const float TankMoveSpeedConst = 3f;
 
+
+        private ETCJoystick joystick;
         private void InitMove(Vector2 gridPos)
         {
             this.gridPos = gridPos;
             UpdateTankMoveSpeed();
             //MaxGridPos = gridPos * UIModelMap.GRID_SIZE;
             //MaxMapPos = mapPos * UIModelMap.GRID_SIZE;
+            joystick = GameEntry.UI.GetController<UIControlBattle>().Joystick;
+
+
+        }
+
+        private void OnMoveEndHandler()
+        {
+            Debug.Log("joystick != null" + joystick);
+
+        }
+
+        private void OnMoveHandler()
+        {
+            Debug.Log("joystick != null" + joystick);
         }
 
         private void Move()
@@ -31,55 +49,107 @@ namespace GameMain
             if (IsCanMove)
             {
                 MovePC();
+
+                MoveTouch();
             }
         }
 
         private void UpdateTankMoveSpeed()
-         {
+        {
             moveSpeed = DataTools.GetTankPlayer(TankTypeID).MoveSpeed * TankMoveSpeedConst;
         }
 
         private void MovePC()
         {
-            if (IsCanMove)
+            if (Input.GetKey(KeyCode.W))
             {
-                if (Input.GetKey(KeyCode.W))
-                {
-                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                    //player.transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
-                    m_Rigidbody.MovePosition(entity.transform.position + Vector3.forward * Time.deltaTime * moveSpeed);
-                    MoveDirType = MoveDirType.Forward;
-                    IsMoving = true;
-                }
-                else if (Input.GetKey(KeyCode.S))
-                {
-                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 180));
-                    //player.transform.Translate(Vector3.back * Time.deltaTime * moveSpeed);
-                    m_Rigidbody.MovePosition(entity.transform.position + Vector3.back * Time.deltaTime * moveSpeed);
-                    MoveDirType = MoveDirType.Back;
-                    IsMoving = true;
-                }
-                else if (Input.GetKey(KeyCode.A))
-                {
-                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 90));
-                    //player.transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
-                    m_Rigidbody.MovePosition(entity.transform.position + Vector3.left * Time.deltaTime * moveSpeed);
+                Move(MoveDirType.Forward);
+                IsMoving = true;
+            }
+            else if (Input.GetKey(KeyCode.S))
+            {
+                Move(MoveDirType.Back);
+                IsMoving = true;
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                Move(MoveDirType.Left);
+                IsMoving = true;
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                Move(MoveDirType.Right);
+                IsMoving = true;
+            }
+            else
+            {
+                IsMoving = false;
+            }
+        }
 
-                    MoveDirType = MoveDirType.Left;
+        private void Move(MoveDirType moveDirType)
+        {
+            IsMoving = true;
+            MoveDirType = moveDirType;
+            Vector3 moveDir = Vector3.zero;
+            Vector3 rotateDir = Vector3.zero;
+            switch (moveDirType)
+            {
+                case MoveDirType.Forward:
+                    rotateDir = new Vector3(0, 0, 0);
+                    moveDir = Vector3.forward;
+
+                    break;
+                case MoveDirType.Back:
+                    rotateDir = new Vector3(0, 0, 180);
+                    moveDir = Vector3.back;
+
+                    break;
+                case MoveDirType.Left:
+                    rotateDir = new Vector3(0, 0, 90);
+                    moveDir = Vector3.left;
+                    break;
+                case MoveDirType.Right:
+                    rotateDir = new Vector3(0, 0, 270);
+                    moveDir = Vector3.right;
+                    break;
+            }
+            RectAnimTank.transform.localRotation = Quaternion.Euler(rotateDir);
+            m_Rigidbody.MovePosition(entity.transform.position + moveDir * Time.deltaTime * moveSpeed);
+        }
+
+        private void MoveTouch()
+        {
+            if (joystick != null)
+            {
+                if (joystick.axisY.axisValue != 0 && joystick.axisX.axisValue != 0)
+                {
+                    bool isForward = Math.Abs(joystick.axisY.axisValue) > Math.Abs(joystick.axisX.axisValue);
+                    if (isForward)
+                    {
+                        Move(joystick.axisY.axisValue > 0 ? MoveDirType.Forward : MoveDirType.Back);
+                        IsMoving = true;
+                    }
+                    else
+                    {
+                        Move(joystick.axisX.axisValue > 0 ? MoveDirType.Right : MoveDirType.Left);
+                        IsMoving = true;
+                    }
+                }
+                else if (joystick.axisY.axisValue != 0)
+                {
+                    Move(joystick.axisY.axisValue > 0 ? MoveDirType.Forward : MoveDirType.Back);
                     IsMoving = true;
                 }
-                else if (Input.GetKey(KeyCode.D))
+                else if (joystick.axisX.axisValue != 0)
                 {
-                    RectAnimTank.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 270));
-                    //player.transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
-                    m_Rigidbody.MovePosition(entity.transform.position + Vector3.right * Time.deltaTime * moveSpeed);
-                    MoveDirType = MoveDirType.Right;
+                    Move(joystick.axisX.axisValue > 0 ? MoveDirType.Right : MoveDirType.Left);
                     IsMoving = true;
                 }
                 else
                 {
                     IsMoving = false;
-                } 
+                }
             }
         }
     }

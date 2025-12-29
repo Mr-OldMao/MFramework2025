@@ -28,7 +28,7 @@ namespace GameMain
 
             Move();
 
-            Fire();
+            FireByKeyCode();
         }
 
         private void ChangeTankType(int id)

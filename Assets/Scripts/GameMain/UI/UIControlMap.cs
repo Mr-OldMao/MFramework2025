@@ -3,7 +3,6 @@ using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using MFramework.Runtime.Extend;
 using System.Collections.Generic;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -75,8 +74,10 @@ namespace GameMain
             await GenerateMapAirBorder();
             await GeneragetFirstEnemyTank(1);
             GeneragetPlayerTank();
+            await GameEntry.UI.ShowViewAsync<UIPanelBattle>();
 
             GameEntry.Event.DispatchEvent(GameEventType.GameStart);
+
             isGenerateMap = false;
 
 #pragma warning disable CS4014
