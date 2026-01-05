@@ -6,16 +6,15 @@ namespace GameMain
 {
     public partial class EnemyEntity : TankEntityBase
     {
-
         private FB_tank_enemy m_TankEnemyData;
 
-
-        private void Awake()
+        protected override void InitBornBefore()
         {
-            //entity = gameObject;
+            
         }
 
-        protected override void Init()
+
+        protected override void InitBornAfter()
         {
             MoveDirType = MoveDirType.Back;
             m_TankEnemyData = DataTools.GetTankEnemy(TankTypeID);

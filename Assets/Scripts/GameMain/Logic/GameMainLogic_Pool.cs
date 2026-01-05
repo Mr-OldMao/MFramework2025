@@ -123,7 +123,7 @@ namespace GameMain
             {
                 //Debug.Log("回收子弹TODO " + go);
             }, 1, 50));
-            
+
 
             var enemyTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas", false);
             var entmyTankPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "tank/Enemy.prefab", false);
@@ -144,6 +144,8 @@ namespace GameMain
                     enemy.GetComponentInChildren<SpriteRenderer>().sprite = enemyTankAtlas.GetSprite(spriteName);
                     enemy.GetOrAddComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurTankID);
                     enemy.name = "entmy" + m_CurTankID;
+                    --RemainEnemyTankNum;
+                    GameEntry.Event.DispatchEvent(GameEventType.EnemyTankGenerate, enemy);
                     Debugger.Log($"generate enemy tank {m_CurTankID}");
                 },
                 recycleObjCallback = (go) => Debug.Log("回收坦克 " + go),
@@ -179,6 +181,7 @@ namespace GameMain
                 recycleObjCallback = (go) =>
                 {
                     Debug.Log("回收坦克 " + go);
+                    Player1Entity.SubLife();
                 },
                 preloadObjCallback = (go) =>
                 {
@@ -189,7 +192,6 @@ namespace GameMain
                 maxCount = 1
             };
             PoolIdPlayerEnemy = GameEntry.Pool.CreatPool(new Pool(tankPlayer1PoolDataInfo));
-
         }
 
 
@@ -219,6 +221,6 @@ namespace GameMain
                     break;
             }
             return go;
-        } 
+        }
     }
 }

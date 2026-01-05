@@ -256,7 +256,7 @@ namespace GameMain
 
             if (aiMoveDataArr.Count == 0)
             {
-                Debugger.LogError($"{gameObject} 无法移动 重新移动 MoveToPlayer");
+                Debugger.Log($"{gameObject} 无法移动 重新移动 MoveToPlayer");
                 RestartMove();
             }
             else

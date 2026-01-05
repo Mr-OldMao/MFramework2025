@@ -6,6 +6,8 @@ namespace GameMain
 {
     public partial class PlayerEntity
     {
+        public int remainLife;
+
 
     }
 }

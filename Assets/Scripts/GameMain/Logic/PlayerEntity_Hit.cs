@@ -11,7 +11,7 @@ namespace GameMain
         {
             Debugger.Log($"PlayerEntity_Hit OnTankDead, id:{EntityID}, {this.gameObject.name}");
 
-            Revive();
+            TryRevive();
         }
 
         protected override void OnTankHit(int hitValue)

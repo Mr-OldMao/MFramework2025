@@ -20,7 +20,7 @@ public struct FB_stage_stage : IFlatbufferObject
   public FB_stage_stage __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public int ID { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
-  public int TankNum { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int EnemyTankNum { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public GameMain.Generate.FlatBuffers.DictIntFloat? EnemyProbability(int j) { int o = __p.__offset(8); return o != 0 ? (GameMain.Generate.FlatBuffers.DictIntFloat?)(new GameMain.Generate.FlatBuffers.DictIntFloat()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
   public int EnemyProbabilityLength { get { int o = __p.__offset(8); return o != 0 ? __p.__vector_len(o) : 0; } }
   public int LevelDuration { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
@@ -28,7 +28,7 @@ public struct FB_stage_stage : IFlatbufferObject
 
   public static Offset<GameMain.Generate.FlatBuffers.FB_stage_stage> CreateFB_stage_stage(FlatBufferBuilder builder,
       int ID = 0,
-      int TankNum = 0,
+      int EnemyTankNum = 0,
       VectorOffset EnemyProbabilityOffset = default(VectorOffset),
       int LevelDuration = 0,
       int mapTypeID = 0) {
@@ -36,14 +36,14 @@ public struct FB_stage_stage : IFlatbufferObject
     FB_stage_stage.AddMapTypeID(builder, mapTypeID);
     FB_stage_stage.AddLevelDuration(builder, LevelDuration);
     FB_stage_stage.AddEnemyProbability(builder, EnemyProbabilityOffset);
-    FB_stage_stage.AddTankNum(builder, TankNum);
+    FB_stage_stage.AddEnemyTankNum(builder, EnemyTankNum);
     FB_stage_stage.AddID(builder, ID);
     return FB_stage_stage.EndFB_stage_stage(builder);
   }
 
   public static void StartFB_stage_stage(FlatBufferBuilder builder) { builder.StartTable(5); }
   public static void AddID(FlatBufferBuilder builder, int iD) { builder.AddInt(0, iD, 0); }
-  public static void AddTankNum(FlatBufferBuilder builder, int tankNum) { builder.AddInt(1, tankNum, 0); }
+  public static void AddEnemyTankNum(FlatBufferBuilder builder, int enemyTankNum) { builder.AddInt(1, enemyTankNum, 0); }
   public static void AddEnemyProbability(FlatBufferBuilder builder, VectorOffset enemyProbabilityOffset) { builder.AddOffset(2, enemyProbabilityOffset.Value, 0); }
   public static VectorOffset CreateEnemyProbabilityVector(FlatBufferBuilder builder, Offset<GameMain.Generate.FlatBuffers.DictIntFloat>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
   public static VectorOffset CreateEnemyProbabilityVectorBlock(FlatBufferBuilder builder, Offset<GameMain.Generate.FlatBuffers.DictIntFloat>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
@@ -65,7 +65,7 @@ static public class FB_stage_stageVerify
   {
     return verifier.VerifyTableStart(tablePos)
       && verifier.VerifyField(tablePos, 4 /*ID*/, 4 /*int*/, 4, false)
-      && verifier.VerifyField(tablePos, 6 /*TankNum*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 6 /*EnemyTankNum*/, 4 /*int*/, 4, false)
       && verifier.VerifyVectorOfTables(tablePos, 8 /*EnemyProbability*/, GameMain.Generate.FlatBuffers.DictIntFloatVerify.Verify, false)
       && verifier.VerifyField(tablePos, 10 /*LevelDuration*/, 4 /*int*/, 4, false)
       && verifier.VerifyField(tablePos, 12 /*MapTypeID*/, 4 /*int*/, 4, false)

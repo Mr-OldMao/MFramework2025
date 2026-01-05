@@ -1,9 +1,6 @@
 using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GameMain
@@ -12,12 +9,17 @@ namespace GameMain
     {
         private FB_tank_player m_TankPlayerData;
 
+        private bool m_FirstInit = true;
+        protected override void InitBornBefore()
+        {
+            InitPlayerLife();
+        }
 
-        protected override void Init()
+
+        protected override void InitBornAfter()
         {
             MoveDirType = MoveDirType.Forward;
             ChangeTankType(TankTypeID);
-
             InitMove(new Vector2(entity.transform.localPosition.x, entity.transform.localPosition.z));
             InitFire();
         }
@@ -63,22 +65,36 @@ namespace GameMain
             HP = m_TankPlayerData.HP;
         }
 
-        public void Revive()
+        public void SubLife()
+        {
+            --remainLife;
+        }
+
+        public void InitPlayerLife()
+        {
+            if (m_FirstInit)
+            {
+                m_FirstInit = false;
+                remainLife = DataTools.GetConst("Player_Tank_Life");
+            }
+        }
+
+        public void TryRevive()
         {
             Dead();
             //判定能否复活
-            bool isCanRevive = true;
+            bool isCanRevive = remainLife >= 0;
             if (isCanRevive)
             {
                 GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdPlayerEnemy).GetEntity();
                 //await TankBorn(TankOwnerType);
             }
-
         }
 
         public void Dead()
         {
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdPlayerEnemy).RecycleEntity(entity);
+            GameMainLogic.Instance.JudgeGameFail();
         }
         #endregion
     }

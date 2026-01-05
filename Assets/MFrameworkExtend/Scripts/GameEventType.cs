@@ -9,7 +9,10 @@ public enum GameEventType
     LoadingProgress = 200,
 
     GameStart = 300,
-    GameOver = 301,
+
+    GamePause,
+    GameWin,
+    GameFail,
 
     /// <summary>
     /// 坦克被击中
@@ -17,9 +20,22 @@ public enum GameEventType
     TankBeHit = 400,
 
     /// <summary>
-    /// 坦克死亡
+    /// 玩家1坦克死亡
     /// </summary>
-    TankDead =410,
+    Player1TankDead =410,
+    /// <summary>
+    /// 玩家2坦克死亡
+    /// </summary>
+    Player2TankDead = 411,
+    /// <summary>
+    /// 敌方坦克死亡
+    /// </summary>
+    EnemyTankDead = 412,
+
+    /// <summary>
+    /// 敌方坦克出生
+    /// </summary>
+    EnemyTankGenerate,
 
     #region 框架层事件
     /// <summary>

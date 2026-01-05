@@ -47,9 +47,11 @@ namespace GameMain
             await GenerateMapByStageID(GameMainLogic.Instance.StageID);
             Debugger.Log("InitMapEntity Completed ", LogType.Test);
         }
+
         public async UniTask GenerateMapByStageID(int stageID)
         {
             int mapTypeID = DataTools.GetMapTypeIDByStageID(stageID);
+            GameMainLogic.Instance.RemainEnemyTankNum = DataTools.GetStageData(stageID).EnemyTankNum;
             await GenerateMapByMapTypeID(mapTypeID);
         }
 
@@ -72,16 +74,19 @@ namespace GameMain
             m_StageData = DataTools.GetStageData(GameMainLogic.Instance.StageID);
             await GenerateMapEntityByDataAsync();
             await GenerateMapAirBorder();
-            await GeneragetFirstEnemyTank(1);
             GeneragetPlayerTank();
             await GameEntry.UI.ShowViewAsync<UIPanelBattle>();
+            //await GeneragetFirstEnemyTank(1);
 
+            GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
             GameEntry.Event.DispatchEvent(GameEventType.GameStart);
 
             isGenerateMap = false;
 
+            GameMainLogic.Instance.GameStateType = GameStateType.GameRunning;
+
 #pragma warning disable CS4014
-            AutoGeneragetEnemyTank(m_StageData.TankNum);
+            AutoGeneragetEnemyTank(GameMainLogic.Instance.RemainEnemyTankNum);
 #pragma warning restore CS4014
         }
 

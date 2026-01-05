@@ -50,14 +50,15 @@ namespace GameMain
             m_AnimInvincible = transform.Find<Animator>("rectAnimInvincible");
             m_AnimBorn = transform.Find<Animator>("rectAnimBorn");
             m_Rigidbody = GetComponentInChildren<Rigidbody>();
-
+            InitBornBefore();
             await TankBorn(tankOwnerType);
 
             UpdateTankAnim();
-            Init();
+            InitBornAfter();
         }
+        protected abstract void InitBornBefore();
 
-        protected abstract void Init();
+        protected abstract void InitBornAfter();
 
         protected async UniTask TankBorn(TankOwnerType tankOwnerType)
         {
@@ -115,7 +116,19 @@ namespace GameMain
                     eTankState = ETankState.Dead;
                     tankDeadCallback?.Invoke(true);
                     OnTankDead();
-                    GameEntry.Event.DispatchEvent(GameEventType.TankDead, EntityID);
+                    switch (TankOwnerType)
+                    {
+                        case TankOwnerType.Player1:
+                            GameEntry.Event.DispatchEvent(GameEventType.Player1TankDead, entity);
+                            break;
+                        case TankOwnerType.Player2:
+                            GameEntry.Event.DispatchEvent(GameEventType.Player2TankDead, entity);
+                            break;
+                        case TankOwnerType.Enemy:
+                            GameEntry.Event.DispatchEvent(GameEventType.EnemyTankDead, entity);
+                            GameMainLogic.Instance.JudgeGameWin();
+                            break;
+                    }
                 }
                 else
                 {
@@ -156,7 +169,7 @@ namespace GameMain
             m_IsInvincible = true;
             m_AnimInvincible.gameObject.SetActive(true);
 
-            if (m_InvincibleTimerID >0)
+            if (m_InvincibleTimerID > 0)
             {
                 Debug.Log($"SetInvincible RemoveDelayTimer{gameObject.name} {durationTime}");
                 GameEntry.Timer.RemoveDelayTimer(m_InvincibleTimerID);
@@ -166,7 +179,7 @@ namespace GameMain
                 m_InvincibleTimerID = -1;
                 m_IsInvincible = false;
                 m_AnimInvincible.gameObject.SetActive(false);
-            } );
+            });
         }
 
         protected abstract void OnTankDead();

@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GameMain
@@ -20,6 +21,8 @@ namespace GameMain
         private static readonly Dictionary<int, FB_tank_player> dicTankPlayer = new Dictionary<int, FB_tank_player>();
         private static readonly Dictionary<int, FB_tank_enemy> dicTankEnemy = new Dictionary<int, FB_tank_enemy>();
         private static readonly Dictionary<int, FB_map_mapType> dicMapMapType = new Dictionary<int, FB_map_mapType>();
+        private static readonly Dictionary<string, int> dicConstConst = new Dictionary<string, int>();
+
 
         public static async UniTask Init()
         {
@@ -29,6 +32,7 @@ namespace GameMain
             await SetTankPlayer();
             await SetTankEnemy();
             await SetMapType();
+            await SetConst();
             Debugger.Log("数据加载完成");
         }
 
@@ -99,6 +103,18 @@ namespace GameMain
             }
         }
 
+        private static async Task SetConst()
+        {
+            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("const_const"));
+            ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);
+            var datas = FB_const_const_Array.GetRootAsFB_const_const_Array(byteBuffer);
+            for (int i = 0; i < datas.DatasLength; i++)
+            {
+                dicConstConst.Add(datas.Datas(i).Value.Key, datas.Datas(i).Value.Value);
+            }
+        }
+
+
         #region GetData
 
         public static FB_reward_reward GetRewardReward(string name)
@@ -144,6 +160,11 @@ namespace GameMain
         public static FB_stage_stage GetStageData(int id)
         {
             return dicStageStage.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
+
+        public static int GetConst(string key)
+        {
+            return dicConstConst[key];
         }
         #endregion
 
