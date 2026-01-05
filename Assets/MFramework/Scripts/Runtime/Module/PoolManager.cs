@@ -100,12 +100,12 @@ namespace MFramework.Runtime
         public Pool(GameObject templateObj, Action<GameObject, bool> getObjCallback, Action<GameObject> recycleObjCallback, int initCount = 1, int maxCount = 0)
         {
             m_IsGameObject = true;
-            this.getObjCallback = (obj, isCreate) => 
+            this.getObjCallback = (obj, isCreate) =>
             {
                 (obj as GameObject).SetActive(true);
                 getObjCallback?.Invoke(obj as GameObject, isCreate);
             };
-            this.recycleObjCallback = (obj) => 
+            this.recycleObjCallback = (obj) =>
             {
                 (obj as GameObject).SetActive(false);
                 recycleObjCallback?.Invoke(obj as GameObject);
@@ -113,13 +113,39 @@ namespace MFramework.Runtime
             CreatePool(templateObj, initCount, maxCount);
         }
 
+        public Pool(PoolDataInfo poolDataInfo)
+        {
+            m_IsGameObject = true;
+            this.getObjCallback = (obj, isCreate) =>
+            {
+                (obj as GameObject).SetActive(true);
+                poolDataInfo.getObjCallback?.Invoke(obj as GameObject, isCreate);
+            };
+            this.recycleObjCallback = (obj) =>
+            {
+                (obj as GameObject).SetActive(false);
+                poolDataInfo.recycleObjCallback?.Invoke(obj as GameObject);
+            };
+            this.preloadObjCallback = (obj) =>
+            {
+                (obj as GameObject).SetActive(false);
+                poolDataInfo.preloadObjCallback?.Invoke(obj as GameObject);
+            };
+            CreatePool(poolDataInfo.templateObj, poolDataInfo.initCount, poolDataInfo.maxCount);
+        }
+
+
         private Object TemplateObj;
         private List<Object> ListUsedObj;
         private List<Object> ListFreeObj;
+        private List<Object> ListPreloadObj;
         private Action<Object, bool> getObjCallback;
         private Action<Object> recycleObjCallback;
+        private Action<Object> preloadObjCallback;
         private int maxCount = 0;
         private bool m_IsGameObject = false;
+
+        public int UsedCount => ListUsedObj != null ? ListUsedObj.Count : 0;
 
         private void CreatePool(Object templateObj, int initCount = 1, int maxCount = 0)
         {
@@ -136,12 +162,13 @@ namespace MFramework.Runtime
             }
             ListUsedObj = new List<Object>();
             ListFreeObj = new List<Object>();
+            ListPreloadObj = new List<Object>();
             this.maxCount = maxCount;
             for (int i = 0; i < initCount; i++)
             {
                 Object obj = GameObject.Instantiate<Object>(templateObj);
-                ListUsedObj.Add(obj);
-                getObjCallback.Invoke(obj, true);
+                ListPreloadObj.Add(obj);
+                preloadObjCallback?.Invoke(obj);
             }
         }
 
@@ -161,12 +188,20 @@ namespace MFramework.Runtime
             }
             ListUsedObj = null;
             ListFreeObj = null;
+            ListPreloadObj = null;
         }
 
         public Object GetEntityObject()
         {
             Object res = null;
-            if (ListFreeObj.Count > 0)
+            if (ListPreloadObj.Count > 0)
+            {
+                res = ListPreloadObj[0];
+                ListPreloadObj.Remove(res);
+                ListUsedObj.Add(res);
+                getObjCallback?.Invoke(res, true);
+            }
+            else if (ListFreeObj.Count > 0)
             {
                 res = ListFreeObj[0];
                 ListFreeObj.Remove(res);
@@ -178,8 +213,8 @@ namespace MFramework.Runtime
                 if (maxCount <= 0 || ListUsedObj.Count + ListFreeObj.Count < maxCount)
                 {
                     res = GameObject.Instantiate<Object>(TemplateObj);
-                    getObjCallback?.Invoke(res, true);
                     ListUsedObj.Add(res);
+                    getObjCallback?.Invoke(res, true);
                 }
                 else
                 {
@@ -196,7 +231,14 @@ namespace MFramework.Runtime
                 return null;
             }
             GameObject res = null;
-            if (ListFreeObj.Count > 0)
+            if (ListPreloadObj.Count > 0)
+            {
+                res = ListPreloadObj[0] as GameObject;
+                ListPreloadObj.Remove(res);
+                ListUsedObj.Add(res);
+                getObjCallback?.Invoke(res, true);
+            }
+            else if (ListFreeObj.Count > 0)
             {
                 res = ListFreeObj[0] as GameObject;
                 ListFreeObj.Remove(res);
@@ -208,8 +250,8 @@ namespace MFramework.Runtime
                 if (maxCount <= 0 || ListUsedObj.Count + ListFreeObj.Count < maxCount)
                 {
                     res = GameObject.Instantiate(TemplateObj) as GameObject;
-                    getObjCallback?.Invoke(res, true);
                     ListUsedObj.Add(res);
+                    getObjCallback?.Invoke(res, true);
                 }
                 else
                 {
@@ -233,5 +275,27 @@ namespace MFramework.Runtime
                 Debugger.LogError($"RecycleObj faill , obj:{obj} is not in pool", LogType.FrameCore);
             }
         }
+
+        public void RecycleAllEntity()
+        {
+            for (int i = 0; i < ListUsedObj.Count; i++)
+            {
+                Object obj = ListUsedObj[i];
+                ListUsedObj.Remove(obj);
+                ListFreeObj.Add(obj);
+                recycleObjCallback?.Invoke(obj);
+            }
+        }
     }
+
+    public class PoolDataInfo
+    {
+        public Object templateObj;
+        public Action<GameObject, bool> getObjCallback;
+        public Action<GameObject> recycleObjCallback;
+        public Action<GameObject> preloadObjCallback;
+        public int initCount = 1;
+        public int maxCount = 0;
+    }
+
 }

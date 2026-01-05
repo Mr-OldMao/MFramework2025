@@ -15,6 +15,9 @@ namespace MFramework.Runtime
         GameObject GetEntity();
         Object GetEntityObject();
         void RecycleEntity(Object obj);
+        void RecycleAllEntity();
         void DestroyPool();
+
+        int UsedCount { get; }
     }
 }
