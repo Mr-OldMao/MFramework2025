@@ -138,6 +138,10 @@ PrefabInstance:
       propertyPath: m_ReferenceResolution.y
       value: 1080
       objectReference: {fileID: 0}
+    - target: {fileID: 2236023189282421404, guid: fe4e6fd33306f8d4aba7df29ecf6b745, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 2531798504751607217, guid: fe4e6fd33306f8d4aba7df29ecf6b745, type: 3}
       propertyPath: m_ReferenceResolution.x
       value: 1920

@@ -1,5 +1,6 @@
 
 using MFramework.Runtime;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 
 namespace GameMain
@@ -8,6 +9,7 @@ namespace GameMain
     {
         public PlayerEntity Player1Entity { get; set; }
 
+        public GamePlayerType GamePlayerType { get; set; } = GamePlayerType.Single;
         /// <summary>
         /// 当前关卡剩余生成敌人数量
         /// </summary>
@@ -32,7 +34,7 @@ namespace GameMain
             return IsGameWin;
         }
 
-        public bool JudgeGameFail()
+        public async Task<bool> JudgeGameFail()
         {
             IsGameFail = Player1Entity.remainLife < 0;
             if (IsGameFail)
@@ -40,6 +42,9 @@ namespace GameMain
                 Debugger.LogError("游戏结束-失败");
                 GameStateType = GameStateType.GameFail;
                 GameEntry.Event.DispatchEvent(GameEventType.GameFail);
+
+                var UIPanelGameOverPanel = await GameEntry.UI.ShowViewAsync<UIPanelGameOver>();
+                UIPanelGameOverPanel.ShowPanelPop();
             }
             return IsGameFail;
         }
@@ -55,5 +60,11 @@ namespace GameMain
         GameWin,
         GameFail,
         GameSettlement,
+    }
+
+    public enum GamePlayerType
+    {
+        Single,
+        Multi,
     }
 }

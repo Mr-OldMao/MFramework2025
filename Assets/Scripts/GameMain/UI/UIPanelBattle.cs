@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace GameMain
 {
     [UIBind(typeof(UIControlBattle), typeof(UIModelBattle))]
-    [UILayer(UILayerType.Tips)]
+    [UILayer(UILayerType.Normal)]
     public class UIPanelBattle : UIViewBase
     {
         public Button btnFire;
