@@ -9,13 +9,14 @@ namespace GameMain
 {
     //[UIBind(typeof(UIControlGameOver), typeof(UIModelGameOver))]
     [UILayer(UILayerType.Popup)]
-    public  class UIPanelGameOver : UIViewBase
+    public class UIPanelGameOver : UIViewBase
     {
         // UI字段
         private RectTransform rootNode;
         private RectTransform rectGameOverFull;
         private Image imgBg;
         private RectTransform rectGameOverPop;
+        private Button btnClose;
 
         public override async UniTask Init()
         {
@@ -26,7 +27,7 @@ namespace GameMain
         {
             if (model is not null)
             {
-                
+
             }
         }
 
@@ -44,7 +45,7 @@ namespace GameMain
             rectGameOverFull.gameObject.SetActive(false);
 
             await UniTask.Delay(2000);
-            GameEntry.UI.ShowView<UIPanelSettlement>();
+            GameEntry.UI.ShowView<UIPanelSettlement>(this);
         }
 
         public void ShowPanelFull()
@@ -61,12 +62,16 @@ namespace GameMain
 
         protected override void RegisterEvent()
         {
-            
+            btnClose.onClick.AddListener(async () =>
+            {
+                await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
+                HidePanel();
+            });
         }
 
         protected override void UnRegisterEvent()
         {
-            
+            btnClose.onClick.RemoveAllListeners();
         }
 
     }

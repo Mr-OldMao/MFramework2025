@@ -3,6 +3,8 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using System.Linq;
 
 namespace GameMain
 {
@@ -15,10 +17,12 @@ namespace GameMain
         public Image imgBg;
         public RectTransform txtLoading;
         public Slider sdrLoading;
-        public Image Background;
-        public Image Fill;
-        public Image Handle;
 
+        public RectTransform rectLoadSlider;
+        public RectTransform rectLoadStage;
+        public TextMeshProUGUI txtStage;
+
+        public Animator animLoadStage;
         public override async UniTask Init()
         {
             await base.Init();
@@ -38,6 +42,34 @@ namespace GameMain
             }
             sdrLoading.value = modelLoad.LoadingProgress;
         }
+
+        public void ShowLoadSlider()
+        {
+            rectLoadSlider.gameObject.SetActive(true);
+            rectLoadStage.gameObject.SetActive(false);
+        }
+
+        public void ShowLoadStage(Action callback)
+        {
+            txtStage.text = GameMainLogic.Instance.StageID.ToString();
+            rectLoadSlider.gameObject.SetActive(false);
+            rectLoadStage.gameObject.SetActive(true);
+            if (animLoadStage == null)
+            {
+                animLoadStage = rectLoadStage.GetComponent<Animator>();
+
+            }
+            string animName = "loadStage";
+            animLoadStage.Play(animName);
+            //等待当前动画播放完成
+            float animTime = animLoadStage.runtimeAnimatorController.animationClips.Where(p => p.name == animName).FirstOrDefault().length;
+            GameEntry.Timer.AddDelayTimer(animTime, () =>
+            {
+                callback?.Invoke();
+                HidePanel();
+            });
+        }
+
 
         public override UniTask ShowPanel()
         {
@@ -62,7 +94,7 @@ namespace GameMain
         protected override void UnRegisterEvent()
         {
             GameEntry.Event.UnRegisterEvent(GameEventType.LoadingProgress);
-        }
 
+        }
     }
 }

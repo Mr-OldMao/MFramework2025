@@ -61,7 +61,6 @@ namespace GameMain
 
         private void Fire()
         {
-            Debug.Log("Fire");
             BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
             eTankState = ETankState.Attack;
             bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankEnemy(TankTypeID).BulletID, () =>

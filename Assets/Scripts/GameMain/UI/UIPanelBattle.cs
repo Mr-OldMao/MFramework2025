@@ -40,7 +40,8 @@ namespace GameMain
 
         private void RefreshPlayerLife()
         {
-            txtLifePlayer1.text = $"{Math.Max(GameMainLogic.Instance.Player1Entity.remainLife, 0)}";
+            txtLifePlayer1.text = GameMainLogic.Instance.Player1Entity != null ?
+                $"{Math.Max(GameMainLogic.Instance.Player1Entity.remainLife, 0)}" : string.Empty;
         }
 
         private void RefreshStage()
@@ -65,7 +66,7 @@ namespace GameMain
         {
             btnFire.GetOrAddComponent<UIEvents>().AddListenerLongPressEvent((p) =>
             {
-                GameMainLogic.Instance.Player1Entity.FireByTouch();
+                GameMainLogic.Instance.Player1Entity?.FireByTouch();
             }, 0.1f);
 
             GameEntry.Event.RegisterEvent<GameObject>(GameEventType.Player1TankDead, (entity) =>

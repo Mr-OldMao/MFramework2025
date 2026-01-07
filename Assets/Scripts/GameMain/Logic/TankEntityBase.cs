@@ -8,7 +8,7 @@ namespace GameMain
     public abstract class TankEntityBase : MonoBehaviour
     {
         public GameObject entity;
-
+        public float bornTime = 1f;
         public TankOwnerType TankOwnerType { get; private set; }
 
         public MoveDirType MoveDirType { get; protected set; }
@@ -86,10 +86,10 @@ namespace GameMain
             m_AnimTank.gameObject.SetActive(false);
             m_AnimInvincible.gameObject.SetActive(false);
             m_AnimBorn.gameObject.SetActive(true);
-            await UniTask.Delay(2000);
+            await UniTask.Delay((int)(bornTime * 1000));
             m_AnimBorn.gameObject.SetActive(false);
             m_AnimTank.gameObject.SetActive(true);
-            SetInvincible(2f);
+            SetInvincible(bornTime);
             IsCanMove = true;
             eTankState = ETankState.Idle;
         }

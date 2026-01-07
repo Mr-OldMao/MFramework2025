@@ -25,23 +25,6 @@ namespace GameMain
         public override async UniTask Init()
         {
             await base.Init();
-            //var dataReward = DataTools.GetRewardReward("RewardBomb");
-            //var stone = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/map/stone/Stone.prefab", false);
-            //stone.transform.SetParent(nodeOther);
-            //stone.transform.localPosition = Vector3.zero;
-
-            //var homeWall = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/map/MapHomeWall.prefab", false);
-            //homeWall.transform.SetParent(nodeHomeWall);
-            //homeWall.transform.localPosition = Vector3.zero;
-
-            //var player1 = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Player1.prefab", false);
-            //player1.transform.SetParent(nodeBornPlayer1);
-            //player1.transform.localPosition = Vector3.zero;
-
-            //var enemy = await GameEntry.Resource.InstantiateAsset("Assets/Download/prefab/entity/tank/Enemy.prefab", false);
-            //enemy.transform.SetParent(nodeBornEnemy1);
-            //enemy.transform.localPosition = Vector3.zero;
-
             Debugger.Log("UIPanelMap Init Completed");
         }
 

@@ -24,13 +24,14 @@ namespace GameMain
         private ETCJoystick joystick;
         private void InitMove(Vector2 gridPos)
         {
+            MoveDirType = MoveDirType.Forward;
+
             this.gridPos = gridPos;
             UpdateTankMoveSpeed();
             //MaxGridPos = gridPos * UIModelMap.GRID_SIZE;
             //MaxMapPos = mapPos * UIModelMap.GRID_SIZE;
             joystick = GameEntry.UI.GetController<UIControlBattle>().Joystick;
-
-
+            RectAnimTank.transform.localRotation = Quaternion.Euler(Vector3.zero);
         }
 
         private void OnMoveEndHandler()

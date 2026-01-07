@@ -65,7 +65,7 @@ namespace GameMain
         [ContextMenu("自动寻找目标并移动")]
         public void AutoMove()
         {
-            Debugger.Log("MoveToPlayer");
+            //Debugger.Log("MoveToPlayer");
             m_IsArrivedTargetPoint = false;
 
             EAIMoveTargetType eAIMoveTargetType = EAIMoveTargetType.None;
@@ -203,7 +203,7 @@ namespace GameMain
 
         private void FindTargetPosPath()
         {
-            Debugger.Log("射线打点");
+            //Debugger.Log("射线打点");
             m_ListAiMoveData.Clear();
 
             List<AIMoveData> aiMoveDataArr = new List<AIMoveData>();
@@ -303,7 +303,7 @@ namespace GameMain
                     break;
             }
 
-            Debugger.Log($"射线打点 subTargetPoint:{res.Pos}");
+            //Debugger.Log($"射线打点 subTargetPoint:{res.Pos}");
             return res;
         }
         #endregion

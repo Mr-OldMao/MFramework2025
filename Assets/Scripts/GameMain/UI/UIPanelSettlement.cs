@@ -54,6 +54,8 @@ namespace GameMain
         private RectTransform rectP2KillTotalCount;
         private RectTransform txtP2KillTotalCount;
 
+        private Button btnClose;
+
         public override async UniTask Init()
         {
             await base.Init();
@@ -73,6 +75,8 @@ namespace GameMain
             GameStateType gameStateType = GameMainLogic.Instance.GameStateType;
             GameMainLogic.Instance.GameStateType = GameStateType.GameSettlement;
 
+
+
             for (int i = 0; i < rectP2Enemy1.childCount; i++)
             {
                 rectP2Enemy1.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
@@ -87,7 +91,7 @@ namespace GameMain
             await UniTask.Delay(1);
             LayoutRebuilder.ForceRebuildLayoutImmediate(rectGroup);
 
-            await UniTask.Delay(3000);
+            
 
             switch (gameStateType)
             {
@@ -99,10 +103,19 @@ namespace GameMain
                     Debugger.LogError("游戏状态异常，gameStateType：" + gameStateType);
                     break;
                 case GameStateType.GameWin:
-                    Debugger.LogError("加载下一关卡");
+                    Debugger.LogError("即将进入加载页下一关卡");
+                    await UniTask.Delay(2000);
+                    await GameEntry.UI.GetController<UIControlMap>().GenerateMapNextStage();
+                    var UIPanelLoad = await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
+                    UIPanelLoad.ShowLoadStage(() =>
+                    {
+                        GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
+                    });
                     break;
                 case GameStateType.GameFail:
-                    Debugger.LogError("游戏结束，结算完毕，准备返回主界面");
+                    await UniTask.Delay(3000);
+                    Debugger.LogError("游戏结束，结算完毕，准备返回菜单界面");
+                    GameEntry.UI.ShowView<UIPanelMenu>(this);
                     break;
             }
 
@@ -117,12 +130,16 @@ namespace GameMain
 
         protected override void RegisterEvent()
         {
-
+            btnClose.onClick.AddListener(() =>
+            {
+                GameEntry.UI.ShowView<UIPanelLoad>();
+                HidePanel();
+            });
         }
 
         protected override void UnRegisterEvent()
         {
-
+            btnClose.onClick.RemoveAllListeners();
         }
 
     }

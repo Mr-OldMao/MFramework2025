@@ -9,10 +9,10 @@ public enum GameEventType
     LoadingProgress = 200,
 
     GameStart = 300,
-
     GamePause,
     GameWin,
     GameFail,
+    GameSettlement,
 
     /// <summary>
     /// 坦克被击中

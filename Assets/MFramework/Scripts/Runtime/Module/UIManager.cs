@@ -1,9 +1,11 @@
+using Cysharp.Threading.Tasks;
 using MFramework.Runtime.Extend;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -31,6 +33,13 @@ namespace MFramework.Runtime
 #pragma warning disable CS4014
             ShowViewAsync<T>();
 #pragma warning restore CS4014
+        }
+
+        public async void ShowView<T>(UIViewBase hideView) where T : UIViewBase
+        {
+            await ShowViewAsync<T>();
+            UIDataInfo uiDataInfo = GetUIDataInfo<T>();
+            HideViewAsync(hideView);
         }
 
         public async UniTask<T> ShowViewAsync<T>() where T : UIViewBase
@@ -122,12 +131,20 @@ namespace MFramework.Runtime
 #pragma warning restore CS4014
         }
 
+        public async UniTask HideViewAsync(UIViewBase uIViewBase)
+        {
+            await HideViewAsync(m_DicUIDataInfos.GetValueOrDefault(uIViewBase.GetType()));
+        }
+
         public async UniTask HideViewAsync<T>() where T : UIViewBase
+        {
+            await HideViewAsync(GetUIDataInfo<T>());
+        }
+
+        private async UniTask HideViewAsync(UIDataInfo uiDataInfo)
         {
             try
             {
-                UIDataInfo uiDataInfo = GetUIDataInfo<T>();
-
                 if (uiDataInfo != null)
                 {
                     SetState(uiDataInfo.view, UIStateProgressType.HideStart);
@@ -144,6 +161,7 @@ namespace MFramework.Runtime
                 HandleUIError($"隐藏UI失败: {typeof(T).Name}", ex);
             }
         }
+
 
         public void RemoveView<T>() where T : UIViewBase
         {

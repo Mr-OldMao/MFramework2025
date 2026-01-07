@@ -8,8 +8,6 @@ using Random = UnityEngine.Random;
 
 namespace GameMain
 {
-
-
     public partial class GameMainLogic
     {
         public Transform RootNode { get; private set; }
@@ -26,7 +24,7 @@ namespace GameMain
         private int m_PoolIdBulletPlayer1;
         private int m_PoolIdBulletEnemy;
         public int PoolIdTankEnemy { get; private set; }
-        public int PoolIdPlayerEnemy { get; private set; }
+        public int PoolIdTankPlayer { get; private set; }
 
 
         private int m_CurTankID;
@@ -148,7 +146,11 @@ namespace GameMain
                     GameEntry.Event.DispatchEvent(GameEventType.EnemyTankGenerate, enemy);
                     Debugger.Log($"generate enemy tank {m_CurTankID}");
                 },
-                recycleObjCallback = (go) => Debug.Log("回收坦克 " + go),
+                recycleObjCallback = (go) =>
+                {
+                    Debug.Log("回收坦克 " + go);
+                    go.GetComponent<EnemyEntity>().RecycleTank();
+                },
                 preloadObjCallback = (go) =>
                 {
                     go.transform.SetParent(NodePoolTankEnemy);
@@ -175,13 +177,14 @@ namespace GameMain
                     int tankTypeID = Random.Range(101, 105);
                     Player1Entity = playerObj.GetOrAddComponent<PlayerEntity>();
                     Player1Entity.InitData(TankOwnerType.Player1, tankTypeID, ++m_CurTankID);
+                    GameEntry.UI.GetView<UIPanelBattle>().RefreshUI();
                     playerObj.name = "Player1" + m_CurTankID;
                     Debugger.Log($"generate player tank {m_CurTankID}");
                 },
                 recycleObjCallback = (go) =>
                 {
                     Debug.Log("回收坦克 " + go);
-                    Player1Entity.SubLife();
+                    go.GetComponent<PlayerEntity>().RecycleTank();
                 },
                 preloadObjCallback = (go) =>
                 {
@@ -191,10 +194,8 @@ namespace GameMain
                 initCount = 1,
                 maxCount = 1
             };
-            PoolIdPlayerEnemy = GameEntry.Pool.CreatPool(new Pool(tankPlayer1PoolDataInfo));
+            PoolIdTankPlayer = GameEntry.Pool.CreatPool(new Pool(tankPlayer1PoolDataInfo));
         }
-
-
 
         public GameObject GetPoolEffSmallBomb()
         {

@@ -15,10 +15,16 @@ namespace GameMain
             InitPlayerLife();
         }
 
+        public void RecycleTank()
+        {
+            SubLife();
+            IsCanMove = false;
+            m_IsCanFire = false;
+            entity.SetActive(false);
+        }
 
         protected override void InitBornAfter()
         {
-            MoveDirType = MoveDirType.Forward;
             ChangeTankType(TankTypeID);
             InitMove(new Vector2(entity.transform.localPosition.x, entity.transform.localPosition.z));
             InitFire();
@@ -86,14 +92,14 @@ namespace GameMain
             bool isCanRevive = remainLife >= 0;
             if (isCanRevive)
             {
-                GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdPlayerEnemy).GetEntity();
+                GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).GetEntity();
                 //await TankBorn(TankOwnerType);
             }
         }
 
         public void Dead()
         {
-            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdPlayerEnemy).RecycleEntity(entity);
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).RecycleEntity(entity);
             GameMainLogic.Instance.JudgeGameFail();
         }
         #endregion

@@ -1,8 +1,11 @@
 ﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using MFramework.Runtime.Extend;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -13,7 +16,7 @@ namespace GameMain
         private UIModelMap model;
         private UIPanelMap view;
 
-        private bool isGenerateMap = false;
+        //private bool isGenerateMap = false;
 
         private GameObject NodeMap;
         private GameObject NodePlayer;
@@ -23,10 +26,6 @@ namespace GameMain
 
         private Transform MapNode2D;
 
-
-        private int m_CurEnemyPlayerID;
-        private int m_CurEnemyEntityID;
-
         private FB_stage_stage m_StageData;
         public override async UniTask Init(IUIView view, IUIModel model)
         {
@@ -35,18 +34,49 @@ namespace GameMain
             view = (UIPanelMap)View;
             GameMainLogic.Instance = new GameMainLogic();
 
+            GameEntry.Event.RegisterEvent(GameEventType.GameStart, OnGameStart);
+            GameEntry.Event.RegisterEvent(GameEventType.GameSettlement, OnGameSettlement);
 
             await GameMainLogic.Instance.Init();
             await InitMapEntity();
+        }
+
+        private void OnGameStart()
+        {
+            GameMainLogic.Instance.GameStateType = GameStateType.GameRunning;
+            GeneragetPlayerTank();
+#pragma warning disable CS4014
+            AutoGeneragetEnemyTank(GameMainLogic.Instance.RemainEnemyTankNum);
+#pragma warning restore CS4014
         }
 
         private async UniTask InitMapEntity()
         {
             MapNode2D = GameObject.Find("MapNode2D").transform;
             MapNode2D.SetParent(GameMainLogic.Instance.RootNode);
-            await GenerateMapByStageID(GameMainLogic.Instance.StageID);
+            await GenerateMapFirstStage();
             Debugger.Log("InitMapEntity Completed ", LogType.Test);
         }
+
+        private void OnGameSettlement()
+        {
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).RecycleAllEntity();
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).RecycleAllEntity();
+        }
+
+
+        #region GenerateMap
+        public async UniTask GenerateMapNextStage()
+        {
+            await GenerateMapByStageID(++GameMainLogic.Instance.StageID);
+        }
+
+        public async UniTask GenerateMapFirstStage()
+        {
+            GameMainLogic.Instance.StageID = 1;
+            await GenerateMapByStageID(GameMainLogic.Instance.StageID);
+        }
+
 
         public async UniTask GenerateMapByStageID(int stageID)
         {
@@ -57,7 +87,7 @@ namespace GameMain
 
         public async UniTask GenerateMapByMapTypeID(int mapTypeID)
         {
-            if (isGenerateMap)
+            if (GameMainLogic.Instance.GameStateType == GameStateType.GameMapGenerating)
             {
                 return;
             }
@@ -65,52 +95,38 @@ namespace GameMain
             {
                 mapTypeID = 1;
             }
+            GameMainLogic.Instance.GameStateType = GameStateType.GameMapGenerating;
 
-            isGenerateMap = true;
             ((UIModelMap)Model).GenerateMapData(mapTypeID);
-
             ResetNodeContainer();
-
             m_StageData = DataTools.GetStageData(GameMainLogic.Instance.StageID);
             await GenerateMapEntityByDataAsync();
             await GenerateMapAirBorder();
-            GeneragetPlayerTank();
             await GameEntry.UI.ShowViewAsync<UIPanelBattle>();
+
+            GameMainLogic.Instance.GameStateType = GameStateType.GameMapGenerated;
+
+
             //await GeneragetFirstEnemyTank(1);
-
-            GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
-            GameEntry.Event.DispatchEvent(GameEventType.GameStart);
-
-            isGenerateMap = false;
-
-            GameMainLogic.Instance.GameStateType = GameStateType.GameRunning;
-
-#pragma warning disable CS4014
-            AutoGeneragetEnemyTank(GameMainLogic.Instance.RemainEnemyTankNum);
-#pragma warning restore CS4014
         }
+        #endregion
 
         private void GeneragetPlayerTank()
         {
-            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdPlayerEnemy).GetEntity();
-        }
-
-        private async UniTask GeneragetFirstEnemyTank(int count)
-        {
-            model = (UIModelMap)Model;
-            m_CurEnemyEntityID = 1000;
-            await AutoGeneragetEnemyTank(count);
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).GetEntity();
         }
 
         private async UniTask AutoGeneragetEnemyTank(int count)
         {
             var enemyTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas", false);
 
-
             for (int i = 0; i < count; i++)
             {
-                GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).GetEntity();
-                await UniTask.Delay(1000);
+                if (GameMainLogic.Instance.GameStateType == GameStateType.GameRunning)
+                {
+                    GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).GetEntity();
+                    await UniTask.Delay(1000);
+                }
             }
         }
 

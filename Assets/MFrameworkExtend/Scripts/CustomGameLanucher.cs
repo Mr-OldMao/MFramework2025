@@ -20,19 +20,21 @@ namespace GameMain
 
             await DataTools.Init();
 
-            await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
+            var uiPanelLoad = await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
+            uiPanelLoad.ShowLoadSlider();
 
             GameEntry.Scene.LoadSceneAsync(sceneName, LoadSceneMode.Single, (p) =>
             {
-                Debug.Log($"progress:{p}");
+                //Debug.Log($"progress:{p}");
                 GameEntry.UI.GetModel<UIModelLoad>().SetLoadingProgress(p);
             }, async () =>
             {
                 GameEntry.UI.GetModel<UIModelLoad>().SetLoadingProgress(1f);
                 await GameEntry.UI.ShowViewAsync<UIPanelMap>();
                 await GameEntry.UI.ShowViewAsync<UIPanelGM>();
-                GameEntry.UI.HideView<UIPanelLoad>();
-            },null,1f);
+                await GameEntry.UI.ShowViewAsync<UIPanelMenu>();
+                uiPanelLoad.HidePanel();
+            }, null, 1f);
         }
     }
 }

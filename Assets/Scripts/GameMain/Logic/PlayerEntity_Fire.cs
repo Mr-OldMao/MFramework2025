@@ -9,6 +9,7 @@ namespace GameMain
 
         public float m_BulletInterval;
         private bool m_IsCanFire;
+        private bool m_IsFiring;
         private float m_CurBulletTimer;
 
 
@@ -16,6 +17,7 @@ namespace GameMain
         {
             NodePosBullet = transform.Find<Transform>("NodePosBullet");
             m_IsCanFire = true;
+            m_IsFiring = false;
             m_CurBulletTimer = 0;
         }
 
@@ -26,12 +28,12 @@ namespace GameMain
 
         public void FireByKeyCode()
         {
-            if (!m_IsCanFire)
+            if (!m_IsFiring)
             {
                 m_CurBulletTimer += Time.deltaTime;
                 if (m_CurBulletTimer >= m_BulletInterval)
                 {
-                    m_IsCanFire = true;
+                    m_IsFiring = true;
                     m_CurBulletTimer = 0;
                 }
             }
@@ -42,21 +44,21 @@ namespace GameMain
             }
         }
 
-        public void FireByTouch( )
+        public void FireByTouch()
         {
             Fire();
         }
 
         private void Fire()
         {
-            if (m_IsCanFire)
+            if (m_IsCanFire && m_IsFiring)
             {
                 BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
                 bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(TankTypeID).BulletID, () =>
                 {
                     ResetFireState();
                 });
-                m_IsCanFire = false;
+                m_IsFiring = false;
             }
         }
 
@@ -66,7 +68,7 @@ namespace GameMain
             /// 碰撞后子弹重置最短时间
             /// </summary>
             float m_ResetBulletMinTimer = m_BulletInterval / 2;
-            if (!m_IsCanFire && m_CurBulletTimer < m_ResetBulletMinTimer)
+            if (!m_IsFiring && m_CurBulletTimer < m_ResetBulletMinTimer)
             {
                 m_CurBulletTimer = m_ResetBulletMinTimer;
             }

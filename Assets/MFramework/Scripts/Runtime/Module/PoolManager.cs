@@ -278,9 +278,9 @@ namespace MFramework.Runtime
 
         public void RecycleAllEntity()
         {
-            for (int i = 0; i < ListUsedObj.Count; i++)
+            while (ListUsedObj.Count > 0)
             {
-                Object obj = ListUsedObj[i];
+                Object obj = ListUsedObj[0];
                 ListUsedObj.Remove(obj);
                 ListFreeObj.Add(obj);
                 recycleObjCallback?.Invoke(obj);
