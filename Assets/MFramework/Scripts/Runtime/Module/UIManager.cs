@@ -106,7 +106,7 @@ namespace MFramework.Runtime
                     {
                         await newControl.Init(view, newModel);
                     }
-                    else 
+                    else
                     {
                         await view.Init();
                     }
@@ -153,12 +153,12 @@ namespace MFramework.Runtime
                 }
                 else
                 {
-                    Debugger.LogError($"隐藏UI面板失败，未创建初始化面板，viewType:{typeof(T)}");
+                    Debugger.LogError($"隐藏UI面板失败，未创建初始化面板，viewType:{uiDataInfo.GetType()}");
                 }
             }
             catch (Exception ex)
             {
-                HandleUIError($"隐藏UI失败: {typeof(T).Name}", ex);
+                HandleUIError($"隐藏UI失败: {uiDataInfo.GetType().Name}", ex);
             }
         }
 
@@ -364,7 +364,7 @@ namespace MFramework.Runtime
             var go = GameObject.Instantiate(prefab);
             var viewBaseScript = go.AddComponent<T>();
 
-            if (go.GetComponent<Canvas>() ==  null)
+            if (go.GetComponent<Canvas>() == null)
             {
                 go.AddComponent<Canvas>();
             }
