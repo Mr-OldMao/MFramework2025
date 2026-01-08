@@ -21,7 +21,8 @@ namespace GameMain
         [SerializeField]
         protected int HP;
         [SerializeField]
-        protected int TankTypeID;
+        protected int tankTypeID;
+        public int TankTypeID { get => tankTypeID; }
         [SerializeField]
         public bool IsCanMove;
 
@@ -38,18 +39,27 @@ namespace GameMain
         protected bool m_IsInvincible;
         private int m_InvincibleTimerID;
 
+        /// <summary>
+        /// 下次坦克生成是否继承之前的坦克属性（子弹等级等）
+        /// </summary>
+        public bool IsExtendBeforeDataNextGenerate;
+
         public async UniTask InitData(TankOwnerType tankOwnerType, int tankTypeID, int entityID)
         {
-            entity = this.gameObject;
+            if (entity == null)
+            {
+                entity = this.gameObject;
+                RectAnimTank = transform.Find<SpriteRenderer>("rectAnimTank");
+                m_AnimTank = transform.Find<Animator>("rectAnimTank");
+                m_AnimInvincible = transform.Find<Animator>("rectAnimInvincible");
+                m_AnimBorn = transform.Find<Animator>("rectAnimBorn");
+                m_Rigidbody = GetComponentInChildren<Rigidbody>();
+            }
+
             TankOwnerType = tankOwnerType;
-            TankTypeID = tankTypeID;
+            this.tankTypeID = tankTypeID;
             EntityID = entityID;
             HP = tankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).HP : DataTools.GetTankPlayer(tankTypeID).HP;
-            RectAnimTank = transform.Find<SpriteRenderer>("rectAnimTank");
-            m_AnimTank = transform.Find<Animator>("rectAnimTank");
-            m_AnimInvincible = transform.Find<Animator>("rectAnimInvincible");
-            m_AnimBorn = transform.Find<Animator>("rectAnimBorn");
-            m_Rigidbody = GetComponentInChildren<Rigidbody>();
             InitBornBefore();
             await TankBorn(tankOwnerType);
 
@@ -142,13 +152,13 @@ namespace GameMain
 
         protected void UpdateTankData(int tankTypeID)
         {
-            TankTypeID = tankTypeID;
+            this.tankTypeID = tankTypeID;
             UpdateTankAnim();
         }
 
         public void UpdateTankAnim()
         {
-            string animName = "move" + TankTypeID;
+            string animName = "move" + tankTypeID;
             m_AnimTank.Play(animName);
         }
         public void PauseMoveAnim(bool isPause)

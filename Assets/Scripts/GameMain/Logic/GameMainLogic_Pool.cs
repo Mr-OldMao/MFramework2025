@@ -166,18 +166,18 @@ namespace GameMain
             PoolDataInfo tankPlayer1PoolDataInfo = new PoolDataInfo
             {
                 templateObj = player1TankPrefab,
-                getObjCallback = (playerObj, b) =>
+                getObjCallback =  (playerObj, isNewObj) =>
                 {
-                    if (b)
+                    if (isNewObj)
                     {
                         playerObj.transform.SetParent(NodePoolPlayer1Enemy);
                         playerObj.GetOrAddComponent<PlayerEntity>();
                     }
-                    playerObj.gameObject.SetActive(true);
-                    int tankTypeID = Random.Range(101, 105);
+                    playerObj.SetActive(true);
+
                     Player1Entity = playerObj.GetOrAddComponent<PlayerEntity>();
+                    int tankTypeID = Player1Entity.IsExtendBeforeDataNextGenerate ? Player1Entity.TankTypeID : DataTools.GetConst("Player_Default_ID") ;
                     Player1Entity.InitData(TankOwnerType.Player1, tankTypeID, ++m_CurTankID);
-                    GameEntry.UI.GetView<UIPanelBattle>().RefreshUI();
                     playerObj.name = "Player1" + m_CurTankID;
                     Debugger.Log($"generate player tank {m_CurTankID}");
                 },

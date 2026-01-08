@@ -20,13 +20,13 @@ namespace GameMain
             IsAutoFire = false;
             IsCanMove = false;
             MoveTargetType =  EAIMoveTargetType.None;
-            entity.gameObject.SetActive(false);
+            entity.SetActive(false);
         }
 
         protected override void InitBornAfter()
         {
             MoveDirType = MoveDirType.Back;
-            m_TankEnemyData = DataTools.GetTankEnemy(TankTypeID);
+            m_TankEnemyData = DataTools.GetTankEnemy(tankTypeID);
 
             InitAIMove();
             InitFire();

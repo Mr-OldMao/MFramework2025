@@ -41,7 +41,7 @@ namespace GameMain
         private void RefreshPlayerLife()
         {
             txtLifePlayer1.text = GameMainLogic.Instance.Player1Entity != null ?
-                $"{Math.Max(GameMainLogic.Instance.Player1Entity.remainLife, 0)}" : string.Empty;
+                $"{Math.Max(GameMainLogic.Instance.Player1Entity.remainLife, 0)}" : DataTools.GetConst("Player_Tank_Life").ToString();
         }
 
         private void RefreshStage()
@@ -85,7 +85,7 @@ namespace GameMain
 
         protected override void UnRegisterEvent()
         {
-            btnFire.GetComponent<UIEvents>().RemoveListenerLongPressEvent();
+            btnFire?.GetComponent<UIEvents>()?.RemoveListenerLongPressEvent();
 
             GameEntry.Event.UnRegisterEvent(GameEventType.Player1TankDead);
             GameEntry.Event.UnRegisterEvent(GameEventType.EnemyTankDead);

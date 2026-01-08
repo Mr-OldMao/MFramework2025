@@ -15,10 +15,10 @@ namespace GameMain
         {
             Debugger.Log($"OnTankHit, id:{EntityID}, {this.gameObject.name} , remain HP:{HP}");
 
-            int nextID = DataTools.GetTankEnemy(TankTypeID).NextID;
+            int nextID = DataTools.GetTankEnemy(tankTypeID).NextID;
             UpdateTankData(nextID);
 
-            m_TankEnemyData = DataTools.GetTankEnemy(TankTypeID);
+            m_TankEnemyData = DataTools.GetTankEnemy(tankTypeID);
             moveSpeed = m_TankEnemyData.MoveSpeed;
             UpdateBulletInterval();
         }

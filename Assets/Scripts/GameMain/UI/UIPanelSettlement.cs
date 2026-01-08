@@ -105,8 +105,10 @@ namespace GameMain
                 case GameStateType.GameWin:
                     Debugger.LogError("即将进入加载页下一关卡");
                     await UniTask.Delay(2000);
+                    GameMainLogic.Instance.Player1Entity.IsExtendBeforeDataNextGenerate = true;
                     await GameEntry.UI.GetController<UIControlMap>().GenerateMapNextStage();
                     var UIPanelLoad = await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
+                    HidePanel();
                     UIPanelLoad.ShowLoadStage(() =>
                     {
                         GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
@@ -116,6 +118,9 @@ namespace GameMain
                     await UniTask.Delay(3000);
                     Debugger.LogError("游戏结束，结算完毕，准备返回菜单界面");
                     GameEntry.UI.ShowView<UIPanelMenu>(this);
+                    GameMainLogic.Instance.Player1Entity.IsInitLife = true;
+                    GameMainLogic.Instance.Player1Entity.IsExtendBeforeDataNextGenerate = false;
+                    GameMainLogic.Instance.Player1Entity.ResetTankData();
                     break;
             }
 

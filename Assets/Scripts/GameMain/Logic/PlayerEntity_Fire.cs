@@ -54,7 +54,7 @@ namespace GameMain
             if (m_IsCanFire && m_IsFiring)
             {
                 BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
-                bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(TankTypeID).BulletID, () =>
+                bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(tankTypeID).BulletID, () =>
                 {
                     ResetFireState();
                 });
