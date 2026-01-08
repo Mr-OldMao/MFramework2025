@@ -17,44 +17,46 @@ namespace GameMain
         private RectTransform rectNode2;
         private RectTransform rectNode3;
         private RectTransform rectNode4;
-        private RectTransform txtTotalScore;
+        private TextMeshProUGUI txtTotalScore;
         private RectTransform rectNode5;
         private RectTransform rectNodeKillEnemy1;
         private RectTransform rectP1Enemy1;
-        private RectTransform txtP1Score1;
-        private RectTransform txtP1KillTankCount1;
+        private TextMeshProUGUI txtP1Score1;
+        private TextMeshProUGUI txtP1KillTankCount1;
         private RectTransform rectP2Enemy1;
-        private RectTransform txtP2KillTankCount1;
-        private RectTransform txtP2Score1;
+        private TextMeshProUGUI txtP2KillTankCount1;
+        private TextMeshProUGUI txtP2Score1;
         private RectTransform rectNodeKillEnemy2;
         private RectTransform rectP1Enemy2;
-        private RectTransform txtP1Score2;
-        private RectTransform txtP1KillTankCount2;
+        private TextMeshProUGUI txtP1Score2;
+        private TextMeshProUGUI txtP1KillTankCount2;
         private RectTransform rectP2Enemy2;
-        private RectTransform txtP2KillTankCount2;
-        private RectTransform txtP2Score2;
+        private TextMeshProUGUI txtP2KillTankCount2;
+        private TextMeshProUGUI txtP2Score2;
         private RectTransform rectNodeKillEnemy3;
         private RectTransform rectP1Enemy3;
-        private RectTransform txtP1Score3;
-        private RectTransform txtP1KillTankCount3;
+        private TextMeshProUGUI txtP1Score3;
+        private TextMeshProUGUI txtP1KillTankCount3;
         private RectTransform rectP2Enemy3;
-        private RectTransform txtP2KillTankCount3;
-        private RectTransform txtP2Score3;
+        private TextMeshProUGUI txtP2KillTankCount3;
+        private TextMeshProUGUI txtP2Score3;
         private RectTransform rectNodeKillEnemy4;
         private RectTransform rectP1Enemy4;
-        private RectTransform txtP1Score4;
-        private RectTransform txtP1KillTankCount4;
+        private TextMeshProUGUI txtP1Score4;
+        private TextMeshProUGUI txtP1KillTankCount4;
         private RectTransform rectP2Enemy4;
-        private RectTransform txtP2KillTankCount4;
-        private RectTransform txtP2Score4;
+        private TextMeshProUGUI txtP2KillTankCount4;
+        private TextMeshProUGUI txtP2Score4;
         private RectTransform rectNode6;
         private RectTransform rectNode7;
         private RectTransform rectP1KillTotalCount;
-        private RectTransform txtP1KillTotalCount;
+        private TextMeshProUGUI txtP1KillTotalCount;
         private RectTransform rectP2KillTotalCount;
-        private RectTransform txtP2KillTotalCount;
+        private TextMeshProUGUI txtP2KillTotalCount;
 
         private Button btnClose;
+
+
 
         public override async UniTask Init()
         {
@@ -63,10 +65,38 @@ namespace GameMain
 
         public override void RefreshUI(IUIModel model = null)
         {
-            if (model is not null)
-            {
+            UIModelSettlement _model = Controller.Model as UIModelSettlement;
+            var dicplayer1KillData = _model.GetDicPlayer1KillData();
 
-            }
+            //TODO
+            int p1KillCountEnemy1 = dicplayer1KillData[201].KillCount + dicplayer1KillData[301].KillCount;
+            int p1KillCountEnemy2 = dicplayer1KillData[202].KillCount + dicplayer1KillData[302].KillCount;
+            int p1KillCountEnemy3 = 0;
+            int p1KillCountEnemy4 = dicplayer1KillData[203].KillCount + dicplayer1KillData[204].KillCount
+                + dicplayer1KillData[205].KillCount + dicplayer1KillData[303].KillCount;
+            int p1KillTotalCount = p1KillCountEnemy1 + p1KillCountEnemy2 + p1KillCountEnemy3 + p1KillCountEnemy4;
+
+            int p1KillScoreEnemy1 = dicplayer1KillData[201].KillScore + dicplayer1KillData[301].KillScore;
+            int p1KillScoreEnemy2 = dicplayer1KillData[202].KillScore + dicplayer1KillData[302].KillScore;
+            int p1KillScoreEnemy3 = 0;
+            int p1KillScoreEnemy4 = dicplayer1KillData[203].KillScore + dicplayer1KillData[204].KillScore
+                + dicplayer1KillData[205].KillScore + dicplayer1KillData[303].KillScore;
+            int p1KillTotalScore = p1KillScoreEnemy1 + p1KillScoreEnemy2 + p1KillScoreEnemy3 + p1KillScoreEnemy4;
+
+            txtP1KillTankCount1.text = $"{p1KillCountEnemy1}";
+            txtP1KillTankCount2.text = $"{p1KillCountEnemy2}";
+            txtP1KillTankCount3.text = $"{p1KillCountEnemy3}";
+            txtP1KillTankCount4.text = $"{p1KillCountEnemy4}";
+
+            txtP1Score1.text = $"{p1KillScoreEnemy1}";
+            txtP1Score2.text = $"{p1KillScoreEnemy2}";
+            txtP1Score3.text = $"{p1KillScoreEnemy3}";
+            txtP1Score4.text = $"{p1KillScoreEnemy4}";
+
+
+            txtTotalScore.text = $"{p1KillTotalCount}";
+            txtP1KillTotalCount.text = $"{p1KillTotalScore}";
+
         }
 
         public override async UniTask ShowPanel()
@@ -75,24 +105,16 @@ namespace GameMain
             GameStateType gameStateType = GameMainLogic.Instance.GameStateType;
             GameMainLogic.Instance.GameStateType = GameStateType.GameSettlement;
 
+            await RefreshUILayoutAsync();
 
+            await ProcessNextStage(gameStateType);
 
-            for (int i = 0; i < rectP2Enemy1.childCount; i++)
-            {
-                rectP2Enemy1.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
-                rectP2Enemy2.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
-                rectP2Enemy3.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
-                rectP2Enemy4.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
-            }
-            for (int i = 0; i < rectP2KillTotalCount.childCount; i++)
-            {
-                rectP2KillTotalCount.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
-            }
-            await UniTask.Delay(1);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rectGroup);
+            (Controller as UIControlSettlement).ResetScore();
+            //return UniTask.CompletedTask;
+        }
 
-            
-
+        private async UniTask ProcessNextStage(GameStateType gameStateType)
+        {
             switch (gameStateType)
             {
                 case GameStateType.Unstart:
@@ -123,8 +145,6 @@ namespace GameMain
                     GameMainLogic.Instance.Player1Entity.ResetTankData();
                     break;
             }
-
-            //return UniTask.CompletedTask;
         }
 
         public override UniTask HidePanel()
@@ -145,6 +165,23 @@ namespace GameMain
         protected override void UnRegisterEvent()
         {
             btnClose.onClick.RemoveAllListeners();
+        }
+
+        private async UniTask RefreshUILayoutAsync()
+        {
+            for (int i = 0; i < rectP2Enemy1.childCount; i++)
+            {
+                rectP2Enemy1.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
+                rectP2Enemy2.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
+                rectP2Enemy3.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
+                rectP2Enemy4.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
+            }
+            for (int i = 0; i < rectP2KillTotalCount.childCount; i++)
+            {
+                rectP2KillTotalCount.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
+            }
+            await UniTask.Delay(1);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectGroup);
         }
 
     }

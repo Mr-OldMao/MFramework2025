@@ -23,6 +23,8 @@ namespace GameMain
             var uiPanelLoad = await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
             uiPanelLoad.ShowLoadSlider();
 
+            GameEntry.UI.GetModel<UIModelSettlement>().InitData();
+
             GameEntry.Scene.LoadSceneAsync(sceneName, LoadSceneMode.Single, (p) =>
             {
                 //Debug.Log($"progress:{p}");

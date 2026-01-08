@@ -156,7 +156,11 @@ namespace GameMain
         {
             return dicTankEnemy.Values.Where(x => x.ID == id).FirstOrDefault();
         }
-         
+        public static Dictionary<int, FB_tank_enemy> GetTankEnemys()
+        {
+            return dicTankEnemy;
+        }
+
         public static FB_stage_stage GetStageData(int id)
         {
             return dicStageStage.Values.Where(x => x.ID == id).FirstOrDefault();

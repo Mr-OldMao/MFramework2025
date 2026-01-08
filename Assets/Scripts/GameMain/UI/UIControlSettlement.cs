@@ -10,5 +10,10 @@ namespace GameMain
             await base.Init(view, model);
         }
 
+
+        public void ResetScore()
+        {
+            (Model as UIModelSettlement).ResetScore();
+        }
     }
 }

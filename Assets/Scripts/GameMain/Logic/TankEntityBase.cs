@@ -136,6 +136,7 @@ namespace GameMain
                             break;
                         case TankOwnerType.Enemy:
                             GameEntry.Event.DispatchEvent(GameEventType.EnemyTankDead, entity);
+                            GameEntry.UI.GetModel<UIModelSettlement>().AddScore(tankTypeID, bulletEntity.tankOwnerType);
                             GameMainLogic.Instance.JudgeGameWin();
                             break;
                     }
