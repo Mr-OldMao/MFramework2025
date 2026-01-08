@@ -278,9 +278,9 @@ namespace MFramework.Runtime
 
         public void RecycleAllEntity()
         {
-            for (int i = 0; i < ListUsedObj.Count; i++)
+            while (ListUsedObj.Count > 0)
             {
-                Object obj = ListUsedObj[i];
+                Object obj = ListUsedObj[0];
                 ListUsedObj.Remove(obj);
                 ListFreeObj.Add(obj);
                 recycleObjCallback?.Invoke(obj);
@@ -291,6 +291,9 @@ namespace MFramework.Runtime
     public class PoolDataInfo
     {
         public Object templateObj;
+        /// <summary>
+        /// p1实体，p2是否为新生成的实体
+        /// </summary>
         public Action<GameObject, bool> getObjCallback;
         public Action<GameObject> recycleObjCallback;
         public Action<GameObject> preloadObjCallback;
