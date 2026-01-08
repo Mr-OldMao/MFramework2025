@@ -33,6 +33,13 @@ namespace MFramework.Runtime
 #pragma warning restore CS4014
         }
 
+        public async void ShowView<T>(UIViewBase hideView) where T : UIViewBase
+        {
+            await ShowViewAsync<T>();
+            UIDataInfo uiDataInfo = GetUIDataInfo<T>();
+            HideViewAsync(hideView);
+        }
+
         public async UniTask<T> ShowViewAsync<T>() where T : UIViewBase
         {
             try
@@ -97,7 +104,7 @@ namespace MFramework.Runtime
                     {
                         await newControl.Init(view, newModel);
                     }
-                    else 
+                    else
                     {
                         await view.Init();
                     }
@@ -122,12 +129,20 @@ namespace MFramework.Runtime
 #pragma warning restore CS4014
         }
 
+        public async UniTask HideViewAsync(UIViewBase uIViewBase)
+        {
+            await HideViewAsync(m_DicUIDataInfos.GetValueOrDefault(uIViewBase.GetType()));
+        }
+
         public async UniTask HideViewAsync<T>() where T : UIViewBase
+        {
+            await HideViewAsync(GetUIDataInfo<T>());
+        }
+
+        private async UniTask HideViewAsync(UIDataInfo uiDataInfo)
         {
             try
             {
-                UIDataInfo uiDataInfo = GetUIDataInfo<T>();
-
                 if (uiDataInfo != null)
                 {
                     SetState(uiDataInfo.view, UIStateProgressType.HideStart);
@@ -136,14 +151,15 @@ namespace MFramework.Runtime
                 }
                 else
                 {
-                    Debugger.LogError($"隐藏UI面板失败，未创建初始化面板，viewType:{typeof(T)}");
+                    Debugger.LogError($"隐藏UI面板失败，未创建初始化面板，viewType:{uiDataInfo.GetType()}");
                 }
             }
             catch (Exception ex)
             {
-                HandleUIError($"隐藏UI失败: {typeof(T).Name}", ex);
+                HandleUIError($"隐藏UI失败: {uiDataInfo.GetType().Name}", ex);
             }
         }
+
 
         public void RemoveView<T>() where T : UIViewBase
         {
@@ -346,7 +362,7 @@ namespace MFramework.Runtime
             var go = GameObject.Instantiate(prefab);
             var viewBaseScript = go.AddComponent<T>();
 
-            if (go.GetComponent<Canvas>() ==  null)
+            if (go.GetComponent<Canvas>() == null)
             {
                 go.AddComponent<Canvas>();
             }
