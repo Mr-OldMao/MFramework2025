@@ -16,6 +16,7 @@ namespace MFramework.Runtime
     {
         private Dictionary<UILayerType, Transform> m_LayerContainer = new Dictionary<UILayerType, Transform>();
         private Dictionary<Type, UIDataInfo> m_DicUIDataInfos = new Dictionary<Type, UIDataInfo>();
+        private Dictionary<Type, UIModelBase> m_DicTempModelInstance = new Dictionary<Type, UIModelBase>();
 
         public class UIDataInfo
         {
@@ -95,7 +96,17 @@ namespace MFramework.Runtime
                     else
                     {
                         newControl = Activator.CreateInstance(bindAttr.ControllerType) as UIControllerBase;
-                        newModel = Activator.CreateInstance(bindAttr.ModelType, newControl) as UIModelBase;
+                        if (m_DicTempModelInstance.ContainsKey(bindAttr.ModelType))
+                        {
+                            newModel = m_DicTempModelInstance[bindAttr.ModelType];
+                            newModel.Controller = newControl;
+                            m_DicTempModelInstance.Remove(bindAttr.ModelType);
+                        }
+                        else
+                        {
+                            newModel = Activator.CreateInstance(bindAttr.ModelType, newControl) as UIModelBase;
+                        }
+
                         view.Controller = newControl;
                         newUIDataInfo.control = newControl;
                         newUIDataInfo.model = newModel;
@@ -162,6 +173,16 @@ namespace MFramework.Runtime
             }
         }
 
+        private T InstanceModel<T>(IUIController Controller = null) where T : UIModelBase
+        {
+            if (!m_DicTempModelInstance.ContainsKey(typeof(T)))
+            {
+                var newModel = Activator.CreateInstance(typeof(T), Controller) as T;
+                newModel.Controller = Controller;
+                m_DicTempModelInstance.Add(typeof(T), newModel);
+            }
+            return m_DicTempModelInstance[typeof(T)] as T;
+        }
 
         public void RemoveView<T>() where T : UIViewBase
         {
@@ -200,15 +221,13 @@ namespace MFramework.Runtime
         }
 
         public T GetModel<T>() where T : UIModelBase
-        {
-            var dataInfo = m_DicUIDataInfos.Values.Where(p => p.model.GetType() == typeof(T)).FirstOrDefault();
-            return dataInfo?.model as T;
-        }
-
-        public UIModelBase GetModel(IUIModel uiModel)
-        {
-            var dataInfo = m_DicUIDataInfos.Values.Where(p => p.model == uiModel).FirstOrDefault();
-            return dataInfo?.model as UIModelBase;
+        { 
+            var dataInfo = m_DicUIDataInfos.Values.Where(p => p.model?.GetType() == typeof(T)).FirstOrDefault();
+            if (dataInfo != null)
+            {
+                return dataInfo.model as T;
+            }
+            return InstanceModel<T>();
         }
 
         public T GetController<T>() where T : UIControllerBase

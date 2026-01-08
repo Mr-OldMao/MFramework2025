@@ -12,7 +12,6 @@ public class TestUIManager : MonoBehaviour
         GameEntry.UI.GetController(new UIControlMain());
 
         GameEntry.UI.GetModel<UIModelMain>();
-        GameEntry.UI.GetModel(new UIModelMain(null));
 
         GameEntry.UI.ShowView<UIPanelMain>();
 
