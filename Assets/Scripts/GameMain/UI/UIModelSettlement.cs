@@ -15,6 +15,11 @@ namespace GameMain
             return m_DicPlayer1KillData;
         }
 
+        public Dictionary<int, KillDataInfo> GetDicPlayer2KillData()
+        {
+            return m_DicPlayer2KillData;
+        }
+
         public UIModelSettlement(IUIController controller) : base(controller)
         {
 
@@ -43,14 +48,14 @@ namespace GameMain
                     {
                         m_DicPlayer1KillData.Add(enemyTypeID, new KillDataInfo());
                     }
-                    m_DicPlayer1KillData[enemyTypeID].Kill(enemyTypeID);
+                    m_DicPlayer1KillData[enemyTypeID].Kill();
                     break;
                 case TankOwnerType.Player2:
                     if (!m_DicPlayer2KillData.ContainsKey(enemyTypeID))
                     {
                         m_DicPlayer2KillData.Add(enemyTypeID, new KillDataInfo());
                     }
-                    m_DicPlayer2KillData[enemyTypeID].Kill(enemyTypeID);
+                    m_DicPlayer2KillData[enemyTypeID].Kill();
                     break;
             }
         }
@@ -70,25 +75,15 @@ namespace GameMain
         public class KillDataInfo
         {
             public int KillCount { get; private set; }
-            public int KillScore { get; private set; }
 
-            public void Kill(int enemyTypeID)
+            public void Kill()
             {
                 KillCount++;
-                if (DataTools.GetTankEnemy(enemyTypeID).ByteBuffer != null)
-                {
-                    KillScore += DataTools.GetTankEnemy(enemyTypeID).Score;
-                }
-                else
-                {
-                    Debug.LogError("enemyTypeID:" + enemyTypeID + "不存在  ");
-                }
             }
 
             public void Reset()
             {
                 KillCount = 0;
-                KillScore = 0;
             }
         }
     }

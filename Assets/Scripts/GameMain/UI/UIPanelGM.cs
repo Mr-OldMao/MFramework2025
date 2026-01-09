@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace GameMain
 {
     //[UIBind(typeof(UIControlGM), typeof(UIModelGM))]
-    [UILayer(UILayerType.Normal)]
+    [UILayer(UILayerType.Background)]
     public class UIPanelGM : UIViewBase
     {
         // UI字段

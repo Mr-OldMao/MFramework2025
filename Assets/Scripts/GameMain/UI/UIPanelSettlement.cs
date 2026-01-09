@@ -3,6 +3,8 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GameMain
 {
@@ -56,19 +58,22 @@ namespace GameMain
 
         private Button btnClose;
 
-
+        private GameStateType CurGameStateType;
 
         public override async UniTask Init()
         {
             await base.Init();
         }
 
-        public override void RefreshUI(IUIModel model = null)
+        public override async void RefreshUI(IUIModel model = null)
         {
             UIModelSettlement _model = Controller.Model as UIModelSettlement;
-            var dicplayer1KillData = _model.GetDicPlayer1KillData();
+
+            btnClose.gameObject.SetActive(false);
 
             //TODO
+            //P1
+            var dicplayer1KillData = _model.GetDicPlayer1KillData();
             int p1KillCountEnemy1 = dicplayer1KillData[201].KillCount + dicplayer1KillData[301].KillCount;
             int p1KillCountEnemy2 = dicplayer1KillData[202].KillCount + dicplayer1KillData[302].KillCount;
             int p1KillCountEnemy3 = 0;
@@ -76,57 +81,89 @@ namespace GameMain
                 + dicplayer1KillData[205].KillCount + dicplayer1KillData[303].KillCount;
             int p1KillTotalCount = p1KillCountEnemy1 + p1KillCountEnemy2 + p1KillCountEnemy3 + p1KillCountEnemy4;
 
-            int p1KillScoreEnemy1 = dicplayer1KillData[201].KillScore + dicplayer1KillData[301].KillScore;
-            int p1KillScoreEnemy2 = dicplayer1KillData[202].KillScore + dicplayer1KillData[302].KillScore;
-            int p1KillScoreEnemy3 = 0;
-            int p1KillScoreEnemy4 = dicplayer1KillData[203].KillScore + dicplayer1KillData[204].KillScore
-                + dicplayer1KillData[205].KillScore + dicplayer1KillData[303].KillScore;
-            int p1KillTotalScore = p1KillScoreEnemy1 + p1KillScoreEnemy2 + p1KillScoreEnemy3 + p1KillScoreEnemy4;
-
-            txtP1KillTankCount1.text = $"{p1KillCountEnemy1}";
-            txtP1KillTankCount2.text = $"{p1KillCountEnemy2}";
-            txtP1KillTankCount3.text = $"{p1KillCountEnemy3}";
-            txtP1KillTankCount4.text = $"{p1KillCountEnemy4}";
-
-            txtP1Score1.text = $"{p1KillScoreEnemy1}";
-            txtP1Score2.text = $"{p1KillScoreEnemy2}";
-            txtP1Score3.text = $"{p1KillScoreEnemy3}";
-            txtP1Score4.text = $"{p1KillScoreEnemy4}";
-
+            txtP1KillTankCount1.text = string.Empty;
+            txtP1KillTankCount2.text = string.Empty;
+            txtP1KillTankCount3.text = string.Empty;
+            txtP1KillTankCount4.text = string.Empty;
+            txtP1Score1.text = string.Empty;
+            txtP1Score2.text = string.Empty;
+            txtP1Score3.text = string.Empty;
+            txtP1Score4.text = string.Empty;
+            txtP1KillTotalCount.text = string.Empty;
 
             txtTotalScore.text = $"{p1KillTotalCount}";
-            txtP1KillTotalCount.text = $"{p1KillTotalScore}";
+            int score1 = await DalayShowTxt(p1KillCountEnemy1, DataTools.GetTankEnemy(201).Score, txtP1KillTankCount1, txtP1Score1);
+            await UniTask.Delay(500);
+            int score2 = await DalayShowTxt(p1KillCountEnemy2, DataTools.GetTankEnemy(202).Score, txtP1KillTankCount2, txtP1Score2);
+            await UniTask.Delay(500);
+            int score3 = await DalayShowTxt(p1KillCountEnemy3, DataTools.GetTankEnemy(201).Score, txtP1KillTankCount3, txtP1Score3);
+            await UniTask.Delay(500);
+            int score4 = await DalayShowTxt(p1KillCountEnemy4, DataTools.GetTankEnemy(203).Score, txtP1KillTankCount4, txtP1Score4);
+            await UniTask.Delay(500);
+            txtP1KillTotalCount.text = $"{(score1 + score2 + score3 + score4)}";
 
+            if (GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi)
+            {
+                //P2
+                var dicplayer2KillData = _model.GetDicPlayer1KillData();
+                int p2KillCountEnemy1 = dicplayer2KillData[201].KillCount + dicplayer2KillData[301].KillCount;
+                int p2KillCountEnemy2 = dicplayer2KillData[202].KillCount + dicplayer2KillData[302].KillCount;
+                int p2KillCountEnemy3 = 0;
+                int p2KillCountEnemy4 = dicplayer2KillData[203].KillCount + dicplayer2KillData[204].KillCount
+                    + dicplayer2KillData[205].KillCount + dicplayer2KillData[303].KillCount;
+                int p2KillTotalCount = p1KillCountEnemy1 + p1KillCountEnemy2 + p1KillCountEnemy3 + p1KillCountEnemy4;
+
+                txtP2KillTankCount1.text = string.Empty;
+                txtP2KillTankCount2.text = string.Empty;
+                txtP2KillTankCount3.text = string.Empty;
+                txtP2KillTankCount4.text = string.Empty;
+                txtP2Score1.text = string.Empty;
+                txtP2Score2.text = string.Empty;
+                txtP2Score3.text = string.Empty;
+                txtP2Score4.text = string.Empty;
+                txtP2KillTotalCount.text = string.Empty;
+
+                txtTotalScore.text = $"{p2KillTotalCount}";
+                 score1 = await DalayShowTxt(p2KillCountEnemy1, DataTools.GetTankEnemy(201).Score, txtP2KillTankCount1, txtP2Score1);
+                await UniTask.Delay(500);
+                 score2 = await DalayShowTxt(p2KillCountEnemy2, DataTools.GetTankEnemy(202).Score, txtP2KillTankCount2, txtP2Score2);
+                await UniTask.Delay(500);
+                 score3 = await DalayShowTxt(p2KillCountEnemy3, DataTools.GetTankEnemy(201).Score, txtP2KillTankCount3, txtP2Score3);
+                await UniTask.Delay(500);
+                 score4 = await DalayShowTxt(p2KillCountEnemy4, DataTools.GetTankEnemy(203).Score, txtP2KillTankCount4, txtP2Score4);
+                await UniTask.Delay(500);
+                txtP2KillTotalCount.text = $"{(score1 + score2 + score3 + score4)}";
+            }
+
+            btnClose.gameObject.SetActive(true);
         }
 
         public override async UniTask ShowPanel()
         {
             base.ShowPanel();
-            GameStateType gameStateType = GameMainLogic.Instance.GameStateType;
+            CurGameStateType = GameMainLogic.Instance.GameStateType;
             GameMainLogic.Instance.GameStateType = GameStateType.GameSettlement;
 
             await RefreshUILayoutAsync();
-
-            await ProcessNextStage(gameStateType);
 
             (Controller as UIControlSettlement).ResetScore();
             //return UniTask.CompletedTask;
         }
 
-        private async UniTask ProcessNextStage(GameStateType gameStateType)
+        private async UniTask ProcessNextStage()
         {
-            switch (gameStateType)
+            switch (CurGameStateType)
             {
                 case GameStateType.Unstart:
                 case GameStateType.GameStart:
                 case GameStateType.GameRunning:
                 case GameStateType.GamePause:
                 case GameStateType.GameSettlement:
-                    Debugger.LogError("游戏状态异常，gameStateType：" + gameStateType);
+                    Debugger.LogError("游戏状态异常，gameStateType：" + CurGameStateType);
                     break;
                 case GameStateType.GameWin:
                     Debugger.LogError("即将进入加载页下一关卡");
-                    await UniTask.Delay(2000);
+                    //await UniTask.Delay(2000);
                     GameMainLogic.Instance.Player1Entity.IsExtendBeforeDataNextGenerate = true;
                     await GameEntry.UI.GetController<UIControlMap>().GenerateMapNextStage();
                     var UIPanelLoad = await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
@@ -137,7 +174,7 @@ namespace GameMain
                     });
                     break;
                 case GameStateType.GameFail:
-                    await UniTask.Delay(3000);
+                    //await UniTask.Delay(3000);
                     Debugger.LogError("游戏结束，结算完毕，准备返回菜单界面");
                     GameEntry.UI.ShowView<UIPanelMenu>(this);
                     GameMainLogic.Instance.Player1Entity.IsInitLife = true;
@@ -155,8 +192,10 @@ namespace GameMain
 
         protected override void RegisterEvent()
         {
-            btnClose.onClick.AddListener(() =>
+            btnClose.onClick.AddListener(async () =>
             {
+                await ProcessNextStage();
+
                 GameEntry.UI.ShowView<UIPanelLoad>();
                 HidePanel();
             });
@@ -184,5 +223,25 @@ namespace GameMain
             LayoutRebuilder.ForceRebuildLayoutImmediate(rectGroup);
         }
 
+
+        private async UniTask<int> DalayShowTxt(int num, int score, TextMeshProUGUI txtCount, TextMeshProUGUI txtScore,int delayFrame = 300)
+        {
+            if (num == 0)
+            {
+                txtCount.text = $"0";
+                txtScore.text = $"0";
+                await UniTask.Delay(delayFrame);
+            }
+            else
+            {
+                for (int i = 0; i < num; i++)
+                {
+                    txtCount.text = $"{i + 1}";
+                    txtScore.text = $"{(i + 1) * score}";
+                    await UniTask.Delay(delayFrame);
+                }
+            }
+            return num * score;
+        }
     }
 }
