@@ -3,8 +3,6 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameMain
 {
