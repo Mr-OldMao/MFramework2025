@@ -38,5 +38,15 @@ namespace GameMain
             AIMoveUpdate();
             AutoFireUpdate();
         }
+
+        public override void GameWinEvent()
+        {
+            
+        }
+
+        public override void GameFailEvent()
+        {
+
+        }
     }
 }

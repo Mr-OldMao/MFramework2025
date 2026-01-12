@@ -99,7 +99,7 @@ namespace GameMain
         }
 
 
-        public async UniTask OnTriggerEnter(Collider other)
+        public async void OnTriggerEnter(Collider other)
         {
             //Debug.Log($"OnTriggerEnter : {other.name}");
 
@@ -127,10 +127,12 @@ namespace GameMain
                         if (isDead)
                         {
                             HintSelf(BulletCollisionType.TankDead, tankEntityBase.RectAnimTank.transform.position);
+                            GameEntry.Audio.PlaySound(tankEntityBase.TankOwnerType == TankOwnerType.Enemy ? "explosion_enemy.ogg" : "explosion_player.ogg");
                         }
                         else
                         {
                             HintSelf(BulletCollisionType.TankHit);
+                            GameEntry.Audio.PlaySound("bullet_hit_border.ogg");
                         }
                     });
                 }
@@ -145,7 +147,6 @@ namespace GameMain
                     case EMapEntityType.Grass:
                     case EMapEntityType.Water:
                     case EMapEntityType.Snow:
-
                         break;
                     case EMapEntityType.Wall:
                     case EMapEntityType.Wall_LU:

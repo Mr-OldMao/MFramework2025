@@ -22,6 +22,9 @@ namespace GameMain
 
 
         private ETCJoystick joystick;
+
+        private bool m_InputTypeKeyword;
+        private bool m_InputTypeTouch;
         private void InitMove(Vector2 gridPos)
         {
             MoveDirType = MoveDirType.Forward;
@@ -49,9 +52,19 @@ namespace GameMain
         {
             if (IsCanMove)
             {
-                MovePC();
+                if (!m_InputTypeTouch)
+                {
+                    MovePC();
+                }
+                if (!m_InputTypeKeyword)
+                {
+                    MoveTouch();
+                }
+            }
 
-                MoveTouch();
+            if (IsCanMove)
+            {
+                GameEntry.Audio.PlayBGM(IsMoving ? "engineMoving.mp3" : "engineIdle.aif", 0.2f);
             }
         }
 
@@ -62,29 +75,27 @@ namespace GameMain
 
         private void MovePC()
         {
+            IsMoving = Input.GetKey(KeyCode.W)
+               || Input.GetKey(KeyCode.S)
+               || Input.GetKey(KeyCode.A)
+               || Input.GetKey(KeyCode.D);
+            m_InputTypeKeyword = IsMoving;
+
             if (Input.GetKey(KeyCode.W))
             {
                 Move(MoveDirType.Forward);
-                IsMoving = true;
             }
             else if (Input.GetKey(KeyCode.S))
             {
                 Move(MoveDirType.Back);
-                IsMoving = true;
             }
             else if (Input.GetKey(KeyCode.A))
             {
                 Move(MoveDirType.Left);
-                IsMoving = true;
             }
             else if (Input.GetKey(KeyCode.D))
             {
                 Move(MoveDirType.Right);
-                IsMoving = true;
-            }
-            else
-            {
-                IsMoving = false;
             }
         }
 
@@ -123,33 +134,28 @@ namespace GameMain
         {
             if (joystick != null)
             {
+                IsMoving = joystick.axisY.axisValue != 0 || joystick.axisX.axisValue != 0;
+                m_InputTypeTouch = IsMoving;
+
                 if (joystick.axisY.axisValue != 0 && joystick.axisX.axisValue != 0)
                 {
                     bool isForward = Math.Abs(joystick.axisY.axisValue) > Math.Abs(joystick.axisX.axisValue);
                     if (isForward)
                     {
                         Move(joystick.axisY.axisValue > 0 ? MoveDirType.Forward : MoveDirType.Back);
-                        IsMoving = true;
                     }
                     else
                     {
                         Move(joystick.axisX.axisValue > 0 ? MoveDirType.Right : MoveDirType.Left);
-                        IsMoving = true;
                     }
                 }
                 else if (joystick.axisY.axisValue != 0)
                 {
                     Move(joystick.axisY.axisValue > 0 ? MoveDirType.Forward : MoveDirType.Back);
-                    IsMoving = true;
                 }
                 else if (joystick.axisX.axisValue != 0)
                 {
                     Move(joystick.axisX.axisValue > 0 ? MoveDirType.Right : MoveDirType.Left);
-                    IsMoving = true;
-                }
-                else
-                {
-                    IsMoving = false;
                 }
             }
         }

@@ -67,6 +67,7 @@ namespace GameMain
             {
                 ResetFireState();
             });
+            //GameEntry.Audio.PlaySound("fire.ogg");
         }
 
         private void SetNextFireBulletCountdown()

@@ -23,7 +23,6 @@ namespace GameMain
         [SerializeField]
         protected int tankTypeID;
         public int TankTypeID { get => tankTypeID; }
-        [SerializeField]
         public bool IsCanMove;
 
         protected ETankState eTankState;
@@ -66,6 +65,10 @@ namespace GameMain
             UpdateTankAnim();
             InitBornAfter();
         }
+
+        public abstract void GameWinEvent();
+        public abstract void GameFailEvent();
+
         protected abstract void InitBornBefore();
 
         protected abstract void InitBornAfter();
@@ -125,6 +128,7 @@ namespace GameMain
                 {
                     eTankState = ETankState.Dead;
                     tankDeadCallback?.Invoke(true);
+                    //IsCanMove = false;
                     OnTankDead();
                     switch (TankOwnerType)
                     {
@@ -137,7 +141,11 @@ namespace GameMain
                         case TankOwnerType.Enemy:
                             GameEntry.Event.DispatchEvent(GameEventType.EnemyTankDead, entity);
                             GameEntry.UI.GetModel<UIModelSettlement>().AddScore(tankTypeID, bulletEntity.tankOwnerType);
-                            GameMainLogic.Instance.JudgeGameWin();
+                            if (GameMainLogic.Instance.RemainEnemyTankNum == 0 && GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).UsedCount == 0)
+                            {
+                                GameMainLogic.Instance.GameStateType = GameStateType.GameWin;
+                            }
+                            //GameMainLogic.Instance.TryJudgeGameWin();
                             break;
                     }
                 }

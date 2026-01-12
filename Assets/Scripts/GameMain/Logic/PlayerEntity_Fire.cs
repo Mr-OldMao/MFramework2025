@@ -59,6 +59,7 @@ namespace GameMain
                     ResetFireState();
                 });
                 m_IsFiring = false;
+                GameEntry.Audio.PlaySound("fire.ogg");
             }
         }
 

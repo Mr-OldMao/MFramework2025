@@ -1,4 +1,5 @@
 
+using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace GameMain
         public bool IsGameFail { get; private set; } = false;
 
         private GameStateType m_GameStateType = GameStateType.Unstart;
-        public GameStateType GameStateType 
+        public GameStateType GameStateType
         {
             get
             {
@@ -57,31 +58,21 @@ namespace GameMain
             }
         }
 
-        public bool JudgeGameWin()
+        private void InitRegisterEvent()
         {
-            IsGameWin = RemainEnemyTankNum == 0 && GameEntry.Pool.GetPool(PoolIdTankEnemy).UsedCount == 0;
-            if (IsGameWin)
-            {
-                Debugger.LogError("游戏结束-胜利");
-                GameStateType = GameStateType.GameWin;
-
-                GameEntry.UI.ShowViewAsync<UIPanelSettlement>();
-            }
-            return IsGameWin;
-        }
-
-        public async Task<bool> JudgeGameFail()
-        {
-            IsGameFail = Player1Entity.remainLife < 0;
-            if (IsGameFail)
+            GameEntry.Event.RegisterEvent(GameEventType.GameFail, async () =>
             {
                 Debugger.LogError("游戏结束-失败");
-                GameStateType = GameStateType.GameFail;
-
                 var UIPanelGameOverPanel = await GameEntry.UI.ShowViewAsync<UIPanelGameOver>();
                 UIPanelGameOverPanel.ShowPanelPop();
-            }
-            return IsGameFail;
+            });
+
+            GameEntry.Event.RegisterEvent(GameEventType.GameWin, async () =>
+            {
+                Debugger.LogError("游戏结束-胜利");
+                await UniTask.Delay(2000);
+                GameEntry.UI.ShowViewAsync<UIPanelSettlement>();
+            });
         }
     }
 

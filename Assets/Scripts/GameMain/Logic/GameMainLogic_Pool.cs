@@ -133,7 +133,15 @@ namespace GameMain
                     if (b)
                     {
                         enemy.transform.SetParent(NodePoolTankEnemy);
-                        enemy.GetOrAddComponent<EnemyEntity>();
+                        var enemyEntity = enemy.GetOrAddComponent<EnemyEntity>();
+                        GameEntry.Event.RegisterEvent(GameEventType.GameWin, () =>
+                        {
+                            enemyEntity.GameWinEvent();
+                        });
+                        GameEntry.Event.RegisterEvent(GameEventType.GameFail, () =>
+                        {
+                            enemyEntity.GameFailEvent();
+                        });
                     }
                     enemy.gameObject.SetActive(true);
                     bool isRedTank = Random.Range(0f, 1f) > 0.7f;
@@ -166,17 +174,25 @@ namespace GameMain
             PoolDataInfo tankPlayer1PoolDataInfo = new PoolDataInfo
             {
                 templateObj = player1TankPrefab,
-                getObjCallback =  (playerObj, isNewObj) =>
+                getObjCallback = (playerObj, isNewObj) =>
                 {
                     if (isNewObj)
                     {
                         playerObj.transform.SetParent(NodePoolPlayer1Enemy);
-                        playerObj.GetOrAddComponent<PlayerEntity>();
+                        var playerEntity = playerObj.GetOrAddComponent<PlayerEntity>();
+                        GameEntry.Event.RegisterEvent(GameEventType.GameWin, () =>
+                        {
+                            playerEntity.GameWinEvent();
+                        });
+                        GameEntry.Event.RegisterEvent(GameEventType.GameFail, () =>
+                        {
+                            playerEntity.GameFailEvent();
+                        });
                     }
                     playerObj.SetActive(true);
 
                     Player1Entity = playerObj.GetOrAddComponent<PlayerEntity>();
-                    int tankTypeID = Player1Entity.IsExtendBeforeDataNextGenerate ? Player1Entity.TankTypeID : DataTools.GetConst("Player_Default_ID") ;
+                    int tankTypeID = Player1Entity.IsExtendBeforeDataNextGenerate ? Player1Entity.TankTypeID : DataTools.GetConst("Player_Default_ID");
                     Player1Entity.InitData(TankOwnerType.Player1, tankTypeID, ++m_CurTankID);
                     playerObj.name = "Player1" + m_CurTankID;
                     Debugger.Log($"generate player tank {m_CurTankID}");

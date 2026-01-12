@@ -68,6 +68,7 @@ namespace GameMain
                 callback?.Invoke();
                 HidePanel();
             });
+            GameEntry.Audio.PlaySound("gamestart.ogg");
         }
 
 

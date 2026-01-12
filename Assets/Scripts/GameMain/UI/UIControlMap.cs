@@ -3,6 +3,7 @@ using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using MFramework.Runtime.Extend;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -146,6 +147,7 @@ namespace GameMain
                 if (!string.IsNullOrEmpty(assetPath))
                 {
                     var go = await GameEntry.Resource.InstantiateAsset(assetPath, false);
+                    go.GetOrAddComponent<MapEntity>().SetMapEntityType(EMapEntityType.AirBorder);
                     go.transform.SetParent(NodeBorder.transform);
                     go.transform.localPosition = new Vector3(borderPos[i].x, 0, borderPos[i].y);
                 }

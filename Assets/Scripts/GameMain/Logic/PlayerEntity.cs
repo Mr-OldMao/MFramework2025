@@ -67,6 +67,7 @@ namespace GameMain
         public void AddLevel(int addNum = 1)
         {
             int id = tankTypeID + addNum;
+            GameEntry.Audio.PlaySound("prop_award.ogg");
             ChangeTankType(id);
         }
         public void SubLevel(int subNum = 1)
@@ -111,7 +112,12 @@ namespace GameMain
         {
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).RecycleEntity(entity);
             IsExtendBeforeDataNextGenerate = false;
-            GameMainLogic.Instance.JudgeGameFail();
+            //GameMainLogic.Instance.TryJudgeGameFail();
+
+            if (remainLife < 0)
+            {
+                GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
+            }
         }
         #endregion
     }

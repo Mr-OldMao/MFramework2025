@@ -85,7 +85,10 @@ namespace GameMain
 
         protected override void UnRegisterEvent()
         {
-            btnFire?.GetComponent<UIEvents>()?.RemoveListenerLongPressEvent();
+            if (btnFire != null)
+            {
+                btnFire.GetComponent<UIEvents>()?.RemoveListenerLongPressEvent();
+            }
 
             GameEntry.Event.UnRegisterEvent(GameEventType.Player1TankDead);
             GameEntry.Event.UnRegisterEvent(GameEventType.EnemyTankDead);

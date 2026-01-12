@@ -5,6 +5,8 @@ namespace GameMain
 {
     public  class UIControlSettlement : UIControllerBase
     {
+        public GameStateType CurGameStateType{ get; set; }
+
         public override async UniTask Init(IUIView view, IUIModel model)
         {
             await base.Init(view, model);

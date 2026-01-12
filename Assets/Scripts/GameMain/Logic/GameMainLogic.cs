@@ -1,8 +1,5 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.AI.Navigation;
-using UnityEditor.SceneManagement;
+using MFramework.Runtime;
 using UnityEngine;
 
 namespace GameMain
@@ -15,6 +12,7 @@ namespace GameMain
 
         public async UniTask Init()
         {
+            InitRegisterEvent();
             await InitPool();
         }
 
@@ -22,6 +20,8 @@ namespace GameMain
         {
             Debug.Log("GameParse");
             Time.timeScale = Time.timeScale == 0 ? 1 : 0;
+            GameEntry.Audio.PlaySound("pause.ogg");
+            GameEntry.Audio.StopBGM();
         }
     }
 }

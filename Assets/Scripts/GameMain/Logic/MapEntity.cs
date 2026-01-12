@@ -1,3 +1,4 @@
+using MFramework.Runtime;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -38,14 +39,22 @@ namespace GameMain
                     case EMapEntityType.Grass:
                     case EMapEntityType.Water:
                     case EMapEntityType.Snow:
+                        break;
                     case EMapEntityType.AirBorder:
-
+                        if (bulletEntity.tankOwnerType == TankOwnerType.Player1 || bulletEntity.tankOwnerType == TankOwnerType.Player2)
+                        {
+                            GameEntry.Audio.PlaySound("bullet_hit_border.ogg");
+                        }
                         break;
                     case EMapEntityType.Wall:
                     case EMapEntityType.Wall_LU:
                     case EMapEntityType.Wall_LD:
                     case EMapEntityType.Wall_RU:
                     case EMapEntityType.Wall_RD:
+                        if (bulletEntity.tankOwnerType == TankOwnerType.Player1 || bulletEntity.tankOwnerType == TankOwnerType.Player2)
+                        {
+                            GameEntry.Audio.PlaySound("bullet_hit_wall.ogg");
+                        }
                         Destroy(subEntity);
                         break;
                     case EMapEntityType.Stone:
@@ -53,14 +62,19 @@ namespace GameMain
                     case EMapEntityType.Stone_LD:
                     case EMapEntityType.Stone_RU:
                     case EMapEntityType.Stone_RD:
+                        if (bulletEntity.tankOwnerType == TankOwnerType.Player1 || bulletEntity.tankOwnerType == TankOwnerType.Player2)
+                        {
+                            GameEntry.Audio.PlaySound("bullet_hit_border.ogg");
+                        }
                         if (bulletEntity.BulletData.IsCanStone)
                         {
                             Destroy(subEntity);
                         }
                         break;
-
                     case EMapEntityType.Brid:
                         Debug.Log("GameOver Brid");
+                        SetBridDeadSprite();
+                        GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
                         break;
                     case EMapEntityType.DeadBrid:
                         Debug.Log("GameOver DeadBrid");
@@ -68,6 +82,14 @@ namespace GameMain
                 }
                 
             }
+        }
+
+        private void SetBridDeadSprite()
+        {
+            mapEntityType = EMapEntityType.DeadBrid;
+            transform.GetChild(0).gameObject.SetActive(false);
+            transform.GetChild(1).gameObject.SetActive(true);
+            GameEntry.Audio.PlaySound("explosion_bird.ogg");
         }
     }
 }

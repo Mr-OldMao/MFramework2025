@@ -51,11 +51,6 @@ namespace GameMain
         {
             Debugger.Log("UIPanelGM RegisterEvent");
 
-            GameEntry.Event.RegisterEvent(GameEventType.GameStart, () =>
-            {
-
-            });
-
             btnRegenerateMap.onClick.AddListener(() =>
             {
                 if (int.TryParse(inputTxtMapTypeID.text, out int mapTypeID))
