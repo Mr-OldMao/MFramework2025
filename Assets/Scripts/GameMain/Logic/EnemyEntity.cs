@@ -23,6 +23,29 @@ namespace GameMain
             entity.SetActive(false);
         }
 
+        public void InitRegisterEvents()
+        {
+            GameEntry.Event.RegisterEvent(GameEventType.GameWin, () =>
+            {
+                GameWinEvent();
+            });
+            GameEntry.Event.RegisterEvent(GameEventType.GameFail, () =>
+            {
+                GameFailEvent();
+            });
+            GameEntry.Event.RegisterEvent<TankOwnerType>(GameEventType.ClearAllEnemy, (TankOwnerType tankOwnerType) =>
+            {
+                if (eTankState != ETankState.Dead && !IsUnbastable)
+                {
+                    OnTankDead(tankOwnerType, true);
+                }
+            });
+            GameEntry.Event.RegisterEvent<float>(GameEventType.StopAllEnemyMove, (timer) =>
+            {
+                m_ForgeNotMoveTimer += timer;
+            });
+        }
+
         protected override void InitBornAfter()
         {
             MoveDirType = MoveDirType.Back;

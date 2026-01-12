@@ -74,7 +74,10 @@ namespace GameMain
                     case EMapEntityType.Brid:
                         Debug.Log("GameOver Brid");
                         SetBridDeadSprite();
-                        GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
+                        if (GameMainLogic.Instance.GameStateType != GameStateType.GameFail)
+                        {
+                            GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
+                        }
                         break;
                     case EMapEntityType.DeadBrid:
                         Debug.Log("GameOver DeadBrid");

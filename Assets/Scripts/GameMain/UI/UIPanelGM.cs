@@ -18,6 +18,11 @@ namespace GameMain
         private Button btnTankLevelSub;
         private Button btnGenerateEntmyTank;
         private Button btnGameParse;
+        private Button btnClearAllEnemy;
+        private Button btnAddLife;
+        private Button btnChangeBridWall;
+        private Button btnStopAllEnemyMove;
+        private Button btnPlayerUnbeatable;
 
 
         private PlayerEntity PlayerEntity;
@@ -83,6 +88,33 @@ namespace GameMain
             btnGameParse.onClick.AddListener(() =>
             {
                 GameMainLogic.Instance.GameParse();
+            });
+
+            btnClearAllEnemy.onClick.AddListener(() =>
+            {
+                GameEntry.Event.DispatchEvent<TankOwnerType>(GameEventType.ClearAllEnemy, TankOwnerType.Player1);
+                GameEntry.Audio.PlaySound("explosion_enemy.ogg");
+            });
+
+            btnAddLife.onClick.AddListener(() =>
+            {
+                GameMainLogic.Instance.Player1Entity.AddLife();
+            });
+            btnChangeBridWall.onClick.AddListener(() =>
+            {
+
+            });
+            btnStopAllEnemyMove.onClick.AddListener(() =>
+            {
+                GameEntry.Event.DispatchEvent<float>(GameEventType.StopAllEnemyMove, 5f);
+            });
+            btnPlayerUnbeatable.onClick.AddListener(() =>
+            {
+                GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
+                {
+                    tankEntityBase = GameMainLogic.Instance.Player1Entity,
+                    durationTime = 5f
+                });
             });
         }
 

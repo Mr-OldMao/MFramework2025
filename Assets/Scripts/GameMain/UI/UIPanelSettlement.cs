@@ -53,6 +53,7 @@ namespace GameMain
         private TextMeshProUGUI txtP1KillTotalCount;
         private RectTransform rectP2KillTotalCount;
         private TextMeshProUGUI txtP2KillTotalCount;
+        private TextMeshProUGUI txtStageNum;
 
         private Button btnClose;
 
@@ -90,6 +91,8 @@ namespace GameMain
             txtP1Score4.text = string.Empty;
             txtP1KillTotalCount.text = string.Empty;
             txtTotalScore.text = string.Empty;
+            txtStageNum.text = GameMainLogic.Instance.StageID.ToString();
+
             string txtAudio = "settlement_txt.ogg";
             GameEntry.Audio.PlaySound(txtAudio);
             await UniTask.Delay(200);

@@ -67,10 +67,9 @@ namespace GameMain
                 UIPanelGameOverPanel.ShowPanelPop();
             });
 
-            GameEntry.Event.RegisterEvent(GameEventType.GameWin, async () =>
+            GameEntry.Event.RegisterEvent(GameEventType.GameWin, () =>
             {
                 Debugger.LogError("游戏结束-胜利");
-                await UniTask.Delay(2000);
                 GameEntry.UI.ShowViewAsync<UIPanelSettlement>();
             });
         }

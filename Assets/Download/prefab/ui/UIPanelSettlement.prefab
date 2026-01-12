@@ -1441,7 +1441,7 @@ GameObject:
   - component: {fileID: 5023788834313408477}
   - component: {fileID: 485405934570606770}
   m_Layer: 5
-  m_Name: Text (TMP)_1
+  m_Name: txtStageNum
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

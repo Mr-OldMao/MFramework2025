@@ -134,14 +134,7 @@ namespace GameMain
                     {
                         enemy.transform.SetParent(NodePoolTankEnemy);
                         var enemyEntity = enemy.GetOrAddComponent<EnemyEntity>();
-                        GameEntry.Event.RegisterEvent(GameEventType.GameWin, () =>
-                        {
-                            enemyEntity.GameWinEvent();
-                        });
-                        GameEntry.Event.RegisterEvent(GameEventType.GameFail, () =>
-                        {
-                            enemyEntity.GameFailEvent();
-                        });
+                        enemyEntity.InitRegisterEvents();
                     }
                     enemy.gameObject.SetActive(true);
                     bool isRedTank = Random.Range(0f, 1f) > 0.7f;
@@ -180,14 +173,7 @@ namespace GameMain
                     {
                         playerObj.transform.SetParent(NodePoolPlayer1Enemy);
                         var playerEntity = playerObj.GetOrAddComponent<PlayerEntity>();
-                        GameEntry.Event.RegisterEvent(GameEventType.GameWin, () =>
-                        {
-                            playerEntity.GameWinEvent();
-                        });
-                        GameEntry.Event.RegisterEvent(GameEventType.GameFail, () =>
-                        {
-                            playerEntity.GameFailEvent();
-                        });
+                        playerEntity.InitRegisterEvents();
                     }
                     playerObj.SetActive(true);
 

@@ -4,11 +4,12 @@ namespace GameMain
 {
     public partial class EnemyEntity
     {
-        protected override void OnTankDead()
+        public override void OnTankDead(TankOwnerType killerTankOwnerType, bool isBombDead = false)
         {
             Debugger.Log($"OnTankDead, id:{EntityID}, {this.gameObject.name}");
-
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).RecycleEntity(gameObject);
+
+            base.OnTankDead(killerTankOwnerType,isBombDead);
         }
 
         protected override void OnTankHit(int hitValue)

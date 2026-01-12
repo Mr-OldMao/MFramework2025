@@ -41,6 +41,7 @@ namespace GameMain
         /// </summary>
         private float m_CurMovingTimer;
 
+        private float m_ForgeNotMoveTimer;
 
         private void InitAIMove()
         {
@@ -110,6 +111,12 @@ namespace GameMain
             IsCanMove = true;
         }
 
+        public void StopMoveForge(float time = 3f)
+        {
+
+        }
+
+
         public void SetAIMoveState(ETankState state)
         {
             eTankState = state;
@@ -131,6 +138,12 @@ namespace GameMain
 
         void AIMoveUpdate()
         {
+            if (m_ForgeNotMoveTimer > 0)
+            {
+                m_ForgeNotMoveTimer -= Time.deltaTime;
+                return;
+            }
+
             if (IsCanMove)
             {
                 if (m_ListAiMoveData?.Count > 0)

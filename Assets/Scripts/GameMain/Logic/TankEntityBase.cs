@@ -8,6 +8,7 @@ namespace GameMain
     public abstract class TankEntityBase : MonoBehaviour
     {
         public GameObject entity;
+        public bool IsUnbastable { get; protected set; }
         public float bornTime = 1f;
         public TankOwnerType TankOwnerType { get; private set; }
 
@@ -43,6 +44,10 @@ namespace GameMain
         /// </summary>
         public bool IsExtendBeforeDataNextGenerate;
 
+        /// <summary>
+        /// 无敌定时器ID
+        /// </summary>
+        protected int m_TimerIDUnbastable;
         public async UniTask InitData(TankOwnerType tankOwnerType, int tankTypeID, int entityID)
         {
             if (entity == null)
@@ -54,16 +59,19 @@ namespace GameMain
                 m_AnimBorn = transform.Find<Animator>("rectAnimBorn");
                 m_Rigidbody = GetComponentInChildren<Rigidbody>();
             }
-
             TankOwnerType = tankOwnerType;
             this.tankTypeID = tankTypeID;
             EntityID = entityID;
             HP = tankOwnerType == TankOwnerType.Enemy ? DataTools.GetTankEnemy(tankTypeID).HP : DataTools.GetTankPlayer(tankTypeID).HP;
+
             InitBornBefore();
+            IsUnbastable = true;
             await TankBorn(tankOwnerType);
+            IsUnbastable = false;
 
             UpdateTankAnim();
             InitBornAfter();
+
         }
 
         public abstract void GameWinEvent();
@@ -121,33 +129,19 @@ namespace GameMain
 
         public void TankBeHit(BulletEntity bulletEntity, Action<bool> tankDeadCallback)
         {
+            if (IsUnbastable)
+            {
+                tankDeadCallback(false);
+                return;
+            }
+
             if (bulletEntity?.BulletData != null)
             {
                 HP -= bulletEntity.BulletData.BulletATK;
                 if (HP <= 0)
                 {
-                    eTankState = ETankState.Dead;
                     tankDeadCallback?.Invoke(true);
-                    //IsCanMove = false;
-                    OnTankDead();
-                    switch (TankOwnerType)
-                    {
-                        case TankOwnerType.Player1:
-                            GameEntry.Event.DispatchEvent(GameEventType.Player1TankDead, entity);
-                            break;
-                        case TankOwnerType.Player2:
-                            GameEntry.Event.DispatchEvent(GameEventType.Player2TankDead, entity);
-                            break;
-                        case TankOwnerType.Enemy:
-                            GameEntry.Event.DispatchEvent(GameEventType.EnemyTankDead, entity);
-                            GameEntry.UI.GetModel<UIModelSettlement>().AddScore(tankTypeID, bulletEntity.tankOwnerType);
-                            if (GameMainLogic.Instance.RemainEnemyTankNum == 0 && GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).UsedCount == 0)
-                            {
-                                GameMainLogic.Instance.GameStateType = GameStateType.GameWin;
-                            }
-                            //GameMainLogic.Instance.TryJudgeGameWin();
-                            break;
-                    }
+                    OnTankDead(bulletEntity.tankOwnerType,false);
                 }
                 else
                 {
@@ -201,9 +195,60 @@ namespace GameMain
             });
         }
 
-        protected abstract void OnTankDead();
+        public virtual async void OnTankDead(TankOwnerType killerTankOwnerType, bool isBombDead = false)
+        {
+            eTankState = ETankState.Dead;
+            switch (TankOwnerType)
+            {
+                case TankOwnerType.Player1:
+                    GameEntry.Event.DispatchEvent(GameEventType.Player1TankDead, entity);
+                    break;
+                case TankOwnerType.Player2:
+                    GameEntry.Event.DispatchEvent(GameEventType.Player2TankDead, entity);
+                    break;
+                case TankOwnerType.Enemy:
+                    GameEntry.Event.DispatchEvent(GameEventType.EnemyTankDead, entity);
+                    GameEntry.UI.GetModel<UIModelSettlement>().AddScore(tankTypeID, killerTankOwnerType);
+                    if (GameMainLogic.Instance.RemainEnemyTankNum == 0 && GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).UsedCount == 0)
+                    {
+                        //彩蛋：延时结算游戏通关
+                        //即使敌方玩家全部被消灭，延时结算过程中，子弹击中鸟窝,或者玩家没生命值了仍然判定通关失败
+                        await UniTask.Delay(2000);
+                        if (GameMainLogic.Instance.GameStateType !=  GameStateType.GameFail)
+                        {
+                            GameMainLogic.Instance.GameStateType = GameStateType.GameWin;
+                        }
+                    }
+                    break;
+            }
+            if (isBombDead)
+            {
+               var go = GameMainLogic.Instance.GetPoolEffNormalBomb();
+                go.transform.position = transform.position;
+            }
+        }
 
         protected abstract void OnTankHit(int hitValue);
+
+        protected virtual void OnTankUnbeatable(TankUnbeatableInfo tankUnbeatableInfo)
+        {
+            if (tankUnbeatableInfo.tankEntityBase != this)
+            {
+                return;
+            }
+            if (m_TimerIDUnbastable > 0)
+            {
+                GameEntry.Timer.RemoveDelayTimer(m_TimerIDUnbastable);
+            }
+            IsUnbastable = true;
+            m_AnimInvincible.gameObject.SetActive(true);
+            m_TimerIDUnbastable = GameEntry.Timer.AddDelayTimer(tankUnbeatableInfo.durationTime, () =>
+            {
+                IsUnbastable = false;
+                m_AnimInvincible.gameObject.SetActive(false);
+                m_TimerIDUnbastable = 0;
+            });
+        }
     }
 
     /// <summary>
@@ -234,5 +279,11 @@ namespace GameMain
         Back,
         Left,
         Right
+    }
+
+    public struct TankUnbeatableInfo
+    {
+        public TankEntityBase tankEntityBase;
+        public float durationTime;
     }
 }

@@ -36,6 +36,18 @@ public enum GameEventType
     /// 敌方坦克出生
     /// </summary>
     EnemyTankGenerate,
+    /// <summary>
+    /// 清除场上所有敌人
+    /// </summary>
+    ClearAllEnemy,
+    /// <summary>
+    /// 禁止所有敌人移动
+    /// </summary>
+    StopAllEnemyMove,
+    /// <summary>
+    /// 坦克无敌
+    /// </summary>
+    TankUnbeatable,
 
     #region 框架层事件
     /// <summary>

@@ -13,6 +13,23 @@ namespace GameMain
         /// 下次坦克生成是否初始化坦克剩余生命
         /// </summary>
         public bool IsInitLife = true;
+
+        public void InitRegisterEvents()
+        {
+            GameEntry.Event.RegisterEvent(GameEventType.GameWin, () =>
+            {
+                GameWinEvent();
+            });
+            GameEntry.Event.RegisterEvent(GameEventType.GameFail, () =>
+            {
+                GameFailEvent();
+            });
+            GameEntry.Event.RegisterEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, (p) =>
+            {
+                OnTankUnbeatable(p);
+            });
+        }
+
         protected override void InitBornBefore()
         {
             UpdatePlayerLife();
@@ -76,6 +93,13 @@ namespace GameMain
             ChangeTankType(id);
         }
 
+        public void AddLife(int addNum = 1)
+        {
+            ++remainLife;
+            GameEntry.UI.GetView<UIPanelBattle>().RefreshUI();
+            GameEntry.Audio.PlaySound("prop_addlife.mp3");
+        }
+
         public void UpdateHP()
         {
             HP = m_TankPlayerData.HP;
@@ -112,11 +136,13 @@ namespace GameMain
         {
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).RecycleEntity(entity);
             IsExtendBeforeDataNextGenerate = false;
-            //GameMainLogic.Instance.TryJudgeGameFail();
 
             if (remainLife < 0)
             {
-                GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
+                if (GameMainLogic.Instance.GameStateType != GameStateType.GameFail)
+                {
+                    GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
+                }
             }
         }
         #endregion
