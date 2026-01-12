@@ -129,7 +129,15 @@ namespace MFramework.Runtime
 
             foreach (var field in fields)
             {
-                BindComponent(field);
+                bool isComponent = typeof(Component).IsAssignableFrom(field.FieldType);
+                if (isComponent)
+                {
+                    BindComponent(field);
+                }
+                //else
+                //{
+                //    Debugger.Log($"dont Component，UICanvas{this},Name:{field.Name},Type:{field.FieldType}");
+                //}
             }
         }
 
