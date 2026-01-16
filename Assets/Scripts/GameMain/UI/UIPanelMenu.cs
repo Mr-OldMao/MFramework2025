@@ -1,6 +1,9 @@
-﻿using MFramework.Runtime;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using MFramework.Runtime;
 using TMPro;
+using TTSDK;
+using TTSDK.UNBridgeLib.LitJson;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +17,8 @@ namespace GameMain
         private RectTransform rootNode;
         private Image imgBg;
         private Button btnGameStart;
-
+        private Button btnSidebar;
+        private RectTransform rectSidebar;
         public override async UniTask Init()
         {
             await base.Init();
@@ -43,6 +47,7 @@ namespace GameMain
                 ShowGameStartBtn(true);
             }
             //return UniTask.CompletedTask;
+
         }
 
 
@@ -64,13 +69,24 @@ namespace GameMain
                     GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
                 });
             });
+
+            btnSidebar.onClick.AddListener(() =>
+            {
+                Debug.Log("btnSidebar");
+                GameEntry.UI.ShowView<UIPanelSidebar>();
+            });
+        }
+
+        public class NavigateToSceneInfo
+        {
+            public string scene = "sidebar";
         }
 
         protected override void UnRegisterEvent()
         {
             btnGameStart.onClick.RemoveAllListeners();
         }
-
+        
 
 
         public void ShowGameStartBtn(bool isShow)

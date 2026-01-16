@@ -64,7 +64,7 @@ namespace GameMain
 
             if (IsCanMove)
             {
-                GameEntry.Audio.PlayBGM(IsMoving ? "engineMoving.mp3" : "engineIdle.aif", 0.2f);
+                GameEntry.Audio.PlayBGM(IsMoving ? "engineMoving.mp3" : "engineIdle.mp3", 0.3f);
             }
         }
 

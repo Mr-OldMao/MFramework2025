@@ -1,1 +1,5 @@
-{"deviceOrientation":"portrait","menuButtonStyle":"dark","enableIOSHighPerformanceModePlus":false}
+{
+  "deviceOrientation": "landscape",
+  "menuButtonStyle": "dark",
+  "enableIOSHighPerformanceModePlus": false
+}

@@ -103,7 +103,7 @@ namespace GameMain
             }
         }
 
-        private static async Task SetConst()
+        private static async UniTask SetConst()
         {
             var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("const_const"));
             ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);

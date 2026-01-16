@@ -673,7 +673,7 @@ MonoBehaviour:
     isJump: 0
     unityAxis: Horizontal
     showGeneralInspector: 1
-    showDirectInspector: 1
+    showDirectInspector: 0
     showInertiaInspector: 0
     showSimulatinInspector: 0
   axisY:
