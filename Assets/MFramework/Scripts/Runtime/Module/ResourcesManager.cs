@@ -80,7 +80,7 @@ namespace MFramework.Runtime
                 {
                     handle.Destroyed += destroyedCallback;
                 }
-                await handle.Task;
+                await handle.ToUniTask();
 
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
@@ -199,12 +199,12 @@ namespace MFramework.Runtime
                 if (m_SceneHandles.ContainsKey(sceneAddress) && m_SceneHandles[sceneAddress].IsValid())
                 {
                     Debug.Log($"Scene already loaded: {sceneAddress},TODO 从缓存重新加载相同场景");
-                    await Addressables.LoadSceneAsync(sceneAddress).Task;//TODO 从缓存重新加载相同场景
+                    await Addressables.LoadSceneAsync(sceneAddress).ToUniTask();//TODO 从缓存重新加载相同场景
                     return;
                 }
 
                 AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(sceneAddress);
-                await handle.Task;
+                await handle.ToUniTask();
 
                 if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
@@ -233,7 +233,7 @@ namespace MFramework.Runtime
                 address = ProcessAssetAddress<GameObject>(address);
             }
             var res = Addressables.InstantiateAsync(address);
-            await res.Task;
+            await res.ToUniTask();
 
             //if (m_AssetHandles.ContainsKey(address))
             //{
