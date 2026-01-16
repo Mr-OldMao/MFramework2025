@@ -1,5 +1,4 @@
 using MFramework.Runtime;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,6 +24,8 @@ namespace GameMain
 
             GameEntry.UI.GetModel<UIModelSettlement>().InitData();
 
+            TTSDKManager.Instance.Init();
+
             GameEntry.Scene.LoadSceneAsync(sceneName, LoadSceneMode.Single, (p) =>
             {
                 //Debug.Log($"progress:{p}");
@@ -33,7 +34,7 @@ namespace GameMain
             {
                 GameEntry.UI.GetModel<UIModelLoad>().SetLoadingProgress(1f);
                 await GameEntry.UI.ShowViewAsync<UIPanelMap>();
-                await GameEntry.UI.ShowViewAsync<UIPanelGM>();
+                //await GameEntry.UI.ShowViewAsync<UIPanelGM>();
                 await GameEntry.UI.ShowViewAsync<UIPanelMenu>();
                 uiPanelLoad.HidePanel();
             }, null, 1f);

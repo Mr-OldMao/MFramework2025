@@ -16,11 +16,25 @@ namespace GameMain
             await InitPool();
         }
 
-        public void GameParse()
+        public void GameParse(bool isParse, bool isPlaySound = true)
+        {
+            Debug.Log("GameParse");
+            Time.timeScale = isParse ? 0 : 1;
+            if (isPlaySound)
+            {
+                GameEntry.Audio.PlaySound("pause.ogg");
+            }
+            GameEntry.Audio.StopBGM();
+        }
+
+        public void GameParse(bool isPlaySound = true)
         {
             Debug.Log("GameParse");
             Time.timeScale = Time.timeScale == 0 ? 1 : 0;
-            GameEntry.Audio.PlaySound("pause.ogg");
+            if (isPlaySound)
+            {
+                GameEntry.Audio.PlaySound("pause.ogg");
+            }
             GameEntry.Audio.StopBGM();
         }
     }

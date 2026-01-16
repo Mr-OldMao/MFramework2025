@@ -5,10 +5,11 @@ using TTSDK;
 using TTSDK.UNBridgeLib.LitJson;
 using Unity.VisualScripting;
 using UnityEngine;
+using static StarkSDKSpace.CanIUse.StarkAdManager;
 
 namespace GameMain
 {
-    public class TTSDKManager
+    public partial class TTSDKManager
     {
         private static TTSDKManager m_Instance;
         public static TTSDKManager Instance
@@ -45,7 +46,7 @@ namespace GameMain
                     Debug.Log($"TT.CheckScene Fail p1:{p1},p2:{p2}");
                 });
 
-
+            InitAdv();
         }
 
         private void FailCallback(string errMsg)
@@ -88,6 +89,17 @@ namespace GameMain
              {
                  Debug.Log($"TT.NavigateToScene Fail p1:{p1},p2:{p2}");
              });
+        }
+
+        public void ShotToast(string title, string icon = "", Action complete = null, int durationMS = 1000)
+        {
+            TT.ShowToast(new TTShowToastParam
+            {
+                duration = durationMS,
+                title = title,
+                complete = _ => complete?.Invoke(),
+                icon = icon //success, loading, none, fail
+            });
         }
     }
 }

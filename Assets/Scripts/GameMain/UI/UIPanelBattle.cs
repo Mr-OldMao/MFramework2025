@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using System;
 using TMPro;
 using Unity.VisualScripting;
@@ -23,6 +24,12 @@ namespace GameMain
         public TextMeshProUGUI txtLifePlayer2;
         public TextMeshProUGUI txtStage;
 
+        public Button btnGameParse;
+        public Button btnTankLevelAdd;
+        public Button btnAddLife;
+        public Button btnPlayerUnbeatable;
+
+        private Image imgMask;
         public override UniTask Init()
         {
             return base.Init();
@@ -30,6 +37,8 @@ namespace GameMain
 
         public override UniTask ShowPanel()
         {
+            imgMask.gameObject.SetActive(false);
+
             return base.ShowPanel();
         }
 
@@ -81,6 +90,79 @@ namespace GameMain
             {
                 RefreshEnemyIcon();
             });
+
+            btnGameParse.onClick.AddListener(() =>
+            {
+                GameMainLogic.Instance.GameParse();
+            });
+            btnTankLevelAdd.onClick.AddListener(() =>
+            {
+                ShowMask(true);
+                TTSDKManager.Instance.ShowAdvInsert(() =>
+                {
+                    GameMainLogic.Instance.Player1Entity.AddLevel();
+                    ShowMask(false);
+                }, (errorCode, msg) =>
+                {
+                    GameMainLogic.Instance.Player1Entity.AddLevel();
+                    ShowMask(false);
+                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
+                });
+            });
+            btnAddLife.onClick.AddListener(() =>
+            {
+                ShowMask(true);
+                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                {
+                    if (isPlayed)
+                    {
+                        GameMainLogic.Instance.Player1Entity.AddLife();
+                        ShowMask(false);
+                    }
+                }, loadFailCallback: (errorCode, msg) =>
+                {
+                    GameMainLogic.Instance.Player1Entity.AddLife();
+                    ShowMask(false);
+                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
+                });
+                //ShowMask(true);
+                //TTSDKManager.Instance.ShowAdvBanner(() =>
+                //{
+                //    GameMainLogic.Instance.Player1Entity.AddLife();
+                //    ShowMask(false);
+                //}, (errorCode, msg) =>
+                //{
+                //    GameMainLogic.Instance.Player1Entity.AddLife();
+                //    ShowMask(false);
+                //    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
+                //});
+            });
+            btnPlayerUnbeatable.onClick.AddListener(() =>
+            {
+                ShowMask(true);
+
+                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                {
+                    if (isPlayed)
+                    {
+                        GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
+                        {
+                            tankEntityBase = GameMainLogic.Instance.Player1Entity,
+                            durationTime = 5f * count
+                        });
+                    }
+                    ShowMask(false);
+                }, loadFailCallback: (errorCode, msg) =>
+                {
+                    GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
+                    {
+                        tankEntityBase = GameMainLogic.Instance.Player1Entity,
+                        durationTime = 5f
+                    });
+                    ShowMask(false);
+                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
+                });
+            });
         }
 
         protected override void UnRegisterEvent()
@@ -93,6 +175,14 @@ namespace GameMain
             GameEntry.Event.UnRegisterEvent(GameEventType.Player1TankDead);
             GameEntry.Event.UnRegisterEvent(GameEventType.EnemyTankDead);
             GameEntry.Event.UnRegisterEvent(GameEventType.EnemyTankGenerate);
+        }
+
+        private void ShowMask(bool isMask)
+        {
+#if !UNITY_EDITOR
+            imgMask.gameObject.SetActive(isMask);
+#endif
+            GameMainLogic.Instance.GameParse(isMask, false);
         }
     }
 }
