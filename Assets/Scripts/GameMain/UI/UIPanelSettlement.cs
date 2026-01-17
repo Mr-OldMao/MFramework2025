@@ -190,14 +190,8 @@ namespace GameMain
                     });
                     break;
                 case GameStateType.GameFail:
-
-
                     Debugger.LogError("游戏结束，结算完毕，准备返回菜单界面");
-
-
-                    //GameEntry.UI.ShowView<UIPanelMenu>(this);
                     GameMainLogic.Instance.Player1Entity.ResetTankData();
-
                     var gameoverPanel = await GameEntry.UI.ShowViewAsync<UIPanelGameOver>();
                     gameoverPanel.ShowPanelFull();
                     HidePanel();

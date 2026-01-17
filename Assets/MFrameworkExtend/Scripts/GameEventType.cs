@@ -48,6 +48,10 @@ public enum GameEventType
     /// 坦克无敌
     /// </summary>
     TankUnbeatable,
+    /// <summary>
+    /// 鸟窝石化
+    /// </summary>
+    BirdChangeStore,
 
     #region 框架层事件
     /// <summary>

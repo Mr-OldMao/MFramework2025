@@ -64,6 +64,12 @@ namespace GameMain
             return m_DicMapGridData.Values.ToList();
         }
 
+        public GridDataInfo GetMapGridDataInfo(Vector2 gridPos)
+        {
+            m_DicMapGridData.TryGetValue(gridPos, out GridDataInfo gridDataInfo);
+            return gridDataInfo;
+        }
+
         public string GetMapPropAssetPath(EMapEntityType eMapEntityType)
         {
             if (eMapEntityType == EMapEntityType.None)
@@ -88,6 +94,7 @@ namespace GameMain
             Vector2 gridPos = GridPosBornEnemyArr[Random.Range(0, GridPosBornEnemyArr.Count)];
             return gridPos;
         }
+
 
         private void SetMapGridData(int mapTypeID)
         {

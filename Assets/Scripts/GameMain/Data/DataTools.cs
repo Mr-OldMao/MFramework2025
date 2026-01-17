@@ -117,9 +117,14 @@ namespace GameMain
 
         #region GetData
 
-        public static FB_reward_reward GetRewardReward(string name)
+        public static FB_reward_reward GetRewardReward(int id)
         {
-            return dicRewardReward.Values.Where(x => x.Name == name).FirstOrDefault();
+            return dicRewardReward.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
+
+        public static List<FB_reward_reward> GetRewardRewards()
+        {
+            return dicRewardReward.Values.ToList();
         }
 
         public static FB_map_mapType GetMapType(int id)

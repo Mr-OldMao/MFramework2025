@@ -25,6 +25,9 @@ namespace GameMain
         private Transform MapNode2D;
 
         private FB_stage_stage m_StageData;
+
+        private SpriteAtlas m_ItemAtlas;
+
         public override async UniTask Init(IUIView view, IUIModel model)
         {
             await base.Init(view, model);
@@ -34,6 +37,7 @@ namespace GameMain
 
             GameEntry.Event.RegisterEvent(GameEventType.GameStart, OnGameStart);
             GameEntry.Event.RegisterEvent(GameEventType.GameSettlement, OnGameSettlement);
+            GameEntry.Event.RegisterEvent<int>(GameEventType.BirdChangeStore, OnBirdChangeStore);
 
             await GameMainLogic.Instance.Init();
             await InitMapEntity();
@@ -60,6 +64,7 @@ namespace GameMain
         {
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).RecycleAllEntity();
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).RecycleAllEntity();
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).RecycleAllEntity();
         }
 
 
@@ -219,6 +224,60 @@ namespace GameMain
             NodeBomb = new GameObject("NodeBomb");
             NodeBomb.transform.SetParent(MapNode2D);
             NodeBomb.transform.localPosition = Vector3.zero;
+        }
+
+
+        public async void OnBirdChangeStore(int duration)
+        {
+            if (m_ItemAtlas == null)
+            {
+                m_ItemAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "itemAtlas.spriteatlas", false);
+            }
+
+            for (int i = 0; i < model.GridPosBridWallArr.Count; i++)
+            {
+                GridDataInfo gridDataInfo = model.GetMapGridDataInfo(model.GridPosBridWallArr[i]);
+                for (int j = 0; j < gridDataInfo.entityDataInfos.Count; j++)
+                {
+                    MapEntity mapEntity = gridDataInfo.entityDataInfos[j].propEntity.GetComponent<MapEntity>();
+                    EMapEntityType targetType = EMapEntityType.None;
+                    switch (mapEntity.mapEntityType)
+                    {
+                        case EMapEntityType.Wall:
+                            targetType = EMapEntityType.Stone;
+                            break;
+                        case EMapEntityType.Stone:
+                            targetType = EMapEntityType.Wall;
+                            break;
+                        case EMapEntityType.Wall_LU:
+                            targetType = EMapEntityType.Stone_LU;
+                            break;
+                        case EMapEntityType.Wall_LD:
+                            targetType = EMapEntityType.Stone_LD;
+                            break;
+                        case EMapEntityType.Wall_RU:
+                            targetType = EMapEntityType.Stone_RU;
+                            break;
+                        case EMapEntityType.Wall_RD:
+                            targetType = EMapEntityType.Stone_RD;
+                            break;
+                        case EMapEntityType.Stone_LU:
+                            targetType = EMapEntityType.Wall_LU;
+                            break;
+                        case EMapEntityType.Stone_LD:
+                            targetType = EMapEntityType.Wall_LD;
+                            break;
+                        case EMapEntityType.Stone_RU:
+                            targetType = EMapEntityType.Wall_RU;
+                            break;
+                        case EMapEntityType.Stone_RD:
+                            targetType = EMapEntityType.Wall_RD;
+                            break;
+                    }
+                    mapEntity.SetMapEntityType(targetType);
+                    mapEntity.SetSprite(targetType, m_ItemAtlas);
+                }
+            }
         }
     }
 }

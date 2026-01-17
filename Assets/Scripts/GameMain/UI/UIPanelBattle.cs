@@ -28,6 +28,7 @@ namespace GameMain
         public Button btnTankLevelAdd;
         public Button btnAddLife;
         public Button btnPlayerUnbeatable;
+        public Button btnRandomReward;
 
         private Image imgMask;
         public override UniTask Init()
@@ -105,7 +106,7 @@ namespace GameMain
                 }, (errorCode, msg) =>
                 {
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励暂不发放");
+                    TTSDKManager.Instance.ShotToast("奖励暂不发放");
                 });
             });
             btnAddLife.onClick.AddListener(() =>
@@ -122,7 +123,7 @@ namespace GameMain
                 {
                     GameMainLogic.Instance.Player1Entity.AddLife();
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
+                    TTSDKManager.Instance.ShotToast("奖励已发放");
                 });
                 //ShowMask(true);
                 //TTSDKManager.Instance.ShowAdvBanner(() =>
@@ -159,7 +160,25 @@ namespace GameMain
                         durationTime = 5f
                     });
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
+                    TTSDKManager.Instance.ShotToast("奖励已发放");
+                });
+            });
+
+            btnRandomReward.onClick.AddListener(() =>
+            {
+                ShowMask(true);
+                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                {
+                    if (isPlayed)
+                    {
+                        GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
+                    }
+                    ShowMask(false);
+                }, loadFailCallback: (errorCode, msg) =>
+                {
+                    GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
+                    ShowMask(false);
+                    TTSDKManager.Instance.ShotToast("奖励已发放");
                 });
             });
         }

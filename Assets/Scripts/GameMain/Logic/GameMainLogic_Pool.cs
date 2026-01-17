@@ -4,6 +4,7 @@ using MFramework.Runtime.Extend;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using Random = UnityEngine.Random;
 
 namespace GameMain
@@ -18,6 +19,7 @@ namespace GameMain
         private Transform NodePoolBulletEnemy;
         private Transform NodePoolTankEnemy;
         private Transform NodePoolPlayer1Enemy;
+        private Transform NodePoolReward;
 
         private int m_PoolIdEffSmallBomb;
         private int m_PoolIdEffNormallBomb;
@@ -26,6 +28,7 @@ namespace GameMain
         public int PoolIdTankEnemy { get; private set; }
         public int PoolIdTankPlayer { get; private set; }
 
+        public int PoolIdReward { get; private set; }
 
         private int m_CurTankID;
         public async UniTask InitPool()
@@ -37,6 +40,7 @@ namespace GameMain
             NodePoolBulletEnemy = InitNodePool("NodePoolBulletEnemy");
             NodePoolTankEnemy = InitNodePool("NodePoolTankEnemy");
             NodePoolPlayer1Enemy = InitNodePool("NodePoolPlayer1Enemy");
+            NodePoolReward = InitNodePool("NodePoolReward");
 
             m_CurTankID = 0;
             await GeneratePool();
@@ -197,6 +201,29 @@ namespace GameMain
                 maxCount = 1
             };
             PoolIdTankPlayer = GameEntry.Pool.CreatPool(new Pool(tankPlayer1PoolDataInfo));
+
+
+            var rewardAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "reward.spriteatlas", false);
+            var rewardPrefab = await GameEntry.Resource.LoadAssetAsync<GameObject>(SystemConstantData.PATH_PREFAB_ENTITY_ROOT + "reward/Reward.prefab", false);
+            PoolIdReward = GameEntry.Pool.CreatPool(new Pool(rewardPrefab, (go, b) =>
+            {
+                if (b)
+                {
+                    go.transform.SetParent(NodePoolReward);
+                    //go.transform.localPosition = Vector3.zero;
+                    go.GetOrAddComponent<RewardEntity>();
+                }
+                var rewardDatas = DataTools.GetRewardRewards();
+                //int id = Random.Range(rewardDatas[0].ID, rewardDatas[rewardDatas.Count - 1].ID + 1);
+                int id = Random.Range(rewardDatas[0].ID, rewardDatas[rewardDatas.Count - 1].ID );//TODO
+                go.GetComponent<RewardEntity>().Init(id);
+                string spriteName = DataTools.GetRewardReward(id).Name;
+                go.transform.Find<SpriteRenderer>("imgReward").sprite = rewardAtlas.GetSprite(spriteName);
+                go.name = "reward" + id;
+            }, (go) =>
+            {
+                go.GetComponent<RewardEntity>().ClreaTimer();
+            }, 1, 50));
         }
 
         public GameObject GetPoolEffSmallBomb()

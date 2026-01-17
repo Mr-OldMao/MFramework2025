@@ -1,8 +1,10 @@
 using MFramework.Runtime;
+using MFramework.Runtime.Extend;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.U2D;
 
 namespace GameMain
 {
@@ -27,7 +29,36 @@ namespace GameMain
             //}
         }
 
-
+        public  void SetSprite(EMapEntityType eMapEntityType , SpriteAtlas itemAtlas)
+        {
+            SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+            switch (eMapEntityType)
+            {
+                case EMapEntityType.Wall_LU:
+                case EMapEntityType.Wall_LD:
+                case EMapEntityType.Wall_RU:
+                case EMapEntityType.Wall_RD:
+                case EMapEntityType.Wall:
+                    for (int i = 0; i < spriteRenderers.Length; i++)
+                    {
+                        spriteRenderers[i].sprite = itemAtlas.GetSprite("wall32_0");
+                    }
+                    break;
+                case EMapEntityType.Stone_LU:
+                case EMapEntityType.Stone_LD:
+                case EMapEntityType.Stone_RU:
+                case EMapEntityType.Stone_RD:
+                case EMapEntityType.Stone:
+                    for (int i = 0; i < spriteRenderers.Length; i++)
+                    {
+                        spriteRenderers[i].sprite = itemAtlas.GetSprite("stone_0");
+                    }
+                    break;
+                default:
+                    Debug.LogError($"SetSprite Error {eMapEntityType}");
+                    break;
+            }
+        }
 
         public void BulletCollEvent(BulletEntity bulletEntity, GameObject subEntity)
         {
