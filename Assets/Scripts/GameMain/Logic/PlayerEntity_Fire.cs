@@ -1,4 +1,6 @@
+using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
+using MFramework.Runtime.Extend;
 using UnityEngine;
 
 namespace GameMain
@@ -59,9 +61,27 @@ namespace GameMain
                     ResetFireState();
                 });
                 m_IsFiring = false;
-                GameEntry.Audio.PlaySound("fire.ogg");
+                GameEntry.Audio.PlaySound("fire.mp3");
+                //PlayFireSound();
             }
         }
+        //private AudioSource audioSource;
+        //private async  UniTask PlayFireSound()
+        //{
+        //  string  audioName = SystemConstantData.PATH_AUDIO_SOUND + "fire.mp3";
+
+        //    AudioClip clip = await GameEntry.Resource.LoadAssetAsync<AudioClip>(audioName);
+
+        //    if (audioSource == null)
+        //    {
+        //        audioSource = new GameObject("fireAudio").AddComponent<AudioSource>();
+        //        audioSource.loop = false;
+        //    }
+        //    audioSource.PlayOneShot(clip);
+
+        //    //audioSource.clip = clip;
+        //    //audioSource.Play();
+        //}
 
         private void ResetFireState()
         {

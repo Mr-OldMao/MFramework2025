@@ -104,9 +104,8 @@ namespace GameMain
                     ShowMask(false);
                 }, (errorCode, msg) =>
                 {
-                    GameMainLogic.Instance.Player1Entity.AddLevel();
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
+                    TTSDKManager.Instance.ShotToast("广告播放失败，奖励暂不发放");
                 });
             });
             btnAddLife.onClick.AddListener(() =>
@@ -117,8 +116,8 @@ namespace GameMain
                     if (isPlayed)
                     {
                         GameMainLogic.Instance.Player1Entity.AddLife();
-                        ShowMask(false);
                     }
+                    ShowMask(false);
                 }, loadFailCallback: (errorCode, msg) =>
                 {
                     GameMainLogic.Instance.Player1Entity.AddLife();

@@ -28,6 +28,7 @@ namespace GameMain
             }
             set
             {
+                GameStateType beforeState = m_GameStateType;
                 m_GameStateType = value;
                 switch (m_GameStateType)
                 {
@@ -49,7 +50,10 @@ namespace GameMain
                         GameEntry.Event.DispatchEvent(GameEventType.GameWin);
                         break;
                     case GameStateType.GameFail:
-                        GameEntry.Event.DispatchEvent(GameEventType.GameFail);
+                        if (beforeState != m_GameStateType)
+                        {
+                            GameEntry.Event.DispatchEvent(GameEventType.GameFail);
+                        }
                         break;
                     case GameStateType.GameSettlement:
                         GameEntry.Event.DispatchEvent(GameEventType.GameSettlement);

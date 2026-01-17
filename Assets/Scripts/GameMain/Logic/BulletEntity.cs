@@ -132,7 +132,7 @@ namespace GameMain
                         else
                         {
                             HintSelf(BulletCollisionType.TankHit);
-                            GameEntry.Audio.PlaySound("bullet_hit_border.ogg");
+                            GameEntry.Audio.PlaySound("bullet_hit_border.mp3");
                         }
                     });
                 }

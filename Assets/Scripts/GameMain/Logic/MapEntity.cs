@@ -43,7 +43,7 @@ namespace GameMain
                     case EMapEntityType.AirBorder:
                         if (bulletEntity.tankOwnerType == TankOwnerType.Player1 || bulletEntity.tankOwnerType == TankOwnerType.Player2)
                         {
-                            GameEntry.Audio.PlaySound("bullet_hit_border.ogg");
+                            GameEntry.Audio.PlaySound("bullet_hit_border.mp3");
                         }
                         break;
                     case EMapEntityType.Wall:
@@ -53,7 +53,7 @@ namespace GameMain
                     case EMapEntityType.Wall_RD:
                         if (bulletEntity.tankOwnerType == TankOwnerType.Player1 || bulletEntity.tankOwnerType == TankOwnerType.Player2)
                         {
-                            GameEntry.Audio.PlaySound("bullet_hit_wall.ogg");
+                            GameEntry.Audio.PlaySound("bullet_hit_wall.mp3");
                         }
                         Destroy(subEntity);
                         break;
@@ -64,7 +64,7 @@ namespace GameMain
                     case EMapEntityType.Stone_RD:
                         if (bulletEntity.tankOwnerType == TankOwnerType.Player1 || bulletEntity.tankOwnerType == TankOwnerType.Player2)
                         {
-                            GameEntry.Audio.PlaySound("bullet_hit_border.ogg");
+                            GameEntry.Audio.PlaySound("bullet_hit_border.mp3");
                         }
                         if (bulletEntity.BulletData.IsCanStone)
                         {

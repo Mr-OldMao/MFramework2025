@@ -17,7 +17,7 @@ namespace GameMain
         private RectTransform rectNode2;
         private RectTransform rectNode3;
         private RectTransform rectNode4;
-        private TextMeshProUGUI txtTotalScore;
+        private TextMeshProUGUI txtP1TotalScore;
         private RectTransform rectNode5;
         private RectTransform rectNodeKillEnemy1;
         private RectTransform rectP1Enemy1;
@@ -55,6 +55,9 @@ namespace GameMain
         private TextMeshProUGUI txtP2KillTotalCount;
         private TextMeshProUGUI txtStageNum;
 
+        private RectTransform rectP1TotalScore;
+        private RectTransform rectP2TotalScore;
+        private RectTransform rectP2PlayName;
         private Button btnClose;
 
 
@@ -90,10 +93,10 @@ namespace GameMain
             txtP1Score3.text = string.Empty;
             txtP1Score4.text = string.Empty;
             txtP1KillTotalCount.text = string.Empty;
-            txtTotalScore.text = string.Empty;
+            txtP1TotalScore.text = string.Empty;
             txtStageNum.text = GameMainLogic.Instance.StageID.ToString();
 
-            string txtAudio = "settlement_txt.ogg";
+            string txtAudio = "settlement_txt.wav";
             GameEntry.Audio.PlaySound(txtAudio);
             await UniTask.Delay(200);
             GameEntry.Audio.PlaySound(txtAudio);
@@ -101,7 +104,6 @@ namespace GameMain
             GameEntry.Audio.PlaySound(txtAudio);
 
             await UniTask.Delay(500);
-            txtTotalScore.text = $"{p1KillTotalCount}";
             GameEntry.Audio.PlaySound(txtAudio);
             int score1 = await DalayShowTxt(p1KillCountEnemy1, DataTools.GetTankEnemy(201).Score, txtP1KillTankCount1, txtP1Score1);
             await UniTask.Delay(500);
@@ -111,7 +113,9 @@ namespace GameMain
             await UniTask.Delay(500);
             int score4 = await DalayShowTxt(p1KillCountEnemy4, DataTools.GetTankEnemy(203).Score, txtP1KillTankCount4, txtP1Score4);
             await UniTask.Delay(500);
-            txtP1KillTotalCount.text = $"{(score1 + score2 + score3 + score4)}";
+            txtP1TotalScore.text = $"{(score1 + score2 + score3 + score4)}";
+            txtP1KillTotalCount.text = $"{p1KillTotalCount}";
+
             GameEntry.Audio.PlaySound(txtAudio);
 
             if (GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi)
@@ -134,8 +138,8 @@ namespace GameMain
                 txtP2Score3.text = string.Empty;
                 txtP2Score4.text = string.Empty;
                 txtP2KillTotalCount.text = string.Empty;
+                txtP1TotalScore.text = string.Empty;
 
-                txtTotalScore.text = $"{p2KillTotalCount}";
                 score1 = await DalayShowTxt(p2KillCountEnemy1, DataTools.GetTankEnemy(201).Score, txtP2KillTankCount1, txtP2Score1);
                 await UniTask.Delay(500);
                 score2 = await DalayShowTxt(p2KillCountEnemy2, DataTools.GetTankEnemy(202).Score, txtP2KillTankCount2, txtP2Score2);
@@ -144,7 +148,8 @@ namespace GameMain
                 await UniTask.Delay(500);
                 score4 = await DalayShowTxt(p2KillCountEnemy4, DataTools.GetTankEnemy(203).Score, txtP2KillTankCount4, txtP2Score4);
                 await UniTask.Delay(500);
-                txtP2KillTotalCount.text = $"{(score1 + score2 + score3 + score4)}";
+                txtP2KillTotalCount.text = $"{p2KillTotalCount}";
+                txtP1TotalScore.text = $"{(score1 + score2 + score3 + score4)}";
                 GameEntry.Audio.PlaySound(txtAudio);
             }
 
@@ -185,9 +190,17 @@ namespace GameMain
                     });
                     break;
                 case GameStateType.GameFail:
+
+
                     Debugger.LogError("游戏结束，结算完毕，准备返回菜单界面");
-                    GameEntry.UI.ShowView<UIPanelMenu>(this);
+
+
+                    //GameEntry.UI.ShowView<UIPanelMenu>(this);
                     GameMainLogic.Instance.Player1Entity.ResetTankData();
+
+                    var gameoverPanel = await GameEntry.UI.ShowViewAsync<UIPanelGameOver>();
+                    gameoverPanel.ShowPanelFull();
+                    HidePanel();
                     break;
             }
         }
@@ -226,6 +239,17 @@ namespace GameMain
                 rectP2Enemy3.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
                 rectP2Enemy4.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
             }
+
+            for (int i = 0; i < rectP2TotalScore.childCount; i++)
+            {
+                rectP2TotalScore.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
+            }
+
+            for (int i = 0; i < rectP2PlayName.childCount; i++)
+            {
+                rectP2PlayName.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
+            }
+
             for (int i = 0; i < rectP2KillTotalCount.childCount; i++)
             {
                 rectP2KillTotalCount.GetChild(i).gameObject.SetActive(GameMainLogic.Instance.GamePlayerType == GamePlayerType.Multi);
@@ -242,7 +266,7 @@ namespace GameMain
                 txtCount.text = $"0";
                 txtScore.text = $"0";
                 await UniTask.Delay(delayFrame);
-                GameEntry.Audio.PlaySound("settlement_txt.ogg");
+                GameEntry.Audio.PlaySound("settlement_txt.wav");
             }
             else
             {
@@ -250,7 +274,7 @@ namespace GameMain
                 {
                     txtCount.text = $"{i + 1}";
                     txtScore.text = $"{(i + 1) * score}";
-                    GameEntry.Audio.PlaySound("settlement_txt.ogg");
+                    GameEntry.Audio.PlaySound("settlement_txt.wav");
                     await UniTask.Delay(delayFrame);
                 }
             }

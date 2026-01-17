@@ -15,6 +15,7 @@ namespace GameMain
         private RectTransform rootNode;
         private RectTransform rectGameOverFull;
         private Image imgBg;
+        private Image imgGameOverFull;
         private RectTransform rectGameOverPop;
         private Button btnClose;
 
@@ -36,6 +37,7 @@ namespace GameMain
             base.ShowPanel();
             rectGameOverPop.gameObject.SetActive(false);
             rectGameOverFull.gameObject.SetActive(false);
+            imgGameOverFull.gameObject.SetActive(false);
             return UniTask.CompletedTask;
         }
 
@@ -48,10 +50,15 @@ namespace GameMain
             GameEntry.UI.ShowView<UIPanelSettlement>(this);
         }
 
-        public void ShowPanelFull()
+        public async void ShowPanelFull()
         {
             rectGameOverFull.gameObject.SetActive(true);
             rectGameOverPop.gameObject.SetActive(false);
+            imgGameOverFull.gameObject.SetActive(true);
+            btnClose.gameObject.SetActive(false);
+            GameEntry.Audio.PlaySound("gameover.mp3");
+            await UniTask.Delay(2000);
+            btnClose.gameObject.SetActive(true);
         }
 
         public override UniTask HidePanel()
@@ -64,8 +71,7 @@ namespace GameMain
         {
             btnClose.onClick.AddListener(async () =>
             {
-                await GameEntry.UI.ShowViewAsync<UIPanelLoad>();
-                HidePanel();
+                GameEntry.UI.ShowView<UIPanelMenu>(this);
             });
         }
 
