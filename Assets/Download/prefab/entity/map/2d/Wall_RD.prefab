@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1747617132376578758, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2458211280382217241, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3
@@ -48,9 +52,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5072624171226264907, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6200543593883301141, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
       propertyPath: m_Name
-      value: Wall_1 Variant
+      value: Wall_RD
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144593615807001765, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9220722686954862414, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -66,6 +82,9 @@ PrefabInstance:
     - {fileID: 1637834487943301717, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
     - {fileID: 5753681159679010315, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
     - {fileID: 4485447170427098939, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+    - {fileID: 1747617132376578758, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+    - {fileID: 8144593615807001765, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+    - {fileID: 5072624171226264907, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}

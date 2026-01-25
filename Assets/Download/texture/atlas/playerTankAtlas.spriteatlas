@@ -32,123 +32,26 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 2800000, guid: a7aa2fd698a52014fa628158fc4dfd2b, type: 3}
-    - {fileID: 2800000, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
+    - {fileID: 2800000, guid: c07f20f6502265e438dc707fd2f11149, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
-    - a7aa2fd698a52014fa628158fc4dfd2b: 870097292
-    - a7aa2fd698a52014fa628158fc4dfd2b: 800245394
-    - a7aa2fd698a52014fa628158fc4dfd2b: -1503900656
-    - a7aa2fd698a52014fa628158fc4dfd2b: 2035289731
-    - e29c791a3e5f1c4418f92002243a85f2: 684022329
-    - e29c791a3e5f1c4418f92002243a85f2: 965453113
-    - e29c791a3e5f1c4418f92002243a85f2: 2038771110
-    - e29c791a3e5f1c4418f92002243a85f2: 47272979
-    - e29c791a3e5f1c4418f92002243a85f2: 450084139
-    - e29c791a3e5f1c4418f92002243a85f2: -1173064044
-    - e29c791a3e5f1c4418f92002243a85f2: -1450040653
-    - e29c791a3e5f1c4418f92002243a85f2: 1778592625
-    - e29c791a3e5f1c4418f92002243a85f2: -439544069
-    - e29c791a3e5f1c4418f92002243a85f2: -837539987
-    - e29c791a3e5f1c4418f92002243a85f2: -1396461690
-    - e29c791a3e5f1c4418f92002243a85f2: 1283090106
-    - e29c791a3e5f1c4418f92002243a85f2: 1331708532
-    - e29c791a3e5f1c4418f92002243a85f2: 1797437111
-    - e29c791a3e5f1c4418f92002243a85f2: 562628483
-    - e29c791a3e5f1c4418f92002243a85f2: -339280980
-    - e29c791a3e5f1c4418f92002243a85f2: -309050385
-    - e29c791a3e5f1c4418f92002243a85f2: -1832589072
-    - e29c791a3e5f1c4418f92002243a85f2: -992064525
-    - e29c791a3e5f1c4418f92002243a85f2: -574489691
-    - e29c791a3e5f1c4418f92002243a85f2: -1325790497
-    - e29c791a3e5f1c4418f92002243a85f2: 104418998
-    - e29c791a3e5f1c4418f92002243a85f2: -702220311
-    - e29c791a3e5f1c4418f92002243a85f2: 1327571795
-    - e29c791a3e5f1c4418f92002243a85f2: -2140380704
-    - e29c791a3e5f1c4418f92002243a85f2: -96303126
-    - e29c791a3e5f1c4418f92002243a85f2: -71230189
-    - e29c791a3e5f1c4418f92002243a85f2: -1571278997
-    - e29c791a3e5f1c4418f92002243a85f2: -1790401093
-    - e29c791a3e5f1c4418f92002243a85f2: 1267932466
-    - e29c791a3e5f1c4418f92002243a85f2: -505492501
-    - e29c791a3e5f1c4418f92002243a85f2: 910858510
+    - c07f20f6502265e438dc707fd2f11149: 327628344
+    - c07f20f6502265e438dc707fd2f11149: -584301597
+    - c07f20f6502265e438dc707fd2f11149: 132648101
+    - c07f20f6502265e438dc707fd2f11149: 873285651
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
-  - {fileID: 870097292, guid: a7aa2fd698a52014fa628158fc4dfd2b, type: 3}
-  - {fileID: 800245394, guid: a7aa2fd698a52014fa628158fc4dfd2b, type: 3}
-  - {fileID: -1503900656, guid: a7aa2fd698a52014fa628158fc4dfd2b, type: 3}
-  - {fileID: 2035289731, guid: a7aa2fd698a52014fa628158fc4dfd2b, type: 3}
-  - {fileID: 684022329, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 965453113, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 2038771110, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 47272979, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 450084139, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -1173064044, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -1450040653, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 1778592625, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -439544069, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -837539987, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -1396461690, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 1283090106, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 1331708532, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 1797437111, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 562628483, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -339280980, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -309050385, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -1832589072, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -992064525, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -574489691, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -1325790497, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 104418998, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -702220311, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 1327571795, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -2140380704, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -96303126, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -71230189, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -1571278997, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -1790401093, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 1267932466, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: -505492501, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
-  - {fileID: 910858510, guid: e29c791a3e5f1c4418f92002243a85f2, type: 3}
+  - {fileID: 327628344, guid: c07f20f6502265e438dc707fd2f11149, type: 3}
+  - {fileID: -584301597, guid: c07f20f6502265e438dc707fd2f11149, type: 3}
+  - {fileID: 132648101, guid: c07f20f6502265e438dc707fd2f11149, type: 3}
+  - {fileID: 873285651, guid: c07f20f6502265e438dc707fd2f11149, type: 3}
   m_PackedSpriteNamesToIndex:
   - player1_0
   - player1_1
   - player1_2
   - player1_3
-  - player2_18
-  - player2_19
-  - player2_16
-  - player2_17
-  - player2_14
-  - player2_15
-  - player2_12
-  - player2_13
-  - player2_10
-  - player2_11
-  - player2_9
-  - player2_8
-  - player2_3
-  - player2_2
-  - player2_1
-  - player2_0
-  - player2_7
-  - player2_6
-  - player2_5
-  - player2_4
-  - player2_29
-  - player2_28
-  - player2_30
-  - player2_31
-  - player2_23
-  - player2_22
-  - player2_21
-  - player2_20
-  - player2_27
-  - player2_26
-  - player2_25
-  - player2_24
   m_RenderDataMap: {}
   m_Tag: playerTankAtlas
   m_IsVariant: 0

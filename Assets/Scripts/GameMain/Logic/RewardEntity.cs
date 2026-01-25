@@ -104,7 +104,7 @@ namespace GameMain
                     GameEntry.Audio.PlaySound("prop_bomb.mp3");
                     break;
                 case 6://保卫道具：鸟窝砖硬化为墙
-                    GameEntry.Event.DispatchEvent<int>(GameEventType.BirdChangeStore, 10);
+                    GameEntry.Event.DispatchEvent<float>(GameEventType.BirdChangeStore, 20f);
                     GameEntry.Audio.PlaySound("prop_award.mp3");
                     break;
             }

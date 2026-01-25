@@ -3,7 +3,7 @@
   "projectname": "MFrameWork",
   "unity": {
     "build": {
-      "webgl": "F:\\PrivateProject\\MFrameWork\\MFrameWork\\tt-minigame\\webgl_package-20260117_232825.zip",
+      "webgl": "F:\\PrivateProject\\MFrameWork\\MFrameWork\\tt-minigame\\webgl_package-20260122_195231.zip",
       "native": {
         "il2cpp": "",
         "apk": "",
@@ -14,7 +14,7 @@
     "publishType": "2",
     "starkSdkVersion": "Without StarkSDK",
     "unityToolsVersion": null,
-    "unityEngineVersion": "2022.3.62f1c1",
+    "unityEngineVersion": "2022.3.17f1c1",
     "arch": "both"
   },
   "setting": {

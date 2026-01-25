@@ -1,9 +1,9 @@
 fileFormatVersion: 2
-guid: a7aa2fd698a52014fa628158fc4dfd2b
+guid: c07f20f6502265e438dc707fd2f11149
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 13
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -81,7 +81,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Standalone
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -94,7 +94,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: WebGL
+    buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -119,6 +119,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -128,8 +141,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 320
-        height: 320
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,8 +150,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4ddb037e333227b45a886434a5b0b492
-      internalID: 870097292
+      spriteID: b3c73704f43cbd9418f011295842aa26
+      internalID: 327628344
       vertices: []
       indices: 
       edges: []
@@ -147,10 +160,10 @@ TextureImporter:
       name: player1_1
       rect:
         serializedVersion: 2
-        x: 320
+        x: 512
         y: 0
-        width: 320
-        height: 320
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -158,8 +171,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e291faad233a65346b91d3938a0f700f
-      internalID: 800245394
+      spriteID: 704e5cfd2a10212489594e29a7eb6949
+      internalID: -584301597
       vertices: []
       indices: 
       edges: []
@@ -168,10 +181,10 @@ TextureImporter:
       name: player1_2
       rect:
         serializedVersion: 2
-        x: 640
+        x: 1024
         y: 0
-        width: 320
-        height: 320
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -179,8 +192,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6240c2644b03fd34fa4959849839b6d9
-      internalID: -1503900656
+      spriteID: 243bed3d51b8fee4c82e56226e5ec7d1
+      internalID: 132648101
       vertices: []
       indices: 
       edges: []
@@ -189,10 +202,10 @@ TextureImporter:
       name: player1_3
       rect:
         serializedVersion: 2
-        x: 960
+        x: 1536
         y: 0
-        width: 320
-        height: 320
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,8 +213,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2bb5251d51b4390449930f378d005a02
-      internalID: 2035289731
+      spriteID: 988f198dbafd6894f81aead96a5679e3
+      internalID: 873285651
       vertices: []
       indices: 
       edges: []
@@ -209,7 +222,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: ac4c220ae38c5074c9b46f995b6002c8
     internalID: 0
     vertices: []
     indices: 
@@ -217,10 +230,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      player1_0: 870097292
-      player1_1: 800245394
-      player1_2: -1503900656
-      player1_3: 2035289731
+      player1_0: 327628344
+      player1_1: -584301597
+      player1_2: 132648101
+      player1_3: 873285651
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

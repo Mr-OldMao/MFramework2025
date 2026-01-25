@@ -50,7 +50,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200543593883301141, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
       propertyPath: m_Name
-      value: Wall_LU Variant
+      value: Wall_LU
+      objectReference: {fileID: 0}
+    - target: {fileID: 9220722686954862414, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -66,6 +70,9 @@ PrefabInstance:
     - {fileID: 1909110138405851825, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
     - {fileID: 5507566415121665159, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
     - {fileID: 5278741410685455828, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+    - {fileID: 1747617132376578758, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+    - {fileID: 8144593615807001765, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
+    - {fileID: 6214200332914249455, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ca80f396370e4740af927614b5b8f61, type: 3}

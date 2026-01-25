@@ -6,12 +6,20 @@ namespace GameMain
 {
     public partial class GameMainLogic
     {
+        public bool IsDebugger { get; private set; }
+
         public static GameMainLogic Instance;
 
         public int StageID { get; set; } = 1;
 
         public async UniTask Init()
         {
+#if UNITY_EDITOR
+            IsDebugger = true;
+#else
+            IsDebugger = false;
+#endif
+
             InitRegisterEvent();
             await InitPool();
         }

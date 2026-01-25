@@ -98,6 +98,11 @@ namespace GameMain
             });
             btnTankLevelAdd.onClick.AddListener(() =>
             {
+                if (GameMainLogic.Instance.IsDebugger)
+                {
+                    GameMainLogic.Instance.Player1Entity.AddLevel();
+                    return;
+                }
                 ShowMask(true);
                 TTSDKManager.Instance.ShowAdvInsert(() =>
                 {
@@ -111,6 +116,11 @@ namespace GameMain
             });
             btnAddLife.onClick.AddListener(() =>
             {
+                if (GameMainLogic.Instance.IsDebugger)
+                {
+                    GameMainLogic.Instance.Player1Entity.AddLife();
+                    return;
+                }
                 ShowMask(true);
                 TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {
@@ -139,8 +149,16 @@ namespace GameMain
             });
             btnPlayerUnbeatable.onClick.AddListener(() =>
             {
+                if (GameMainLogic.Instance.IsDebugger)
+                {
+                    GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
+                    {
+                        tankEntityBase = GameMainLogic.Instance.Player1Entity,
+                        durationTime = 5f
+                    });
+                    return;
+                }
                 ShowMask(true);
-
                 TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {
                     if (isPlayed)
@@ -166,6 +184,12 @@ namespace GameMain
 
             btnRandomReward.onClick.AddListener(() =>
             {
+                if (GameMainLogic.Instance.IsDebugger)
+                {
+                    GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
+                    return;
+                }
+
                 ShowMask(true);
                 TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {

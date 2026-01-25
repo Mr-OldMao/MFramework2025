@@ -69,6 +69,11 @@ namespace GameMain
             m_DicMapGridData.TryGetValue(gridPos, out GridDataInfo gridDataInfo);
             return gridDataInfo;
         }
+        
+        public bool IsBridWallGridPos(Vector2 gridPos)
+        {
+            return GridPosBridWallArr != null && GridPosBridWallArr.Contains(gridPos);
+        }
 
         public string GetMapPropAssetPath(EMapEntityType eMapEntityType)
         {

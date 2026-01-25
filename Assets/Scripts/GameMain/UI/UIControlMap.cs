@@ -28,6 +28,8 @@ namespace GameMain
 
         private SpriteAtlas m_ItemAtlas;
 
+
+        private int m_TimerIDBridStoneWall;
         public override async UniTask Init(IUIView view, IUIModel model)
         {
             await base.Init(view, model);
@@ -37,7 +39,7 @@ namespace GameMain
 
             GameEntry.Event.RegisterEvent(GameEventType.GameStart, OnGameStart);
             GameEntry.Event.RegisterEvent(GameEventType.GameSettlement, OnGameSettlement);
-            GameEntry.Event.RegisterEvent<int>(GameEventType.BirdChangeStore, OnBirdChangeStore);
+            GameEntry.Event.RegisterEvent<float>(GameEventType.BirdChangeStore, OnBirdChangeStore);
 
             await GameMainLogic.Instance.Init();
             await InitMapEntity();
@@ -152,9 +154,10 @@ namespace GameMain
                 if (!string.IsNullOrEmpty(assetPath))
                 {
                     var go = await GameEntry.Resource.InstantiateAsset(assetPath, false);
-                    go.GetOrAddComponent<MapEntity>().SetMapEntityType(EMapEntityType.AirBorder);
+                    Vector2 gridPos = borderPos[i];
+                    go.GetOrAddComponent<MapEntity>().SetMapEntityType(gridPos, EMapEntityType.AirBorder);
                     go.transform.SetParent(NodeBorder.transform);
-                    go.transform.localPosition = new Vector3(borderPos[i].x, 0, borderPos[i].y);
+                    go.transform.localPosition = new Vector3(gridPos.x, 0, gridPos.y);
                 }
             }
         }
@@ -163,7 +166,11 @@ namespace GameMain
         {
             model = (UIModelMap)Model;
             List<GridDataInfo> gridDataInfos = model.GetMapGridData();
+            await GenerateMapEntity(gridDataInfos);
+        }
 
+        private async UniTask GenerateMapEntity(List<GridDataInfo> gridDataInfos)
+        {
             for (int i = 0; i < gridDataInfos.Count; i++)
             {
                 for (int j = 0; j < gridDataInfos[i]?.entityDataInfos?.Count; j++)
@@ -176,7 +183,7 @@ namespace GameMain
                         go.transform.SetParent(NodeMap.transform);
                         go.transform.localPosition = new Vector3(gridDataInfos[i].gridPos.x, 0, gridDataInfos[i].gridPos.y);
                         gridDataInfos[i].entityDataInfos[j].propEntity = go;
-                        go.AddComponent<MapEntity>().SetMapEntityType(gridDataInfos[i].entityDataInfos[j].mapEntityType);
+                        go.AddComponent<MapEntity>().SetMapEntityType(gridDataInfos[i].gridPos, gridDataInfos[i].entityDataInfos[j].mapEntityType);
                         go.SetActive(true);
                         go.name = $"{gridDataInfos[i].entityDataInfos[j].mapEntityType}_{gridDataInfos[i].gridPos.x}_{gridDataInfos[i].gridPos.y}";
                     }
@@ -227,55 +234,67 @@ namespace GameMain
         }
 
 
-        public async void OnBirdChangeStore(int duration)
+        public async void OnBirdChangeStore(float duration)
         {
-            if (m_ItemAtlas == null)
+            if (m_TimerIDBridStoneWall > 0)
             {
-                m_ItemAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "itemAtlas.spriteatlas", false);
+                GameEntry.Timer.RemoveDelayTimer(m_TimerIDBridStoneWall);
             }
 
+            FixedBridWall();
+            ChangeBirdWallToStone();
+            m_TimerIDBridStoneWall = GameEntry.Timer.AddDelayTimer(duration, () =>
+            {
+                ChangeBirdStoneToWall();
+                m_TimerIDBridStoneWall = 0;
+            });
+            return;
+        }
+
+
+        public void FixedBridWall()
+        {
             for (int i = 0; i < model.GridPosBridWallArr.Count; i++)
             {
                 GridDataInfo gridDataInfo = model.GetMapGridDataInfo(model.GridPosBridWallArr[i]);
                 for (int j = 0; j < gridDataInfo.entityDataInfos.Count; j++)
                 {
                     MapEntity mapEntity = gridDataInfo.entityDataInfos[j].propEntity.GetComponent<MapEntity>();
-                    EMapEntityType targetType = EMapEntityType.None;
-                    switch (mapEntity.mapEntityType)
+                    if (mapEntity != null)
                     {
-                        case EMapEntityType.Wall:
-                            targetType = EMapEntityType.Stone;
-                            break;
-                        case EMapEntityType.Stone:
-                            targetType = EMapEntityType.Wall;
-                            break;
-                        case EMapEntityType.Wall_LU:
-                            targetType = EMapEntityType.Stone_LU;
-                            break;
-                        case EMapEntityType.Wall_LD:
-                            targetType = EMapEntityType.Stone_LD;
-                            break;
-                        case EMapEntityType.Wall_RU:
-                            targetType = EMapEntityType.Stone_RU;
-                            break;
-                        case EMapEntityType.Wall_RD:
-                            targetType = EMapEntityType.Stone_RD;
-                            break;
-                        case EMapEntityType.Stone_LU:
-                            targetType = EMapEntityType.Wall_LU;
-                            break;
-                        case EMapEntityType.Stone_LD:
-                            targetType = EMapEntityType.Wall_LD;
-                            break;
-                        case EMapEntityType.Stone_RU:
-                            targetType = EMapEntityType.Wall_RU;
-                            break;
-                        case EMapEntityType.Stone_RD:
-                            targetType = EMapEntityType.Wall_RD;
-                            break;
+                        mapEntity.FixedBridWall();
                     }
-                    mapEntity.SetMapEntityType(targetType);
-                    mapEntity.SetSprite(targetType, m_ItemAtlas);
+                }
+            }
+        }
+
+        public void ChangeBirdWallToStone()
+        {
+            for (int i = 0; i < model.GridPosBridWallArr.Count; i++)
+            {
+                GridDataInfo gridDataInfo = model.GetMapGridDataInfo(model.GridPosBridWallArr[i]);
+                for (int j = 0; j < gridDataInfo.entityDataInfos.Count; j++)
+                {
+                    MapEntity mapEntity = gridDataInfo.entityDataInfos[j].propEntity.GetComponent<MapEntity>();
+                    if (mapEntity != null)
+                    {
+                        mapEntity.ChangeBirdWallToStone();
+                    }
+                }
+            }
+        }
+        public void ChangeBirdStoneToWall()
+        {
+            for (int i = 0; i < model.GridPosBridWallArr.Count; i++)
+            {
+                GridDataInfo gridDataInfo = model.GetMapGridDataInfo(model.GridPosBridWallArr[i]);
+                for (int j = 0; j < gridDataInfo.entityDataInfos.Count; j++)
+                {
+                    MapEntity mapEntity = gridDataInfo.entityDataInfos[j].propEntity.GetComponent<MapEntity>();
+                    if (mapEntity != null)
+                    {
+                        mapEntity.ChangeBirdStoneToWall();
+                    }
                 }
             }
         }
