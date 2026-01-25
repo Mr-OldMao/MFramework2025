@@ -214,9 +214,7 @@ namespace GameMain
                     go.GetOrAddComponent<RewardEntity>();
                 }
                 var rewardDatas = DataTools.GetRewardRewards();
-                //int id = Random.Range(rewardDatas[0].ID, rewardDatas[rewardDatas.Count - 1].ID + 1);
-                //int id = Random.Range(rewardDatas[0].ID, rewardDatas[rewardDatas.Count - 1].ID );//TODO
-                int id = rewardDatas[rewardDatas.Count - 1].ID;
+                int id = Random.Range(rewardDatas[0].ID, rewardDatas[rewardDatas.Count - 1].ID + 1);
                 go.GetComponent<RewardEntity>().Init(id);
                 string spriteName = DataTools.GetRewardReward(id).Name;
                 go.transform.Find<SpriteRenderer>("imgReward").sprite = rewardAtlas.GetSprite(spriteName);

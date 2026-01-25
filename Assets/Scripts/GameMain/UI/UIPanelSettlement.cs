@@ -11,6 +11,7 @@ namespace GameMain
     public class UIPanelSettlement : UIViewBase
     {
         // UI字段
+        private TextMeshProUGUI txtTopScore;
         private RectTransform rootNode;
         private RectTransform rectGroup;
         private RectTransform rectNode1;
@@ -95,6 +96,7 @@ namespace GameMain
             txtP1KillTotalCount.text = string.Empty;
             txtP1TotalScore.text = string.Empty;
             txtStageNum.text = GameMainLogic.Instance.StageID.ToString();
+            txtTopScore.text = GameMainLogic.Instance.GetUserDataBase().topScore.ToString();
 
             string txtAudio = "settlement_txt.wav";
             GameEntry.Audio.PlaySound(txtAudio);
@@ -113,7 +115,8 @@ namespace GameMain
             await UniTask.Delay(500);
             int score4 = await DalayShowTxt(p1KillCountEnemy4, DataTools.GetTankEnemy(203).Score, txtP1KillTankCount4, txtP1Score4);
             await UniTask.Delay(500);
-            txtP1TotalScore.text = $"{(score1 + score2 + score3 + score4)}";
+            int p1TotalScore = _model.LastTotalScore + score1 + score2 + score3 + score4;
+            txtP1TotalScore.text = $"{p1TotalScore}";
             txtP1KillTotalCount.text = $"{p1KillTotalCount}";
 
             GameEntry.Audio.PlaySound(txtAudio);
@@ -153,8 +156,16 @@ namespace GameMain
                 GameEntry.Audio.PlaySound(txtAudio);
             }
 
+            int curPassedStage = (Controller as UIControlSettlement).CurGameStateType == GameStateType.GameWin ?
+                GameMainLogic.Instance.StageID : GameMainLogic.Instance.StageID - 1;
+            GameMainLogic.Instance.SetUserDataBase(curPassedStage, p1TotalScore, p1KillTotalCount);
+            txtTopScore.text = GameMainLogic.Instance.GetUserDataBase().topScore.ToString();
+
+            _model.LastTotalScore = p1TotalScore;
+
             btnClose.gameObject.SetActive(true);
         }
+
 
         public override async UniTask ShowPanel()
         {
@@ -177,6 +188,7 @@ namespace GameMain
                 case GameStateType.GameRunning:
                 case GameStateType.GamePause:
                 case GameStateType.GameSettlement:
+                    (Controller.Model as UIModelSettlement).LastTotalScore = 0;
                     Debugger.LogError("游戏状态异常，gameStateType：" + (Controller as UIControlSettlement).CurGameStateType);
                     break;
                 case GameStateType.GameWin:
@@ -191,6 +203,7 @@ namespace GameMain
                     break;
                 case GameStateType.GameFail:
                     Debugger.LogError("游戏结束，结算完毕，准备返回菜单界面");
+                    (Controller.Model as UIModelSettlement).LastTotalScore = 0;
                     GameMainLogic.Instance.Player1Entity.ResetTankData();
                     var gameoverPanel = await GameEntry.UI.ShowViewAsync<UIPanelGameOver>();
                     gameoverPanel.ShowPanelFull();

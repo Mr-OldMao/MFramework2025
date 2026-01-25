@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,8 @@ namespace GameMain
         private Button btnGameStart;
         private Button btnSidebar;
         private RectTransform rectSidebar;
+        private TextMeshProUGUI txtTopScore;
+
         public override async UniTask Init()
         {
             await base.Init();
@@ -31,6 +34,10 @@ namespace GameMain
         public override async UniTask ShowPanel()
         {
             base.ShowPanel();
+
+            int topScore = GameMainLogic.Instance.GetUserDataBase().topScore;
+            txtTopScore.text = $"HI- {topScore}";
+
 
             if (GameMainLogic.Instance.GameStateType == GameStateType.GameSettlement)
             {

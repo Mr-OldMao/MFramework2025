@@ -68,7 +68,7 @@ namespace GameMain
             });
         }
 
-        public void GuideClickSidebar(Action sucCallback)
+        public void GuideClickSidebar(Action<bool> callback)
         {
             Debug.Log("-------TTSDKManager Init NavigateToScene");
             var jd = new JsonData
@@ -81,13 +81,14 @@ namespace GameMain
              () =>
              {
                  Debug.Log($"TT.NavigateToScene succ");
-                 sucCallback?.Invoke();
+                 callback?.Invoke(true);
              }, () =>
              {
                  Debug.Log($"TT.NavigateToScene Completed");
              }, (p1, p2) =>
              {
-                 Debug.Log($"TT.NavigateToScene Fail p1:{p1},p2:{p2}");
+                 Debug.LogError($"TT.NavigateToScene Fail p1:{p1},p2:{p2}");
+                 callback?.Invoke(false);
              });
         }
 

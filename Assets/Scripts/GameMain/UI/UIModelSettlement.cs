@@ -10,6 +10,7 @@ namespace GameMain
         private Dictionary<int, KillDataInfo> m_DicPlayer1KillData = new Dictionary<int, KillDataInfo>();
         private Dictionary<int, KillDataInfo> m_DicPlayer2KillData = new Dictionary<int, KillDataInfo>();
 
+        public int LastTotalScore { get; set; }
         public Dictionary<int, KillDataInfo> GetDicPlayer1KillData()
         {
             return m_DicPlayer1KillData;

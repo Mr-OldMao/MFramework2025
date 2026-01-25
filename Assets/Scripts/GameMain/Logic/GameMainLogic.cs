@@ -21,6 +21,7 @@ namespace GameMain
 #endif
 
             InitRegisterEvent();
+            InitUserData();
             await InitPool();
         }
 

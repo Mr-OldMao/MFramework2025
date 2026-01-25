@@ -10,7 +10,7 @@ namespace GameMain
 {
     //[UIBind(typeof(UIControlSidebar), typeof(UIModelSidebar))]
     [UILayer(UILayerType.Tips)]
-    public  class UIPanelSidebar : UIViewBase
+    public class UIPanelSidebar : UIViewBase
     {
         // UI字段
         private RectTransform rootNode;
@@ -18,9 +18,11 @@ namespace GameMain
         private Button btnClose;
         private RectTransform rectReward;
         private Button btnReceiveReward;
+        private Button btnJumpSidebar;
+        private TextMeshProUGUI txtTodayReceivedReward;
 
-        private TextMeshProUGUI txtReceiveReward;
 
+        
         public override async UniTask Init()
         {
             await base.Init();
@@ -30,15 +32,14 @@ namespace GameMain
         {
             if (model is not null)
             {
-                
+
             }
         }
 
         public override UniTask ShowPanel()
         {
             base.ShowPanel();
-            UpdateReceiveRewardState(false);
-
+            UpdateReceiveRewardState();
             return UniTask.CompletedTask;
         }
 
@@ -58,9 +59,23 @@ namespace GameMain
 
             btnReceiveReward.onClick.AddListener(() =>
             {
-                TTSDKManager.Instance.GuideClickSidebar(() =>
+                Debug.Log("领取奖励TODO "+ GameMainLogic.Instance.IsCanGetTodayReward);
+                if (GameMainLogic.Instance.IsCanGetTodayReward)
                 {
-                    UpdateReceiveRewardState(true);
+                    GameMainLogic.Instance.IsGetTodayReward = true;
+                    UpdateReceiveRewardState();
+                }
+            });
+
+            btnJumpSidebar.onClick.AddListener(() =>
+            {
+                TTSDKManager.Instance.GuideClickSidebar((isSucc) =>
+                {
+                    if (isSucc)
+                    {
+                        GameMainLogic.Instance.SetLastEnterGameDateTime();
+                    }
+                    UpdateReceiveRewardState();
                 });
             });
         }
@@ -72,11 +87,13 @@ namespace GameMain
         }
 
 
-        private void UpdateReceiveRewardState(bool isReceived)
+        private void UpdateReceiveRewardState()
         {
-            txtReceiveReward.text = isReceived ? "已领取奖励" : "跳转侧边栏领取奖励";
-
-            btnReceiveReward.interactable = !isReceived;
+            btnJumpSidebar.gameObject.SetActive(!GameMainLogic.Instance.IsCanGetTodayReward);
+            btnReceiveReward.gameObject.SetActive(
+                GameMainLogic.Instance.IsCanGetTodayReward
+                && !GameMainLogic.Instance.IsGetTodayReward);
+            txtTodayReceivedReward.gameObject.SetActive(GameMainLogic.Instance.IsGetTodayReward);
         }
     }
 }
