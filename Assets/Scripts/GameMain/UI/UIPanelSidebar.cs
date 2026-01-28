@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace GameMain
 {
-    //[UIBind(typeof(UIControlSidebar), typeof(UIModelSidebar))]
+    [UIBind(typeof(UIControlSidebar), typeof(UIModelSidebar))]
     [UILayer(UILayerType.Tips)]
     public class UIPanelSidebar : UIViewBase
     {
@@ -21,8 +21,10 @@ namespace GameMain
         private Button btnJumpSidebar;
         private TextMeshProUGUI txtTodayReceivedReward;
 
+        private Image imgRewardIcon;
+        private TextMeshProUGUI txtRewardDes;
 
-        
+
         public override async UniTask Init()
         {
             await base.Init();
@@ -36,11 +38,15 @@ namespace GameMain
             }
         }
 
-        public override UniTask ShowPanel()
+        public override async UniTask ShowPanel()
         {
             base.ShowPanel();
             UpdateReceiveRewardState();
-            return UniTask.CompletedTask;
+
+            txtRewardDes.text = ((UIControlSidebar)Controller).GetRewardDes();
+            await SetSpriteAsync(imgRewardIcon, EAtlasType.reward, ((UIControlSidebar)Controller).fB_Reward_Sidebar.AssetName);
+
+            //return UniTask.CompletedTask;
         }
 
         public override UniTask HidePanel()
@@ -59,7 +65,7 @@ namespace GameMain
 
             btnReceiveReward.onClick.AddListener(() =>
             {
-                Debug.Log("领取奖励TODO "+ GameMainLogic.Instance.IsCanGetTodayReward);
+                Debug.Log("领取奖励TODO " + GameMainLogic.Instance.IsCanGetTodayReward);
                 if (GameMainLogic.Instance.IsCanGetTodayReward)
                 {
                     GameMainLogic.Instance.IsGetTodayReward = true;

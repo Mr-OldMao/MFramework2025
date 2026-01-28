@@ -18,6 +18,7 @@ namespace GameMain
         private static readonly Dictionary<int, FB_bullet_bullet> dicBulletBullet = new Dictionary<int, FB_bullet_bullet>();
         private static readonly Dictionary<int, FB_stage_stage> dicStageStage = new Dictionary<int, FB_stage_stage>();
         private static readonly Dictionary<int, FB_reward_reward> dicRewardReward = new Dictionary<int, FB_reward_reward>();
+        private static readonly Dictionary<int, FB_reward_sidebar> dicRewardSidebar = new Dictionary<int, FB_reward_sidebar>();
         private static readonly Dictionary<int, FB_tank_player> dicTankPlayer = new Dictionary<int, FB_tank_player>();
         private static readonly Dictionary<int, FB_tank_enemy> dicTankEnemy = new Dictionary<int, FB_tank_enemy>();
         private static readonly Dictionary<int, FB_map_mapType> dicMapMapType = new Dictionary<int, FB_map_mapType>();
@@ -29,6 +30,7 @@ namespace GameMain
             await SetBulletBullet();
             await SetLevelLevel();
             await SetRewardReward();
+            await SetRewardSidebar();
             await SetTankPlayer();
             await SetTankEnemy();
             await SetMapType();
@@ -70,6 +72,17 @@ namespace GameMain
             for (int i = 0; i < datas.DatasLength; i++)
             {
                 dicRewardReward.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
+            }
+        }
+
+        public static async UniTask SetRewardSidebar()
+        {
+            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("reward_sidebar"));
+            ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);
+            var datas = FB_reward_sidebar_Array.GetRootAsFB_reward_sidebar_Array(byteBuffer);
+            for (int i = 0; i < datas.DatasLength; i++)
+            {
+                dicRewardSidebar.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
             }
         }
         public static async UniTask SetTankPlayer()
@@ -127,6 +140,15 @@ namespace GameMain
             return dicRewardReward.Values.ToList();
         }
 
+        public static FB_reward_sidebar GetRewardSidebar(int id)
+        {
+            return dicRewardSidebar.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
+
+        public static List<FB_reward_sidebar> GetRewardSidebars()
+        {
+            return dicRewardSidebar.Values.ToList();
+        }
         public static FB_map_mapType GetMapType(int id)
         {
             return dicMapMapType.Values.Where(x => x.ID == id).FirstOrDefault();
@@ -155,6 +177,11 @@ namespace GameMain
         public static FB_tank_player GetTankPlayer(int id)
         {
             return dicTankPlayer.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
+
+        public static List<FB_tank_player> GetTankPlayer()
+        {
+            return dicTankPlayer.Values.ToList();
         }
 
         public static FB_tank_enemy GetTankEnemy(int id)

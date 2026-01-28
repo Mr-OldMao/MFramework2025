@@ -38,6 +38,7 @@ SpriteAtlas:
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
     - d705d8236a7daed4fa4bffcb3b763fac: 21300000
+    - 267ea5e83518222438e405c5eb6215cf: 21300000
     - 5ff4afe878502c24c8dcd66ca7a2168f: 21300000
     - ffd053a9b758c494888155d7b2af3b93: 21300000
     - 8752aa2aebc8f73429d8b07f9f8c98b0: 21300000
@@ -46,6 +47,7 @@ SpriteAtlas:
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: d705d8236a7daed4fa4bffcb3b763fac, type: 3}
+  - {fileID: 21300000, guid: 267ea5e83518222438e405c5eb6215cf, type: 3}
   - {fileID: 21300000, guid: 5ff4afe878502c24c8dcd66ca7a2168f, type: 3}
   - {fileID: 21300000, guid: ffd053a9b758c494888155d7b2af3b93, type: 3}
   - {fileID: 21300000, guid: 8752aa2aebc8f73429d8b07f9f8c98b0, type: 3}
@@ -53,6 +55,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: d749d50e2c9cb7a4cb9a5abb47c6f915, type: 3}
   m_PackedSpriteNamesToIndex:
   - RewardLife
+  - RewardRandom
   - RewardBomb
   - RewardStone
   - RewardTimer

@@ -198,6 +198,7 @@ namespace GameMain
                     HidePanel();
                     UIPanelLoad.ShowLoadStage(() =>
                     {
+                        GameMainLogic.Instance.Player1Entity.IsInitPlayerData = false;
                         GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
                     });
                     break;

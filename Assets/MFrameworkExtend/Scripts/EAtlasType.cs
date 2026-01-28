@@ -7,5 +7,6 @@ namespace GameMain
     public enum EAtlasType
     {
         temp,
+        reward,
     }
 }

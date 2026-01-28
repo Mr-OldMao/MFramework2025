@@ -10,9 +10,9 @@ namespace GameMain
         private FB_tank_player m_TankPlayerData;
 
         /// <summary>
-        /// 下次坦克生成是否初始化坦克剩余生命
+        /// 下次坦克生成是否初始化坦克数据
         /// </summary>
-        public bool IsInitLife = true;
+        public bool IsInitPlayerData = true;
 
         public void InitRegisterEvents()
         {
@@ -32,7 +32,46 @@ namespace GameMain
 
         protected override void InitBornBefore()
         {
-            UpdatePlayerLife();
+            UpdatePlayerData();
+            UpdatePlayerStageReward();
+        }
+
+        /// <summary>
+        /// 更新玩家关卡奖励
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        private void UpdatePlayerStageReward()
+        {
+            //侧边栏奖励
+            var sidebarData = GameMainLogic.Instance.GetUserDataSidebar();
+            Debugger.Log($"侧边栏奖励 isGetTodayReward:{sidebarData.isGetTodayReward},rewardType:{sidebarData.rewardType},rewardValue:{sidebarData.rewardValue}");
+
+            if (sidebarData.isGetTodayReward && IsInitPlayerData)
+            {
+                //1-第一关 关卡开始生命值+x
+                //2-第一关 关卡开始坦克等级+x
+                //3-每关开始获取随机道具
+                bool isFirstStage = GameMainLogic.Instance.StageID == 1;
+                
+                switch (sidebarData.rewardType)
+                {
+                    case 1:
+                        if (isFirstStage)
+                        {
+                            AddLife(sidebarData.rewardValue, true);
+                        }
+                        break;
+                    case 2:
+                        if (isFirstStage)
+                        {
+                            AddLevel(sidebarData.rewardValue, true);
+                        }
+                        break;
+                    case 3:
+                        GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
+                        break;
+                }
+            }
         }
 
         protected override void InitBornAfter()
@@ -53,10 +92,22 @@ namespace GameMain
 
         private void ChangeTankType(int id)
         {
+            var tankDatas = DataTools.GetTankPlayer();
+            int maxLevelID = tankDatas[tankDatas.Count - 1].ID;
+            int minLevelID = tankDatas[0].ID;
+            if (id > maxLevelID)
+            {
+                id = maxLevelID;
+            }
+            else if (id < minLevelID)
+            {
+                id = minLevelID;
+            }
+
             if (DataTools.GetTankPlayer(id).ByteBuffer == null)
             {
                 Debugger.LogError($"没有该坦克数据 id:{id}");
-                return;
+               
             }
             UpdateTankData(id);
             m_TankPlayerData = DataTools.GetTankPlayer(tankTypeID);
@@ -70,21 +121,27 @@ namespace GameMain
         //重置坦克数据
         public void ResetTankData()
         {
-            UpdatePlayerLife();
+            UpdatePlayerData();
         }
 
         public void RecycleTank()
         {
             entity.SetActive(false);
-            SubLife();
+            if (GameMainLogic.Instance.GameStateType == GameStateType.GameRunning)
+            {
+                SubLife();
+            }
             IsCanMove = false;
             m_IsCanFire = false;
         }
 
-        public void AddLevel(int addNum = 1)
+        public void AddLevel(int addNum = 1, bool isPlaySound = true)
         {
             int id = tankTypeID + addNum;
-            GameEntry.Audio.PlaySound("prop_award.ogg");
+            if (isPlaySound)
+            {
+                GameEntry.Audio.PlaySound("prop_award.mp3");
+            }
             ChangeTankType(id);
         }
         public void SubLevel(int subNum = 1)
@@ -93,11 +150,14 @@ namespace GameMain
             ChangeTankType(id);
         }
 
-        public void AddLife(int addNum = 1)
+        public void AddLife(int addNum = 1, bool isPlaySound = true)
         {
-            ++remainLife;
+            remainLife += addNum;
             GameEntry.UI.GetView<UIPanelBattle>().RefreshUI();
-            GameEntry.Audio.PlaySound("prop_addlife.mp3");
+            if (isPlaySound)
+            {
+                GameEntry.Audio.PlaySound("prop_addlife.mp3");
+            }
         }
 
         public void UpdateHP()
@@ -110,9 +170,9 @@ namespace GameMain
             --remainLife;
         }
 
-        public void UpdatePlayerLife()
+        public void UpdatePlayerData()
         {
-            if (IsInitLife)
+            if (IsInitPlayerData)
             {
                 remainLife = DataTools.GetConst("Player_Tank_Life");
                 GameEntry.UI.GetView<UIPanelBattle>().RefreshUI();
@@ -125,7 +185,7 @@ namespace GameMain
             Dead();
             //判定能否复活
             bool isCanRevive = remainLife >= 0;
-            IsInitLife = !isCanRevive;
+            IsInitPlayerData = !isCanRevive;
             if (isCanRevive)
             {
                 GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).GetEntity();

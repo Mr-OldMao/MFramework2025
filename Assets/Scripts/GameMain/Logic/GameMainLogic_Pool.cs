@@ -153,7 +153,7 @@ namespace GameMain
                 },
                 recycleObjCallback = (go) =>
                 {
-                    Debug.Log("回收坦克 " + go);
+                    Debug.Log("回收坦克 " + go + ",GameStateType:" + GameMainLogic.Instance.GameStateType);
                     go.GetComponent<EnemyEntity>().RecycleTank();
                 },
                 preloadObjCallback = (go) =>
@@ -189,7 +189,7 @@ namespace GameMain
                 },
                 recycleObjCallback = (go) =>
                 {
-                    Debug.Log("回收坦克 " + go);
+                    Debug.Log("回收坦克 " + go + ",GameStateType:" + GameMainLogic.Instance.GameStateType);
                     go.GetComponent<PlayerEntity>().RecycleTank();
                 },
                 preloadObjCallback = (go) =>

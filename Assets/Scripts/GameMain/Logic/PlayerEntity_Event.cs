@@ -22,7 +22,7 @@ namespace GameMain
             m_IsCanFire = false;
             GameEntry.Audio.StopBGM();
 
-            IsInitLife = true;
+            IsInitPlayerData = true;
             IsExtendBeforeDataNextGenerate = false;
         }
 
