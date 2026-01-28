@@ -110,7 +110,7 @@ namespace GameMain
             }, (go) =>
             {
                 //Debug.Log("回收子弹TODO " + go);
-            }, 1, 50));
+            }, 1, 500));
 
             m_PoolIdBulletEnemy = GameEntry.Pool.CreatPool(new Pool(bulletPrefab, (go, b) =>
             {

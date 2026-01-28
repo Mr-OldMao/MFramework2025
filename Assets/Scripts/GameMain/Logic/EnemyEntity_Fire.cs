@@ -1,6 +1,8 @@
 using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameMain
 {
@@ -11,11 +13,8 @@ namespace GameMain
 
         private Transform NodePosBullet;
 
-        /// <summary>
-        /// 当前坦克的发射子弹最短子弹间隔
-        /// </summary>
-        public float m_BulletInterval;
-       
+        public FB_bullet_bullet m_BulletData;
+
 
         /// <summary>
         /// 下次开火倒计时
@@ -34,7 +33,7 @@ namespace GameMain
 
         private void UpdateBulletInterval()
         {
-            m_BulletInterval = DataTools.GetBulletBullet(m_TankEnemyData.BulletID).BulletInterval;
+            m_BulletData = DataTools.GetBulletBullet(m_TankEnemyData.BulletID);
         }
 
         private void AutoFireUpdate()
@@ -55,7 +54,7 @@ namespace GameMain
                 {
                     m_IsCanFire = false;
                     Fire();
-                } 
+                }
             }
         }
 
@@ -73,7 +72,8 @@ namespace GameMain
         private void SetNextFireBulletCountdown()
         {
             float randomNextFireInterval = Random.Range(m_TankEnemyData.AutoFireInterval(0), m_TankEnemyData.AutoFireInterval(1));
-            m_NextFireBulletCountdown = randomNextFireInterval > m_BulletInterval ? randomNextFireInterval : m_BulletInterval;
+            //m_NextFireBulletCountdown = Math.Max(randomNextFireInterval, m_BulletInterval);
+            m_NextFireBulletCountdown = randomNextFireInterval;
         }
 
         private void ResetFireState()
@@ -81,11 +81,7 @@ namespace GameMain
             /// <summary>
             /// 碰撞后子弹重置最短时间
             /// </summary>
-            float m_ResetBulletMinTimer = m_BulletInterval / 2;
-            if (!IsAutoFire && m_NextFireBulletCountdown < m_ResetBulletMinTimer)
-            {
-                m_NextFireBulletCountdown = m_ResetBulletMinTimer;
-            }
+            SetNextFireBulletCountdown();
         }
     }
 }

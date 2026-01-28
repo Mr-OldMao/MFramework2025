@@ -41,6 +41,8 @@ namespace MFramework.Runtime
 
         public int AddDelayTimer(float delaySeconds, Action callback)
         {
+            Debug.LogError("------AddDelayTimer");
+
             TimerInfo timerInfo = new TimerInfo
             {
                 timerId = ++m_CurTimerId,

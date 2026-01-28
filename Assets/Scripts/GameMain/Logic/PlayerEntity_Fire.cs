@@ -1,7 +1,9 @@
 using Cysharp.Threading.Tasks;
+using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using MFramework.Runtime.Extend;
 using UnityEngine;
+using static GameMain.PlayerEntity;
 
 namespace GameMain
 {
@@ -12,33 +14,43 @@ namespace GameMain
         public float m_BulletInterval;
         private bool m_IsCanFire;
         private bool m_IsFiring;
-        private float m_CurBulletTimer;
+        private float m_NextFireBulletCountdown;
 
+        private EBulletStateType m_BulletStateType;
+
+        private FB_bullet_bullet m_BulletData;
 
         public void InitFire()
         {
             NodePosBullet = transform.Find<Transform>("NodePosBullet");
             m_IsCanFire = true;
             m_IsFiring = false;
-            m_CurBulletTimer = 0;
+            m_BulletData = DataTools.GetBulletBullet(m_TankPlayerData.BulletID);
+            m_NextFireBulletCountdown = m_BulletData.BulletInterval;
+            m_BulletStateType = EBulletStateType.BulletCDEnd;
         }
 
         private void UpdateBulletInterval()
         {
+            m_BulletData = DataTools.GetBulletBullet(m_TankPlayerData.BulletID);
             m_BulletInterval = DataTools.GetBulletBullet(m_TankPlayerData.BulletID).BulletInterval;
         }
 
         public void FireByKeyCode()
         {
-            if (!m_IsFiring)
+            if (m_BulletStateType == EBulletStateType.FireBulletEnd
+               || m_BulletStateType == EBulletStateType.BulletCD)
             {
-                m_CurBulletTimer += Time.deltaTime;
-                if (m_CurBulletTimer >= m_BulletInterval)
+                m_BulletStateType = EBulletStateType.BulletCD;
+
+                m_NextFireBulletCountdown -= Time.deltaTime;
+                if (m_NextFireBulletCountdown <= 0)
                 {
-                    m_IsFiring = true;
-                    m_CurBulletTimer = 0;
+                    m_BulletStateType = EBulletStateType.BulletCDEnd;
+                    m_NextFireBulletCountdown = m_BulletData.BulletInterval;
                 }
             }
+
 
             if (Input.GetKey(KeyCode.Space))
             {
@@ -51,48 +63,72 @@ namespace GameMain
             Fire();
         }
 
-        private void Fire()
+        private async void Fire()
         {
-            if (m_IsCanFire && m_IsFiring)
+            if (m_IsCanFire && m_BulletStateType == EBulletStateType.BulletCDEnd)
             {
-                BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
-                bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(tankTypeID).BulletID, () =>
+                m_BulletStateType = EBulletStateType.FireBulletStart;
+
+
+
+                if (!m_BulletData.IsCanFireDouble)
                 {
-                    ResetFireState();
-                });
-                m_IsFiring = false;
-                GameEntry.Audio.PlaySound("fire.mp3");
-                //PlayFireSound();
+                    m_BulletStateType = EBulletStateType.FireBulleting;
+                    BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
+                    bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(tankTypeID).BulletID, () =>
+                    {
+                        ResetFireState();
+                    });
+                    GameEntry.Audio.PlaySound("fire.mp3");
+                    m_BulletStateType = EBulletStateType.FireBulletEnd;
+                }
+                else
+                {
+                    int bulletID = DataTools.GetTankPlayer(tankTypeID).BulletID;
+
+                    m_BulletStateType = EBulletStateType.FireBulleting;
+                    BulletEntity bulletEntity1 = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
+                    bulletEntity1.Fire(NodePosBullet.position, MoveDirType, bulletID, null);
+                    GameEntry.Audio.PlaySound("fire.mp3");
+
+                    Debug.LogError("------双发");
+                    //GameEntry.Timer.AddDelayTimer(0.2f, () =>
+                    //{
+                    await UniTask.Delay(100);
+                    BulletEntity bulletEntity2 = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
+                    bulletEntity2.Fire(NodePosBullet.position, MoveDirType, bulletID, () =>
+                    {
+                        ResetFireState();
+                    });
+                    GameEntry.Audio.PlaySound("fire.mp3");
+                    m_BulletStateType = EBulletStateType.FireBulletEnd;
+                    //});
+                }
             }
         }
-        //private AudioSource audioSource;
-        //private async  UniTask PlayFireSound()
-        //{
-        //  string  audioName = SystemConstantData.PATH_AUDIO_SOUND + "fire.mp3";
-
-        //    AudioClip clip = await GameEntry.Resource.LoadAssetAsync<AudioClip>(audioName);
-
-        //    if (audioSource == null)
-        //    {
-        //        audioSource = new GameObject("fireAudio").AddComponent<AudioSource>();
-        //        audioSource.loop = false;
-        //    }
-        //    audioSource.PlayOneShot(clip);
-
-        //    //audioSource.clip = clip;
-        //    //audioSource.Play();
-        //}
 
         private void ResetFireState()
         {
             /// <summary>
             /// 碰撞后子弹重置最短时间
             /// </summary>
-            float m_ResetBulletMinTimer = m_BulletInterval / 2;
-            if (!m_IsFiring && m_CurBulletTimer < m_ResetBulletMinTimer)
-            {
-                m_CurBulletTimer = m_ResetBulletMinTimer;
-            }
+            //float m_ResetBulletMinTimer = m_BulletInterval / 2;
+            //if (!m_IsFiring && m_CurBulletTimer < m_ResetBulletMinTimer)
+            //{
+            //    m_CurBulletTimer = m_ResetBulletMinTimer;
+            //}
+
+            m_NextFireBulletCountdown = m_BulletData.BulletIntervalMin;
+        }
+
+
+        public enum EBulletStateType
+        {
+            FireBulletStart,
+            FireBulleting,
+            FireBulletEnd,
+            BulletCD,
+            BulletCDEnd,
         }
     }
 }
