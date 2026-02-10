@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2573295612970058246, guid: 214b3e487df36c9469c44f01d11188e2, type: 3}
       propertyPath: m_Name
-      value: Stone_1 Variant
+      value: Stone_RU
       objectReference: {fileID: 0}
     - target: {fileID: 5025890138670200112, guid: 214b3e487df36c9469c44f01d11188e2, type: 3}
       propertyPath: m_LocalPosition.x
