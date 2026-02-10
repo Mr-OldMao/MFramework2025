@@ -21,7 +21,8 @@ namespace GameMain
         private static readonly Dictionary<int, FB_reward_sidebar> dicRewardSidebar = new Dictionary<int, FB_reward_sidebar>();
         private static readonly Dictionary<int, FB_tank_player> dicTankPlayer = new Dictionary<int, FB_tank_player>();
         private static readonly Dictionary<int, FB_tank_enemy> dicTankEnemy = new Dictionary<int, FB_tank_enemy>();
-        private static readonly Dictionary<int, FB_map_mapType> dicMapMapType = new Dictionary<int, FB_map_mapType>();
+        private static readonly Dictionary<int, FB_map_mapRandom> dicMapMapRandom = new Dictionary<int, FB_map_mapRandom>();
+        private static readonly Dictionary<int, FB_map_mapNormal> dicMapMapNormal = new Dictionary<int, FB_map_mapNormal>();
         private static readonly Dictionary<string, int> dicConstConst = new Dictionary<string, int>();
 
 
@@ -33,7 +34,8 @@ namespace GameMain
             await SetRewardSidebar();
             await SetTankPlayer();
             await SetTankEnemy();
-            await SetMapType();
+            await SetMapTypeRandom();
+            await SetMap101();
             await SetConst();
             Debugger.Log("数据加载完成");
         }
@@ -105,14 +107,25 @@ namespace GameMain
                 dicTankEnemy.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
             }
         }
-        public static async UniTask SetMapType()
+        public static async UniTask SetMapTypeRandom()
         {
-            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("map_mapType"));
+            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("map_mapRandom"));
             ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);
-            var datas = FB_map_mapType_Array.GetRootAsFB_map_mapType_Array(byteBuffer);
+            var datas = FB_map_mapRandom_Array.GetRootAsFB_map_mapRandom_Array(byteBuffer);
             for (int i = 0; i < datas.DatasLength; i++)
             {
-                dicMapMapType.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
+                dicMapMapRandom.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
+            }
+        }
+
+        public static async UniTask SetMap101()
+        {
+            var bytesData = await GameEntry.Resource.LoadAssetAsync<TextAsset>(GetBytesFilePath("map_mapNormal"));
+            ByteBuffer byteBuffer = new ByteBuffer(bytesData.bytes);
+            var datas = FB_map_mapNormal_Array.GetRootAsFB_map_mapNormal_Array(byteBuffer);
+            for (int i = 0; i < datas.DatasLength; i++)
+            {
+                dicMapMapNormal.Add(datas.Datas(i).Value.ID, datas.Datas(i).Value);
             }
         }
 
@@ -149,14 +162,19 @@ namespace GameMain
         {
             return dicRewardSidebar.Values.ToList();
         }
-        public static FB_map_mapType GetMapType(int id)
+        public static FB_map_mapRandom GetMapRandom(int id)
         {
-            return dicMapMapType.Values.Where(x => x.ID == id).FirstOrDefault();
+            return dicMapMapRandom.Values.Where(x => x.ID == id).FirstOrDefault();
         }
 
-        public static List<FB_map_mapType> GetMapTypeList()
+        public static FB_map_mapNormal GetMapNormal(int id)
         {
-            return dicMapMapType.Values.ToList();
+            return dicMapMapNormal.Values.Where(x => x.ID == id).FirstOrDefault();
+        }
+
+        public static List<FB_map_mapRandom> GetMapTypeList()
+        {
+            return dicMapMapRandom.Values.ToList();
         }
 
         public static int GetMapTypeIDByStageID(int levelID)

@@ -4,6 +4,7 @@ using MFramework.Runtime;
 using MFramework.Runtime.Extend;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -71,26 +72,80 @@ namespace GameMain
 
 
         #region GenerateMap
-        public async UniTask GenerateMapNextStage()
+        public async UniTask GenerateMapNextStage(bool isGenerateNormalMap = true)
         {
-            await GenerateMapByStageID(++GameMainLogic.Instance.StageID);
+            if (isGenerateNormalMap)
+            {
+                await GenerateNormalStageByMapTypeID(++GameMainLogic.Instance.StageID);
+            }
+            else
+            {
+                await GenerateRandomMapByStageID(++GameMainLogic.Instance.StageID);
+            }
         }
 
-        public async UniTask GenerateMapFirstStage()
+        public async UniTask GenerateMapFirstStage(bool isGenerateNormalMap = true)
         {
             GameMainLogic.Instance.StageID = 1;
-            await GenerateMapByStageID(GameMainLogic.Instance.StageID);
+
+            if (isGenerateNormalMap)
+            {
+                await GenerateNormalStageByMapTypeID(GameMainLogic.Instance.StageID);
+
+            }
+            else
+            {
+                await GenerateRandomMapByStageID(GameMainLogic.Instance.StageID);
+            }
+        }
+
+        /// <summary>
+        /// 生成经典关卡地图
+        /// </summary>
+        /// <param name="stageID"></param>
+        /// <returns></returns>
+        public async UniTask GenerateNormalStageByMapTypeID(int stageID)
+        {
+            GameMainLogic.Instance.RemainEnemyTankNum = DataTools.GetStageData(stageID).EnemyTankNum;
+            if (GameMainLogic.Instance.GameStateType == GameStateType.GameMapGenerating)
+            {
+                return;
+            }
+            if (stageID <= 0)
+            {
+                stageID = 1;
+            }
+            GameMainLogic.Instance.GameStateType = GameStateType.GameMapGenerating;
+
+            ((UIModelMap)Model).GenerateNormalMapData(stageID);
+            ResetNodeContainer();
+            m_StageData = DataTools.GetStageData(GameMainLogic.Instance.StageID);
+            await GenerateMapEntityByDataAsync();
+            await GenerateMapAirBorder();
+            await GameEntry.UI.ShowViewAsync<UIPanelBattle>();
+
+            GameMainLogic.Instance.GameStateType = GameStateType.GameMapGenerated;
         }
 
 
-        public async UniTask GenerateMapByStageID(int stageID)
+        /// <summary>
+        /// 生成随机地图
+        /// </summary>
+        /// <param name="stageID"></param>
+        /// <returns></returns>
+        public async UniTask GenerateRandomMapByStageID(int stageID)
         {
             int mapTypeID = DataTools.GetMapTypeIDByStageID(stageID);
             GameMainLogic.Instance.RemainEnemyTankNum = DataTools.GetStageData(stageID).EnemyTankNum;
-            await GenerateMapByMapTypeID(mapTypeID);
+            await GenerateRandomMapByMapTypeID(mapTypeID);
         }
 
-        public async UniTask GenerateMapByMapTypeID(int mapTypeID)
+        /// <summary>
+        /// 生成随机地图
+        /// </summary>
+        /// <param name="mapTypeID"></param>
+        /// <returns></returns>
+        public async UniTask GenerateRandomMapByMapTypeID(int mapTypeID)
         {
             if (GameMainLogic.Instance.GameStateType == GameStateType.GameMapGenerating)
             {
@@ -102,7 +157,7 @@ namespace GameMain
             }
             GameMainLogic.Instance.GameStateType = GameStateType.GameMapGenerating;
 
-            ((UIModelMap)Model).GenerateMapData(mapTypeID);
+            ((UIModelMap)Model).GenerateRandomMapData(mapTypeID);
             ResetNodeContainer();
             m_StageData = DataTools.GetStageData(GameMainLogic.Instance.StageID);
             await GenerateMapEntityByDataAsync();

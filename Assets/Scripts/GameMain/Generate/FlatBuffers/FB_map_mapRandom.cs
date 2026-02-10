@@ -9,15 +9,15 @@ using global::System;
 using global::System.Collections.Generic;
 using global::Google.FlatBuffers;
 
-public struct FB_map_mapType : IFlatbufferObject
+public struct FB_map_mapRandom : IFlatbufferObject
 {
   private Table __p;
   public ByteBuffer ByteBuffer { get { return __p.bb; } }
   public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_25_2_10(); }
-  public static FB_map_mapType GetRootAsFB_map_mapType(ByteBuffer _bb) { return GetRootAsFB_map_mapType(_bb, new FB_map_mapType()); }
-  public static FB_map_mapType GetRootAsFB_map_mapType(ByteBuffer _bb, FB_map_mapType obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public static FB_map_mapRandom GetRootAsFB_map_mapRandom(ByteBuffer _bb) { return GetRootAsFB_map_mapRandom(_bb, new FB_map_mapRandom()); }
+  public static FB_map_mapRandom GetRootAsFB_map_mapRandom(ByteBuffer _bb, FB_map_mapRandom obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
-  public FB_map_mapType __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+  public FB_map_mapRandom __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public int ID { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public float PNull { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
@@ -27,7 +27,7 @@ public struct FB_map_mapType : IFlatbufferObject
   public float PWater { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
   public float PSnow { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
 
-  public static Offset<GameMain.Generate.FlatBuffers.FB_map_mapType> CreateFB_map_mapType(FlatBufferBuilder builder,
+  public static Offset<GameMain.Generate.FlatBuffers.FB_map_mapRandom> CreateFB_map_mapRandom(FlatBufferBuilder builder,
       int ID = 0,
       float PNull = 0.0f,
       float PWall = 0.0f,
@@ -36,17 +36,17 @@ public struct FB_map_mapType : IFlatbufferObject
       float PWater = 0.0f,
       float PSnow = 0.0f) {
     builder.StartTable(7);
-    FB_map_mapType.AddPSnow(builder, PSnow);
-    FB_map_mapType.AddPWater(builder, PWater);
-    FB_map_mapType.AddPGress(builder, PGress);
-    FB_map_mapType.AddPStone(builder, PStone);
-    FB_map_mapType.AddPWall(builder, PWall);
-    FB_map_mapType.AddPNull(builder, PNull);
-    FB_map_mapType.AddID(builder, ID);
-    return FB_map_mapType.EndFB_map_mapType(builder);
+    FB_map_mapRandom.AddPSnow(builder, PSnow);
+    FB_map_mapRandom.AddPWater(builder, PWater);
+    FB_map_mapRandom.AddPGress(builder, PGress);
+    FB_map_mapRandom.AddPStone(builder, PStone);
+    FB_map_mapRandom.AddPWall(builder, PWall);
+    FB_map_mapRandom.AddPNull(builder, PNull);
+    FB_map_mapRandom.AddID(builder, ID);
+    return FB_map_mapRandom.EndFB_map_mapRandom(builder);
   }
 
-  public static void StartFB_map_mapType(FlatBufferBuilder builder) { builder.StartTable(7); }
+  public static void StartFB_map_mapRandom(FlatBufferBuilder builder) { builder.StartTable(7); }
   public static void AddID(FlatBufferBuilder builder, int iD) { builder.AddInt(0, iD, 0); }
   public static void AddPNull(FlatBufferBuilder builder, float pNull) { builder.AddFloat(1, pNull, 0.0f); }
   public static void AddPWall(FlatBufferBuilder builder, float pWall) { builder.AddFloat(2, pWall, 0.0f); }
@@ -54,14 +54,14 @@ public struct FB_map_mapType : IFlatbufferObject
   public static void AddPGress(FlatBufferBuilder builder, float pGress) { builder.AddFloat(4, pGress, 0.0f); }
   public static void AddPWater(FlatBufferBuilder builder, float pWater) { builder.AddFloat(5, pWater, 0.0f); }
   public static void AddPSnow(FlatBufferBuilder builder, float pSnow) { builder.AddFloat(6, pSnow, 0.0f); }
-  public static Offset<GameMain.Generate.FlatBuffers.FB_map_mapType> EndFB_map_mapType(FlatBufferBuilder builder) {
+  public static Offset<GameMain.Generate.FlatBuffers.FB_map_mapRandom> EndFB_map_mapRandom(FlatBufferBuilder builder) {
     int o = builder.EndTable();
-    return new Offset<GameMain.Generate.FlatBuffers.FB_map_mapType>(o);
+    return new Offset<GameMain.Generate.FlatBuffers.FB_map_mapRandom>(o);
   }
 }
 
 
-static public class FB_map_mapTypeVerify
+static public class FB_map_mapRandomVerify
 {
   static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
   {

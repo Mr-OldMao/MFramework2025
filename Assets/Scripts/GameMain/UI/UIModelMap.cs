@@ -13,10 +13,10 @@ namespace GameMain
     {
         public readonly int ROW_NUM = 13;
         public readonly int COLUMN_NUM = 13;
-        /// <summary>
-        /// 格子大小，坐标映射比例 物理坐标 = 1格子坐标gridPos * posMappingRatio
-        /// </summary>
-        public const int GRID_SIZE = 80;
+        ///// <summary>
+        ///// 格子大小，坐标映射比例 物理坐标 = 1格子坐标gridPos * posMappingRatio
+        ///// </summary>
+        //public const int GRID_SIZE = 80;
 
         //地图网格数据
         private Dictionary<Vector2, GridDataInfo> m_DicMapGridData = new Dictionary<Vector2, GridDataInfo>();
@@ -54,9 +54,14 @@ namespace GameMain
             return m_ListAirBorder;
         }
 
-        public void GenerateMapData(int mapTypeID)
+        public void GenerateNormalMapData(int stageID)
         {
-            SetMapGridData(mapTypeID);
+            SetNormalMapGridData(stageID);
+        }
+
+        public void GenerateRandomMapData(int mapTypeID)
+        {
+            SetRandomMapGridData(mapTypeID);
         }
 
         public List<GridDataInfo> GetMapGridData()
@@ -69,7 +74,7 @@ namespace GameMain
             m_DicMapGridData.TryGetValue(gridPos, out GridDataInfo gridDataInfo);
             return gridDataInfo;
         }
-        
+
         public bool IsBridWallGridPos(Vector2 gridPos)
         {
             return GridPosBridWallArr != null && GridPosBridWallArr.Contains(gridPos);
@@ -100,11 +105,167 @@ namespace GameMain
             return gridPos;
         }
 
-
-        private void SetMapGridData(int mapTypeID)
+        private void SetNormalMapGridData(int stageID)
         {
             m_DicMapGridData.Clear();
-            FB_map_mapType fB_Map_MapType = DataTools.GetMapType(mapTypeID);
+
+            int rowIndexStart = (stageID - 1) * ROW_NUM;
+            int rowIndexEnd = rowIndexStart + ROW_NUM;
+            if (DataTools.GetMapNormal(rowIndexStart).ByteBuffer == null
+                || DataTools.GetMapNormal(rowIndexEnd - 1).ByteBuffer == null)
+            {
+                int randomTypeID = Random.Range(1, DataTools.GetMapTypeList().Count + 1);
+                SetRandomMapGridData(randomTypeID);
+                Debugger.LogError($"地图生成失败,生成随机地图 randomTypeID:{randomTypeID}，stageID:{stageID},rowIndexStart:P{rowIndexStart},rowIndexEnd:{rowIndexEnd}");
+                return;
+            }
+
+            for (int i = rowIndexStart; i < rowIndexEnd; i++)
+            {
+                int curIndexColumn = 0;
+                FB_map_mapNormal mapNormalData = DataTools.GetMapNormal(i);
+                int curRowIndex = i % ROW_NUM;
+                Vector2 curGridPos = Vector2.zero;
+                GridDataInfo gridDataInfo = null;
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY0Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY1Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY2Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY3Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY4Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY5Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY6Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY7Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY8Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY9Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY10Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY11Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+
+                curGridPos = new Vector2(curIndexColumn++, curRowIndex);
+                gridDataInfo = new GridDataInfo
+                {
+                    gridPos = curGridPos,
+                    mapGridType = GetMapGridType(curGridPos),
+                    entityDataInfos = GetMapEntityType(mapNormalData.GetY12Array())
+                };
+                m_DicMapGridData.Add(curGridPos, gridDataInfo);
+            }
+
+#if UNITY_EDITOR
+            string des = string.Empty;
+            for (int i = 0; i < Enum.GetValues(typeof(EMapEntityType)).Length; i++)
+            {
+                var entityTypeArr = m_DicMapGridData.Values.Where(p => p.entityDataInfos.Find(k => k.mapEntityType == (EMapEntityType)i) != null).ToList();
+                if (entityTypeArr.Count > 0)
+                {
+                    des += $"{(EMapEntityType)i}:{entityTypeArr.Count}\n";
+                }
+            }
+            Debugger.Log($"---------------------- GenerateMapData，Des:{des}", LogType.Test);
+
+#endif
+            Debugger.Log("SetMapGridData Completed ", LogType.Test);
+        }
+
+        private void SetRandomMapGridData(int mapTypeID)
+        {
+            m_DicMapGridData.Clear();
+            FB_map_mapRandom fB_Map_MapRandom = DataTools.GetMapRandom(mapTypeID);
             for (int i = 0; i < COLUMN_NUM; i++)
             {
                 for (int j = 0; j < ROW_NUM; j++)
@@ -113,9 +274,9 @@ namespace GameMain
                     GridDataInfo gridDataInfo = new GridDataInfo
                     {
                         gridPos = gridPos,
-                        mapPos = gridPos * GRID_SIZE,
+                        //mapPos = gridPos * GRID_SIZE,
                         mapGridType = GetMapGridType(gridPos),
-                        entityDataInfos = SetEntityDataInfos(gridPos, fB_Map_MapType)
+                        entityDataInfos = SetEntityDataInfos(gridPos, fB_Map_MapRandom)
                     };
                     m_DicMapGridData.Add(gridPos, gridDataInfo);
                 }
@@ -137,7 +298,32 @@ namespace GameMain
             Debugger.Log("SetMapGridData Completed ", LogType.Test);
         }
 
-        private List<EntityDataInfo> SetEntityDataInfos(Vector2 gridID, FB_map_mapType fB_Map_MapType)
+        private List<EntityDataInfo> GetMapEntityType(int[] entityTypeArr)
+        {
+            List<EntityDataInfo> res = new List<EntityDataInfo>();
+            if (entityTypeArr == null || entityTypeArr?.Length == 0)
+            {
+                res.Add(new EntityDataInfo
+                {
+                    mapEntityType = EMapEntityType.None,
+                    propEntity = null
+                });
+            }
+            else
+            {
+                for (int i = 0; i < entityTypeArr?.Length; i++)
+                {
+                    res.Add(new EntityDataInfo
+                    {
+                        mapEntityType = (EMapEntityType)entityTypeArr[i],
+                        propEntity = null
+                    });
+                }
+            }
+            return res;
+        }
+
+        private List<EntityDataInfo> SetEntityDataInfos(Vector2 gridID, FB_map_mapRandom fB_Map_MapRandom)
         {
             List<EntityDataInfo> entityDataInfos = new List<EntityDataInfo>();
             if (GridPosBornEnemyArr.Contains(gridID) || GridPosBornPlayer1 == gridID || GridPosBornPlayer2 == gridID)
@@ -218,34 +404,34 @@ namespace GameMain
             {
                 entityDataInfos.Add(new EntityDataInfo
                 {
-                    mapEntityType = GetRandomEntityType(fB_Map_MapType),
+                    mapEntityType = GetRandomEntityType(fB_Map_MapRandom),
                     propEntity = null,
                 });
             }
             return entityDataInfos;
         }
 
-        private EMapEntityType GetRandomEntityType(FB_map_mapType fB_Map_MapType)
+        private EMapEntityType GetRandomEntityType(FB_map_mapRandom fB_Map_MapRandom)
         {
             EMapEntityType res = EMapEntityType.None;
             float randomValue = Random.Range(0f, 1f);
-            if (randomValue < fB_Map_MapType.PWall)
+            if (randomValue < fB_Map_MapRandom.PWall)
             {
                 res = EMapEntityType.Wall;
             }
-            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone)
+            else if (randomValue < fB_Map_MapRandom.PWall + fB_Map_MapRandom.PStone)
             {
                 res = EMapEntityType.Stone;
             }
-            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone + fB_Map_MapType.PGress)
+            else if (randomValue < fB_Map_MapRandom.PWall + fB_Map_MapRandom.PStone + fB_Map_MapRandom.PGress)
             {
                 res = EMapEntityType.Grass;
             }
-            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone + fB_Map_MapType.PGress + fB_Map_MapType.PWater)
+            else if (randomValue < fB_Map_MapRandom.PWall + fB_Map_MapRandom.PStone + fB_Map_MapRandom.PGress + fB_Map_MapRandom.PWater)
             {
                 res = EMapEntityType.Water;
             }
-            else if (randomValue < fB_Map_MapType.PWall + fB_Map_MapType.PStone + fB_Map_MapType.PGress + fB_Map_MapType.PWater + fB_Map_MapType.PSnow)
+            else if (randomValue < fB_Map_MapRandom.PWall + fB_Map_MapRandom.PStone + fB_Map_MapRandom.PGress + fB_Map_MapRandom.PWater + fB_Map_MapRandom.PSnow)
             {
                 res = EMapEntityType.Snow;
             }
@@ -372,7 +558,7 @@ namespace GameMain
     public class GridDataInfo
     {
         public Vector2 gridPos;
-        public Vector2 mapPos;
+        //public Vector2 mapPos;
         public EMapGridBorderType mapGridType;
         public List<EntityDataInfo> entityDataInfos;
     }
@@ -387,51 +573,53 @@ namespace GameMain
     {
         #region 常规地图道具
         None = 0,
-        Wall,
-        Stone,
-        Grass,
-        Water,
-        Snow,
+        Wall = 1,
+        Stone = 2,
+        Grass = 3,
+        Water = 4,
+        Snow = 5,
         #endregion
 
         #region 特殊地图道具
         /// <summary>
         /// 1/4砖墙，左上
         /// </summary>
-        Wall_LU,
+        Wall_LU = 10,
         /// <summary>
         /// 1/4砖墙，左下
         /// </summary>
-        Wall_LD,
+        Wall_LD = 11,
         /// <summary>
         /// 1/4砖墙，右上
         /// </summary>
-        Wall_RU,
+        Wall_RU = 12,
         /// <summary>
         /// 1/4砖墙，右下
         /// </summary>
-        Wall_RD,
+        Wall_RD = 13,
         /// <summary>
         /// 1/4石头，左上
         /// </summary>
-        Stone_LU,
+        Stone_LU = 14,
         /// <summary>
         /// 1/4石头，左下
         /// </summary>
-        Stone_LD,
+        Stone_LD = 15,
         /// <summary>
         /// 1/4石头，右上
         /// </summary>
-        Stone_RU,
+        Stone_RU = 16,
         /// <summary>
         /// 1/4石头，右下
         /// </summary>
-        Stone_RD,
+        Stone_RD = 17,
         #endregion
 
-        AirBorder,
-        Brid,
-        DeadBrid,
+
+        Brid = 20,
+        DeadBrid = 21,
+
+        AirBorder = 30,
     }
 
     /// <summary>

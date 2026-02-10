@@ -61,7 +61,7 @@ namespace GameMain
                 if (int.TryParse(inputTxtMapTypeID.text, out int mapTypeID))
                 {
 #pragma warning disable CS4014
-                    GameEntry.UI.GetController<UIControlMap>().GenerateMapByMapTypeID(mapTypeID);
+                    GameEntry.UI.GetController<UIControlMap>().GenerateRandomMapByMapTypeID(mapTypeID);
 #pragma warning restore CS4014
                 }
                 else

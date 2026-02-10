@@ -172,6 +172,7 @@ namespace GameMain
             base.ShowPanel();
             (Controller as UIControlSettlement).CurGameStateType = GameMainLogic.Instance.GameStateType;
             GameMainLogic.Instance.GameStateType = GameStateType.GameSettlement;
+            GameEntry.Audio.StopBGM();
 
             await RefreshUILayoutAsync();
 
