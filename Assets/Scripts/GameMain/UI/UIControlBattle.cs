@@ -3,22 +3,27 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace GameMain
 {
     public class UIControlBattle : UIControllerBase
     {
         public ETCJoystick Joystick { get; private set; }
+        public ETCButton Fire { get; private set; }
 
         private int m_PoolEnemyIcon;
 
         private Queue<GameObject> m_EnemyIconArr = new Queue<GameObject>();
+
+
         public override async UniTask Init(IUIView view, IUIModel model)
         {
             await base.Init(view, model);
 
 
             Joystick = ((UIPanelBattle)(view)).gameObject.GetComponentInChildren<ETCJoystick>();
+            Fire = ((UIPanelBattle)(view)).gameObject.GetComponentInChildren<ETCButton>();
 
             UIPanelBattle uIPanelBattle = (UIPanelBattle)view;
             m_PoolEnemyIcon = GameEntry.Pool.CreatPool(new Pool(uIPanelBattle.imgEnemy.gameObject, (go, b) =>
@@ -33,6 +38,7 @@ namespace GameMain
             {
                 m_EnemyIconArr.Dequeue();
             }, 10, 30));
+
         }
 
         public void GetEnemyIcon()

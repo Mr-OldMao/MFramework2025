@@ -98,7 +98,7 @@ namespace GameMain
             txtStageNum.text = GameMainLogic.Instance.StageID.ToString();
             txtTopScore.text = GameMainLogic.Instance.GetUserDataBase().topScore.ToString();
 
-            string txtAudio = "settlement_txt.wav";
+            string txtAudio = "settlement_txt.mp3";
             GameEntry.Audio.PlaySound(txtAudio);
             await UniTask.Delay(200);
             GameEntry.Audio.PlaySound(txtAudio);
@@ -275,7 +275,7 @@ namespace GameMain
                 txtCount.text = $"0";
                 txtScore.text = $"0";
                 await UniTask.Delay(delayFrame);
-                GameEntry.Audio.PlaySound("settlement_txt.wav");
+                GameEntry.Audio.PlaySound("settlement_txt.mp3");
             }
             else
             {
@@ -283,7 +283,7 @@ namespace GameMain
                 {
                     txtCount.text = $"{i + 1}";
                     txtScore.text = $"{(i + 1) * score}";
-                    GameEntry.Audio.PlaySound("settlement_txt.wav");
+                    GameEntry.Audio.PlaySound("settlement_txt.mp3");
                     await UniTask.Delay(delayFrame);
                 }
             }

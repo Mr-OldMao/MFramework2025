@@ -113,7 +113,7 @@ namespace GameMain
                 GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
                 {
                     tankEntityBase = GameMainLogic.Instance.Player1Entity,
-                    durationTime = 5f
+                    durationTime = 10f
                 });
             });
         }

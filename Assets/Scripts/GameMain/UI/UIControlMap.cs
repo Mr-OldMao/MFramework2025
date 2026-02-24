@@ -4,7 +4,6 @@ using MFramework.Runtime;
 using MFramework.Runtime.Extend;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -31,6 +30,8 @@ namespace GameMain
 
 
         private int m_TimerIDBridStoneWall;
+        private int m_EnemyGenerateMaxCount;
+        private int m_EnemyGenerateIntervalMS;
         public override async UniTask Init(IUIView view, IUIModel model)
         {
             await base.Init(view, model);
@@ -42,6 +43,8 @@ namespace GameMain
             GameEntry.Event.RegisterEvent(GameEventType.GameSettlement, OnGameSettlement);
             GameEntry.Event.RegisterEvent<float>(GameEventType.BirdChangeStore, OnBirdChangeStore);
 
+            m_EnemyGenerateMaxCount = DataTools.GetConst("EnemyGenerateMaxCount");
+            m_EnemyGenerateIntervalMS = DataTools.GetConst("EnemyGenerateIntervalMS");
             await GameMainLogic.Instance.Init();
             await InitMapEntity();
         }
@@ -180,12 +183,21 @@ namespace GameMain
         {
             var enemyTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas", false);
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count;)
             {
                 if (GameMainLogic.Instance.GameStateType == GameStateType.GameRunning)
                 {
-                    GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).GetEntity();
-                    await UniTask.Delay(1000);
+                    int enemyEntityCount = GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).UsedCount;
+                    if (enemyEntityCount < m_EnemyGenerateMaxCount )
+                    {
+                        GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).GetEntity();
+                        i++;
+                    }
+                    await UniTask.Delay(m_EnemyGenerateIntervalMS);
+                }
+                else
+                {
+                    break;
                 }
             }
         }

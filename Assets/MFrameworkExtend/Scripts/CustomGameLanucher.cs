@@ -16,6 +16,8 @@ namespace GameMain
         {
             Debugger.Log("框架启动完成,即将切换主场景");
             string sceneName = "MainScene";
+            //GameEntry.Scene.LoadSceneAsync("FPS_Example");
+            //return;
 
             await DataTools.Init();
 

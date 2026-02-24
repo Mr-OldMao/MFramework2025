@@ -75,7 +75,7 @@ namespace GameMain
                 {
                     m_BulletStateType = EBulletStateType.FireBulleting;
                     BulletEntity bulletEntity = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
-                    bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(tankTypeID).BulletID, () =>
+                    bulletEntity.Fire(NodePosBullet.position, MoveDirType, DataTools.GetTankPlayer(tankTypeID).BulletID, true, () =>
                     {
                         ResetFireState();
                     });
@@ -88,7 +88,7 @@ namespace GameMain
 
                     m_BulletStateType = EBulletStateType.FireBulleting;
                     BulletEntity bulletEntity1 = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
-                    bulletEntity1.Fire(NodePosBullet.position, MoveDirType, bulletID, null);
+                    bulletEntity1.Fire(NodePosBullet.position, MoveDirType, bulletID, true, null);
                     GameEntry.Audio.PlaySound("fire.mp3");
 
                     Debug.LogError("------双发");
@@ -96,7 +96,7 @@ namespace GameMain
                     //{
                     await UniTask.Delay(100);
                     BulletEntity bulletEntity2 = GameMainLogic.Instance.GetPoolBullet(TankOwnerType).GetComponent<BulletEntity>();
-                    bulletEntity2.Fire(NodePosBullet.position, MoveDirType, bulletID, () =>
+                    bulletEntity2.Fire(NodePosBullet.position, MoveDirType, bulletID, true, () =>
                     {
                         ResetFireState();
                     });

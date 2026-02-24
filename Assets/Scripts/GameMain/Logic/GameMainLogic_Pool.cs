@@ -142,7 +142,16 @@ namespace GameMain
                     }
                     enemy.gameObject.SetActive(true);
                     bool isRedTank = Random.Range(0f, 1f) > 0.7f;
-                    int tankTypeID = isRedTank ? Random.Range(301, 304) : Random.Range(201, 206);
+                    bool isMaxTank = Random.Range(0f, 1f) > 0.9f;
+                    int tankTypeID = 201;// isRedTank ? Random.Range(301, 304) : Random.Range(201, 206);
+                    if (isRedTank)
+                    {
+                        tankTypeID = isMaxTank ? 303 : Random.Range(301, 303);
+                    }
+                    else
+                    {
+                        tankTypeID = isMaxTank ? Random.Range(203, 206) : Random.Range(201, 203);
+                    }
                     string spriteName = DataTools.GetTankEnemy(tankTypeID).ResName;
                     enemy.GetComponentInChildren<SpriteRenderer>().sprite = enemyTankAtlas.GetSprite(spriteName);
                     enemy.GetOrAddComponent<EnemyEntity>().InitData(TankOwnerType.Enemy, tankTypeID, ++m_CurTankID);

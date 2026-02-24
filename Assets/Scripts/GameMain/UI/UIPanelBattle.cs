@@ -154,7 +154,7 @@ namespace GameMain
                     GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
                     {
                         tankEntityBase = GameMainLogic.Instance.Player1Entity,
-                        durationTime = 5f
+                        durationTime = 10f
                     });
                     return;
                 }
@@ -166,7 +166,7 @@ namespace GameMain
                         GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
                         {
                             tankEntityBase = GameMainLogic.Instance.Player1Entity,
-                            durationTime = 5f * count
+                            durationTime = 10f * count
                         });
                     }
                     ShowMask(false);
@@ -175,7 +175,7 @@ namespace GameMain
                     GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
                     {
                         tankEntityBase = GameMainLogic.Instance.Player1Entity,
-                        durationTime = 5f
+                        durationTime = 10f
                     });
                     ShowMask(false);
                     TTSDKManager.Instance.ShotToast("奖励已发放");

@@ -21,7 +21,8 @@ namespace GameMain
 
         private Vector3 m_bulletDir;
 
-        private const float BulletSpeedConst = 3f;
+        private const float BulletSpeedConstPlayer = 3f;
+        private const float BulletSpeedConstEnemy = 2f;
 
         private Action collCallback;
         public FB_bullet_bullet BulletData { get; private set; }
@@ -33,11 +34,11 @@ namespace GameMain
             m_MaxDis = Mathf.Max(GameEntry.UI.GetModel<UIModelMap>().COLUMN_NUM, GameEntry.UI.GetModel<UIModelMap>().ROW_NUM) + 1;
         }
 
-        public void Fire(Vector3 startPos, MoveDirType bulletDirType, int bulletID, Action collCallback)
+        public void Fire(Vector3 startPos, MoveDirType bulletDirType, int bulletID, bool isPlayer, Action collCallback)
         {
             transform.position = startPos;
             BulletData = DataTools.GetBulletBullet(bulletID);
-            bulletSpeed = BulletData.BulletSpeed * BulletSpeedConst;
+            bulletSpeed = BulletData.BulletSpeed * (isPlayer ? BulletSpeedConstPlayer : BulletSpeedConstEnemy);
             isCanMove = true;
             this.collCallback = collCallback;
             this.bulletDirType = bulletDirType;
