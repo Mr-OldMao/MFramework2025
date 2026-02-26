@@ -109,18 +109,30 @@ namespace GameMain
         /// <returns></returns>
         public async UniTask GenerateNormalStageByMapTypeID(int stageID)
         {
-            GameMainLogic.Instance.RemainEnemyTankNum = DataTools.GetStageData(stageID).EnemyTankNum;
             if (GameMainLogic.Instance.GameStateType == GameStateType.GameMapGenerating)
             {
                 return;
             }
+
             if (stageID <= 0)
             {
                 stageID = 1;
             }
+
+            //TODO
+            int MaxLevel = 35;
+            int targetStageID = stageID == MaxLevel ? MaxLevel : stageID % MaxLevel;
+            var data = DataTools.GetStageData(targetStageID);
+            if (data.ByteBuffer == null)
+            {
+                targetStageID = 1;
+                Debugger.LogError($"data is null,stageID:{stageID},targetStageID:{targetStageID}");
+            }
+            GameMainLogic.Instance.RemainEnemyTankNum = DataTools.GetStageData(targetStageID).EnemyTankNum;
+
             GameMainLogic.Instance.GameStateType = GameStateType.GameMapGenerating;
 
-            ((UIModelMap)Model).GenerateNormalMapData(stageID);
+            ((UIModelMap)Model).GenerateNormalMapData(targetStageID);
             ResetNodeContainer();
             m_StageData = DataTools.GetStageData(GameMainLogic.Instance.StageID);
             await GenerateMapEntityByDataAsync();
@@ -188,7 +200,7 @@ namespace GameMain
                 if (GameMainLogic.Instance.GameStateType == GameStateType.GameRunning)
                 {
                     int enemyEntityCount = GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).UsedCount;
-                    if (enemyEntityCount < m_EnemyGenerateMaxCount )
+                    if (enemyEntityCount < m_EnemyGenerateMaxCount)
                     {
                         GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).GetEntity();
                         i++;

@@ -85,7 +85,7 @@ namespace GameMain
                     GameEntry.Audio.PlaySound("prop_award.mp3");
                     break;
                 case 2://定时道具：冻结所有敌方坦克行动
-                    GameEntry.Event.DispatchEvent<float>(GameEventType.StopAllEnemyMove, 5f);
+                    GameEntry.Event.DispatchEvent<float>(GameEventType.StopAllEnemyMove, 15f);
                     GameEntry.Audio.PlaySound("prop_award.mp3");
                     break;
                 case 3://防护道具：为玩家坦克提供短暂无敌状态

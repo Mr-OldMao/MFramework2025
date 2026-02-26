@@ -91,7 +91,6 @@ namespace GameMain
                     bulletEntity1.Fire(NodePosBullet.position, MoveDirType, bulletID, true, null);
                     GameEntry.Audio.PlaySound("fire.mp3");
 
-                    Debug.LogError("------双发");
                     //GameEntry.Timer.AddDelayTimer(0.2f, () =>
                     //{
                     await UniTask.Delay(100);
