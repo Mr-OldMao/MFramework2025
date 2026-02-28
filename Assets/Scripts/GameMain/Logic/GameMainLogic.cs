@@ -12,6 +12,11 @@ namespace GameMain
 
         public int StageID { get; set; } = 1;
 
+        /// <summary>
+        /// 当前关卡开局是否拥有道具奖励
+        /// </summary>
+        public bool IsCurStageReward = false;
+
         public async UniTask Init()
         {
 #if UNITY_EDITOR

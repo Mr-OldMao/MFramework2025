@@ -44,6 +44,10 @@ namespace GameMain
             {
                 m_ForgeNotMoveTimer += timer;
             });
+            GameEntry.Event.RegisterEvent(GameEventType.CancelStopAllEnemyMove, () =>
+            {
+                m_ForgeNotMoveTimer = 0;
+            });
         }
 
         protected override void InitBornAfter()

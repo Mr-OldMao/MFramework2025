@@ -181,6 +181,10 @@ namespace GameMain
 
         public void ShowAdvBanner(Action closeCallback = null, Action<int, string> loadFailCallback = null, Action loadCallback = null, string advID = "")
         {
+#if UNITY_EDITOR
+            closeCallback?.Invoke();
+            return;
+#endif
             m_TargetAdvEventInfo = new AdvEventInfo
             {
                 closeCallback = closeCallback,
@@ -199,6 +203,11 @@ namespace GameMain
         public void ShowAdvVideo(Action<bool, int> closeCallback, Action loadCallback = null,
             Action<int, string> loadFailCallback = null, string advID = "")
         {
+#if UNITY_EDITOR
+            closeCallback?.Invoke(true, 1);
+            return;
+#endif
+
             m_TargetAdvEventInfo = new AdvEventInfo
             {
                 closeVideoCallback = closeCallback,
@@ -213,8 +222,12 @@ namespace GameMain
             m_DicAdvVideoData[AdvVideoID]?.adVideo.Show();
         }
 
-        public void ShowAdvInsert(Action closeCallback = null, Action<int, string> loadFailCallback = null, Action loadCallback = null,string advID = "")
+        public void ShowAdvInsert(Action closeCallback = null, Action<int, string> loadFailCallback = null, Action loadCallback = null, string advID = "")
         {
+#if UNITY_EDITOR
+            closeCallback?.Invoke();
+            return;
+#endif
             m_TargetAdvEventInfo = new AdvEventInfo
             {
                 closeCallback = closeCallback,

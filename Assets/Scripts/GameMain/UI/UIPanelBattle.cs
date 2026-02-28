@@ -104,23 +104,21 @@ namespace GameMain
                     return;
                 }
                 ShowMask(true);
-                TTSDKManager.Instance.ShowAdvInsert(() =>
+                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {
-                    GameMainLogic.Instance.Player1Entity.AddLevel();
+                    if (isPlayed)
+                    {
+                        GameMainLogic.Instance.Player1Entity.AddLevel();
+                    }                    
                     ShowMask(false);
-                }, (errorCode, msg) =>
+                }, loadFailCallback: (errorCode, msg) =>
                 {
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("奖励暂不发放");
+                    TTSDKManager.Instance.ShotToast("奖励正在准备中......");
                 });
             });
             btnAddLife.onClick.AddListener(() =>
             {
-                if (GameMainLogic.Instance.IsDebugger)
-                {
-                    GameMainLogic.Instance.Player1Entity.AddLife();
-                    return;
-                }
                 ShowMask(true);
                 TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {
@@ -135,29 +133,9 @@ namespace GameMain
                     ShowMask(false);
                     TTSDKManager.Instance.ShotToast("奖励已发放");
                 });
-                //ShowMask(true);
-                //TTSDKManager.Instance.ShowAdvBanner(() =>
-                //{
-                //    GameMainLogic.Instance.Player1Entity.AddLife();
-                //    ShowMask(false);
-                //}, (errorCode, msg) =>
-                //{
-                //    GameMainLogic.Instance.Player1Entity.AddLife();
-                //    ShowMask(false);
-                //    TTSDKManager.Instance.ShotToast("广告播放失败，奖励已发放");
-                //});
             });
             btnPlayerUnbeatable.onClick.AddListener(() =>
             {
-                if (GameMainLogic.Instance.IsDebugger)
-                {
-                    GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
-                    {
-                        tankEntityBase = GameMainLogic.Instance.Player1Entity,
-                        durationTime = 10f
-                    });
-                    return;
-                }
                 ShowMask(true);
                 TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {
@@ -184,12 +162,6 @@ namespace GameMain
 
             btnRandomReward.onClick.AddListener(() =>
             {
-                if (GameMainLogic.Instance.IsDebugger)
-                {
-                    GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
-                    return;
-                }
-
                 ShowMask(true);
                 TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {

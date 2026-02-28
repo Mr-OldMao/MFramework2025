@@ -2,7 +2,9 @@
 using GameMain.Generate.FlatBuffers;
 using MFramework.Runtime;
 using MFramework.Runtime.Extend;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -49,13 +51,25 @@ namespace GameMain
             await InitMapEntity();
         }
 
+        // 取消令牌源，用于控制UniTask的取消
+        private CancellationTokenSource _cts;
+
         private void OnGameStart()
         {
             GameMainLogic.Instance.GameStateType = GameStateType.GameRunning;
             GeneragetPlayerTank();
-#pragma warning disable CS4014
-            AutoGeneragetEnemyTank(GameMainLogic.Instance.RemainEnemyTankNum);
-#pragma warning restore CS4014
+            //#pragma warning disable CS4014
+            //            AutoGeneragetEnemyTank(GameMainLogic.Instance.RemainEnemyTankNum);
+            //#pragma warning restore CS4014
+
+            if (_cts != null && !_cts.IsCancellationRequested)
+            {
+                // 发送取消信号
+                _cts.Cancel();
+                Debug.LogError("已发送取消信号");
+            }
+            _cts = new CancellationTokenSource();
+            AutoGeneragetEnemyTank(GameMainLogic.Instance.RemainEnemyTankNum, _cts.Token);
         }
 
         private async UniTask InitMapEntity()
@@ -68,15 +82,20 @@ namespace GameMain
 
         private void OnGameSettlement()
         {
+            RecycleMapEntity();
+        }
+
+        public void RecycleMapEntity()
+        {
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankEnemy).RecycleAllEntity();
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).RecycleAllEntity();
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).RecycleAllEntity();
         }
 
-
         #region GenerateMap
         public async UniTask GenerateMapNextStage(bool isGenerateNormalMap = true)
         {
+            GameMainLogic.Instance.IsCurStageReward = true;
             if (isGenerateNormalMap)
             {
                 await GenerateNormalStageByMapTypeID(++GameMainLogic.Instance.StageID);
@@ -87,14 +106,23 @@ namespace GameMain
             }
         }
 
-        public async UniTask GenerateMapFirstStage(bool isGenerateNormalMap = true)
+        public async UniTask GenerateMapCurrentStage(bool isGenerateNormalMap = true)
         {
-            GameMainLogic.Instance.StageID = 1;
-
             if (isGenerateNormalMap)
             {
                 await GenerateNormalStageByMapTypeID(GameMainLogic.Instance.StageID);
+            }
+            else
+            {
+                await GenerateRandomMapByStageID(++GameMainLogic.Instance.StageID);
+            }
+        }
 
+        public async UniTask GenerateMapFirstStage(bool isGenerateNormalMap = true)
+        {
+            if (isGenerateNormalMap)
+            {
+                await GenerateNormalStageByMapTypeID(GameMainLogic.Instance.StageID);
             }
             else
             {
@@ -113,6 +141,8 @@ namespace GameMain
             {
                 return;
             }
+
+            GameMainLogic.Instance.IsCurStageReward = true;
 
             if (stageID <= 0)
             {
@@ -162,6 +192,8 @@ namespace GameMain
         /// <returns></returns>
         public async UniTask GenerateRandomMapByMapTypeID(int mapTypeID)
         {
+            GameMainLogic.Instance.IsCurStageReward = true;
+
             if (GameMainLogic.Instance.GameStateType == GameStateType.GameMapGenerating)
             {
                 return;
@@ -191,7 +223,7 @@ namespace GameMain
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).GetEntity();
         }
 
-        private async UniTask AutoGeneragetEnemyTank(int count)
+        private async UniTask AutoGeneragetEnemyTank(int count, CancellationToken cancellationToken)
         {
             var enemyTankAtlas = await GameEntry.Resource.LoadAssetAsync<SpriteAtlas>(SystemConstantData.PATH_PREFAB_TEXTURE_ATLAS_ROOT + "enemyTankAtlas.spriteatlas", false);
 
@@ -206,6 +238,13 @@ namespace GameMain
                         i++;
                     }
                     await UniTask.Delay(m_EnemyGenerateIntervalMS);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        // 执行中断前的清理逻辑（比如释放资源、重置状态）
+                        Debug.LogError("close AutoGeneragetEnemyTank");
+                        break;
+                    }
                 }
                 else
                 {

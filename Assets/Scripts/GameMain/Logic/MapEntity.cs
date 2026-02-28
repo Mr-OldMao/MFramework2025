@@ -92,10 +92,14 @@ namespace GameMain
                     case EMapEntityType.Brid:
                         Debug.Log("GameOver Brid");
                         SetBridDeadSprite();
-                        if (GameMainLogic.Instance.GameStateType != GameStateType.GameFail)
-                        {
-                            GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
-                        }
+
+                        GameEntry.UI.GetModel<UIModelRevive>().SetGameOverType(GameOverType.BridDestroy);
+                        GameEntry.UI.ShowView<UIPanelRevive>();
+
+                        //if (GameMainLogic.Instance.GameStateType != GameStateType.GameFail)
+                        //{
+                        //    GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
+                        //}
                         break;
                     case EMapEntityType.DeadBrid:
                         Debug.Log("GameOver DeadBrid");
@@ -143,13 +147,13 @@ namespace GameMain
         public void ChangeBirdWallToStone()
         {
             mapEntityType = ChangeEntityTypeWallToStone(mapEntityType);
-            if (mapEntityType ==  EMapEntityType.None)
+            if (mapEntityType == EMapEntityType.None)
             {
                 return;
             }
             var wallGroup = transform.Find<Transform>("wallGroup");
             wallGroup.gameObject.SetActive(false);
-            for (int i = 0;i < wallGroup.childCount; i++)
+            for (int i = 0; i < wallGroup.childCount; i++)
             {
                 wallGroup.GetChild(i).gameObject.SetActive(false);
             }
@@ -158,7 +162,7 @@ namespace GameMain
             stoneGroup.gameObject.SetActive(true);
             //Í£Ö¹²¥·Å¶¯»­Animator¶¯»­
 
-            stoneGroup.GetComponent<Animator>().Play("wallToStone",0,0f);
+            stoneGroup.GetComponent<Animator>().Play("wallToStone", 0, 0f);
             for (int i = 0; i < stoneGroup.childCount; i++)
             {
                 stoneGroup.GetChild(i).gameObject.SetActive(true);

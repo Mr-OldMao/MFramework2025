@@ -45,6 +45,10 @@ public enum GameEventType
     /// </summary>
     StopAllEnemyMove,
     /// <summary>
+    /// 取消禁止所有敌人移动
+    /// </summary>
+    CancelStopAllEnemyMove,
+    /// <summary>
     /// 坦克无敌
     /// </summary>
     TankUnbeatable,

@@ -46,7 +46,8 @@ namespace GameMain
             var sidebarData = GameMainLogic.Instance.GetUserDataSidebar();
             Debugger.Log($"侧边栏奖励 isGetTodayReward:{sidebarData.isGetTodayReward},rewardType:{sidebarData.rewardType},rewardValue:{sidebarData.rewardValue}");
 
-            if (sidebarData.isGetTodayReward && IsInitPlayerData)
+
+            if (sidebarData.isGetTodayReward)
             {
                 //1-第一关 关卡开始生命值+x
                 //2-第一关 关卡开始坦克等级+x
@@ -56,19 +57,23 @@ namespace GameMain
                 switch (sidebarData.rewardType)
                 {
                     case 1:
-                        if (isFirstStage)
+                        if (IsInitPlayerData && isFirstStage)
                         {
                             AddLife(sidebarData.rewardValue, true);
                         }
                         break;
                     case 2:
-                        if (isFirstStage)
+                        if (IsInitPlayerData && isFirstStage)
                         {
                             AddLevel(sidebarData.rewardValue, true);
                         }
                         break;
                     case 3:
-                        GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
+                        if (GameMainLogic.Instance.IsCurStageReward)
+                        {
+                            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
+                            GameMainLogic.Instance.IsCurStageReward = false;
+                        }
                         break;
                 }
             }
@@ -197,13 +202,32 @@ namespace GameMain
             GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).RecycleEntity(entity);
             IsExtendBeforeDataNextGenerate = false;
 
+
+            //if (remainLife < 0)
+            //{
+            //    if (GameMainLogic.Instance.GameStateType != GameStateType.GameFail)
+            //    {
+            //        GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
+            //    }
+            //}
             if (remainLife < 0)
             {
-                if (GameMainLogic.Instance.GameStateType != GameStateType.GameFail)
-                {
-                    GameMainLogic.Instance.GameStateType = GameStateType.GameFail;
-                }
+                GameEntry.UI.GetModel<UIModelRevive>().SetGameOverType(GameOverType.LifeZero);
+                GameEntry.UI.ShowView<UIPanelRevive>();
             }
+        }
+
+        public void PlayerReviveByAdv()
+        {
+            AddLife();
+            AddLevel(2);
+            IsInitPlayerData = false;
+            GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdTankPlayer).GetEntity();
+        }
+
+        public void PlayerRestartByAdv()
+        {
+            IsInitPlayerData = true;
         }
         #endregion
     }
