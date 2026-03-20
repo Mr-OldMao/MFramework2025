@@ -118,6 +118,15 @@ namespace GameMain
             int p1TotalScore = _model.LastTotalScore + score1 + score2 + score3 + score4;
             txtP1TotalScore.text = $"{p1TotalScore}";
             txtP1KillTotalCount.text = $"{p1KillTotalCount}";
+            TTSDKManager.Instance.GetRankData(rankData =>
+            {
+                int maxScore = int.Parse(rankData.SelfItem.Item.Value);
+                Debug.LogError($"当前分数:{p1TotalScore},排行榜最高分：{maxScore}");
+                if (p1TotalScore > maxScore)
+                {
+                    TTSDKManager.Instance.SetRankListData(p1TotalScore);
+                }
+            });
 
             GameEntry.Audio.PlaySound(txtAudio);
 
@@ -209,6 +218,7 @@ namespace GameMain
                     GameMainLogic.Instance.Player1Entity.ResetTankData();
                     var gameoverPanel = await GameEntry.UI.ShowViewAsync<UIPanelGameOver>();
                     gameoverPanel.ShowPanelFull();
+                    GameMainLogic.Instance.StageID = 1;
                     HidePanel();
                     break;
             }

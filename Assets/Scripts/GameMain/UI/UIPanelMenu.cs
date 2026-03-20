@@ -17,6 +17,7 @@ namespace GameMain
         private Button btnSidebar;
         private RectTransform rectSidebar;
         private TextMeshProUGUI txtTopScore;
+        private Button btnRankList;
 
         public override async UniTask Init()
         {
@@ -77,6 +78,11 @@ namespace GameMain
             {
                 Debug.Log("btnSidebar");
                 GameEntry.UI.ShowView<UIPanelSidebar>();
+            });
+
+            btnRankList.onClick.AddListener(() =>
+            {
+                TTSDKManager.Instance.ShowRankList();
             });
         }
 

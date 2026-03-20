@@ -531,7 +531,7 @@ namespace MFramework.Runtime
             ReleaseAllAssets();
         }
 
-        public void OnUpdate(float deltaTime)
+        public void OnUpdate(float deltaTime, float unscaledDeltaTime)
         {
 
         }

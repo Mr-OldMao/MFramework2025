@@ -16,7 +16,7 @@ namespace GameMain
         public void RecycleTank()
         {
             //分数+1
-            Debug.Log("EnemyTankDead--------------"+ entity);
+            //Debug.Log("EnemyTankDead--------------"+ entity);
             IsAutoFire = false;
             IsCanMove = false;
             MoveTargetType =  EAIMoveTargetType.None;

@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using System;
 using TMPro;
 using Unity.VisualScripting;
@@ -94,15 +93,15 @@ namespace GameMain
 
             btnGameParse.onClick.AddListener(() =>
             {
-                GameMainLogic.Instance.GameParse();
+                GameMainLogic.Instance.GameParseAutoShowInsertAdv();
             });
             btnTankLevelAdd.onClick.AddListener(() =>
             {
-                if (GameMainLogic.Instance.IsDebugger)
-                {
-                    GameMainLogic.Instance.Player1Entity.AddLevel();
-                    return;
-                }
+                //if (GameMainLogic.Instance.IsDebugger)
+                //{
+                //    GameMainLogic.Instance.Player1Entity.AddLevel();
+                //    return;
+                //}
                 ShowMask(true);
                 TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
                 {

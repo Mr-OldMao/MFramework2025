@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
+using System;
+using System.Collections;
 using UnityEngine;
 
 namespace GameMain
@@ -17,6 +19,7 @@ namespace GameMain
         /// </summary>
         public bool IsCurStageReward = false;
 
+        private int m_TimerIdDelayShowAdv;
         public async UniTask Init()
         {
 #if UNITY_EDITOR
@@ -38,6 +41,12 @@ namespace GameMain
             {
                 GameEntry.Audio.PlaySound("pause.ogg");
             }
+
+            if (m_TimerIdDelayShowAdv > 0)
+            {
+                GameEntry.Timer.RemoveDelayTimer(m_TimerIdDelayShowAdv);
+            }
+
             GameEntry.Audio.StopBGM();
         }
 
@@ -49,6 +58,37 @@ namespace GameMain
             {
                 GameEntry.Audio.PlaySound("pause.ogg");
             }
+            GameEntry.Audio.StopBGM();
+        }
+
+        public void GameParseAutoShowInsertAdv(bool isPlaySound = true, float delayTime = 5f)
+        {
+            Debug.Log("GameParse");
+            Time.timeScale = Time.timeScale == 0 ? 1 : 0;
+            if (isPlaySound)
+            {
+                GameEntry.Audio.PlaySound("pause.ogg");
+            }
+            if (Time.timeScale == 1)
+            {
+                if (m_TimerIdDelayShowAdv > 0)
+                {
+                    GameEntry.Timer.RemoveDelayTimer(m_TimerIdDelayShowAdv);
+                }
+            }
+            if (Time.timeScale == 0)
+            {
+                m_TimerIdDelayShowAdv = GameEntry.Timer.AddDelayTimer(delayTime, () =>
+                {
+                    m_TimerIdDelayShowAdv = 0;
+
+                    TTSDKManager.Instance.ShowAdvInsert(() =>
+                    {
+                        Debug.Log("Show Adv Insert close callback");
+                    });
+                }, true);
+            }
+
             GameEntry.Audio.StopBGM();
         }
     }

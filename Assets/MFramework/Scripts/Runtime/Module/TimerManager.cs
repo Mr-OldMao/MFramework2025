@@ -28,6 +28,7 @@ namespace MFramework.Runtime
             public float targetDelaySeconds;
             public float curDelaySeconds;
             public DelayLoopInfo delayLoopInfo;
+            public bool isUnscaledDeltaTime;
         }
 
         public class DelayLoopInfo
@@ -37,9 +38,10 @@ namespace MFramework.Runtime
             public float targetLoopIntervalSeconds;
             public float curLoopIntervalSeconds;
             public Action loopEndCallback;
+            public bool isUnscaledDeltaTime;
         }
 
-        public int AddDelayTimer(float delaySeconds, Action callback)
+        public int AddDelayTimer(float delaySeconds, Action callback, bool isUnscaledDeltaTime = false)
         {
             TimerInfo timerInfo = new TimerInfo
             {
@@ -47,12 +49,13 @@ namespace MFramework.Runtime
                 callback = callback,
                 targetDelaySeconds = delaySeconds,
                 curDelaySeconds = 0,
-                delayLoopInfo = null
+                delayLoopInfo = null,
+                isUnscaledDeltaTime = isUnscaledDeltaTime
             };
             return AddDelayTimer(timerInfo);
         }
 
-        public int AddDelayTimer(int delayMilliSeconds, Action callback)
+        public int AddDelayTimer(int delayMilliSeconds, Action callback, bool isUnscaledDeltaTime = false)
         {
             TimerInfo timerInfo = new TimerInfo
             {
@@ -60,7 +63,8 @@ namespace MFramework.Runtime
                 callback = callback,
                 targetDelaySeconds = delayMilliSeconds / 1000f,
                 curDelaySeconds = 0,
-                delayLoopInfo = null
+                delayLoopInfo = null,
+                isUnscaledDeltaTime = isUnscaledDeltaTime
             };
             return AddDelayTimer(timerInfo);
         }
@@ -74,7 +78,8 @@ namespace MFramework.Runtime
         /// <param name="loopEndCallback"></param>
         /// <param name="targetLoopCount">-1表示无限循环</param>
         /// <returns></returns>
-        public int AddDelayTimer(float delaySeconds, float loopSeconds, Action callback, Action loopEndCallback = null, int targetLoopCount = -1)
+        public int AddDelayTimer(float delaySeconds, float loopSeconds, Action callback, Action loopEndCallback = null, int targetLoopCount = -1,
+            bool isUnscaledDeltaTime = false)
         {
             TimerInfo timerInfo = new TimerInfo
             {
@@ -89,8 +94,11 @@ namespace MFramework.Runtime
                     curInvokeCount = 0,
                     targetLoopIntervalSeconds = loopSeconds,
                     curLoopIntervalSeconds = 0,
-                    loopEndCallback = loopEndCallback
-                }
+                    loopEndCallback = loopEndCallback,
+                    isUnscaledDeltaTime = isUnscaledDeltaTime
+                },
+
+                isUnscaledDeltaTime = isUnscaledDeltaTime
             };
             return AddDelayTimer(timerInfo);
         }
@@ -145,8 +153,12 @@ namespace MFramework.Runtime
             return default;
         }
 
+        public void OnUpdate(Time time)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void OnUpdate(float deltaTime)
+        public void OnUpdate(float deltaTime, float unscaledDeltaTime)
         {
             if (!IsStartingUp || m_DicCacheTimer == null || m_DicCacheTimer.Count == 0)
             {
@@ -164,7 +176,7 @@ namespace MFramework.Runtime
 
                 if (timerInfo.curDelaySeconds < timerInfo.targetDelaySeconds)
                 {
-                    timerInfo.curDelaySeconds += deltaTime;
+                    timerInfo.curDelaySeconds += timerInfo.isUnscaledDeltaTime ? unscaledDeltaTime : deltaTime;
                 }
 
                 if (timerInfo.curDelaySeconds >= timerInfo.targetDelaySeconds)
@@ -192,7 +204,7 @@ namespace MFramework.Runtime
                         continue;
                     }
 
-                    timerInfo.delayLoopInfo.curLoopIntervalSeconds += deltaTime;
+                    timerInfo.delayLoopInfo.curLoopIntervalSeconds += timerInfo.delayLoopInfo.isUnscaledDeltaTime ? unscaledDeltaTime : deltaTime;
                     if (timerInfo.delayLoopInfo.curLoopIntervalSeconds >= timerInfo.delayLoopInfo.targetLoopIntervalSeconds)
                     {
                         timerInfo.delayLoopInfo.curLoopIntervalSeconds = 0;
@@ -226,5 +238,7 @@ namespace MFramework.Runtime
         {
             Debugger.Log("Shutdown TimerManager", LogType.FrameNormal);
         }
+
+
     }
 }

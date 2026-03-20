@@ -1,3 +1,4 @@
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using TTSDK.UNBridgeLib.LitJson;
 using Unity.VisualScripting;
 using UnityEngine;
 using static StarkSDKSpace.CanIUse.StarkAdManager;
+using static TTSDK.TTRank;
 
 namespace GameMain
 {
@@ -102,5 +104,61 @@ namespace GameMain
                 icon = icon //success, loading, none, fail
             });
         }
+
+
+        #region 排行榜
+        public void ShowRankList()
+        {
+            JsonData jd = new JsonData();
+            jd["rankType"] = "week";
+            jd["dataType"] = 0;
+            jd["relationType"] = "all";
+            jd["suffix"] = "分";
+            jd["rankTitle"] = "本周排行榜";
+            jd["zoneId"] = "default";
+            TT.GetImRankList(jd, (b, s) =>
+            {
+                Debug.Log($"排行榜Show TODO {b},{s} ");
+            });
+        }
+
+        public void SetRankListData(int value)
+        {
+            JsonData jd = new JsonData();
+            jd["dataType"] = 0;
+            jd["value"] = value;
+            jd["priority"] = 0;
+            jd["zoneId"] = "default";
+            TT.SetImRankData(jd, (b, s) =>
+            {
+                Debug.Log($"排行榜Set TODO {b},{s} ");
+            });
+        }
+
+        /// <summary>
+        /// 获取当前用户在IM排行榜中的最高分数
+        /// </summary>
+        /// <param name="onGetScore">回调：返回用户最高分数</param>
+        public void GetRankData(Action<RankData> callback)
+        {
+            JsonData jd = new JsonData();
+            jd["dataType"] = 0;
+            jd["relationType"] = "all";
+            jd["pageSize"] = 10;//(0,40)
+            jd["rankType"] = "week";
+            jd["pageNum"] = 1;
+            jd["zoneId"] = "default";
+
+            TT.GetImRankData(jd, (ref RankData rankData) =>
+            {
+                Debug.Log($"GetRankData succ TODO   ");
+                callback?.Invoke(rankData);
+            }, (msg) =>
+            {
+                Debug.LogError($"TT.GetUserMaxScore Fail msg:{msg} ");
+            });
+        }
+
+        #endregion
     }
 }
