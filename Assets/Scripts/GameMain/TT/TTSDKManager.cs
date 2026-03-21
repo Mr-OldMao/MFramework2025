@@ -1,13 +1,8 @@
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TTSDK;
 using TTSDK.UNBridgeLib.LitJson;
-using Unity.VisualScripting;
 using UnityEngine;
-using static StarkSDKSpace.CanIUse.StarkAdManager;
-using static TTSDK.TTRank;
+using RankData = TTSDK.TTRank.RankData;
 
 namespace GameMain
 {
@@ -138,24 +133,47 @@ namespace GameMain
         /// <summary>
         /// 获取当前用户在IM排行榜中的最高分数
         /// </summary>
-        /// <param name="onGetScore">回调：返回用户最高分数</param>
+        /// <param name="callback">具体分数</param>
         public void GetRankData(Action<RankData> callback)
         {
             JsonData jd = new JsonData();
             jd["dataType"] = 0;
             jd["relationType"] = "all";
-            jd["pageSize"] = 10;//(0,40)
+            jd["pageSize"] = 30;//(0,40)
             jd["rankType"] = "week";
             jd["pageNum"] = 1;
             jd["zoneId"] = "default";
-
             TT.GetImRankData(jd, (ref RankData rankData) =>
             {
-                Debug.Log($"GetRankData succ TODO   ");
+                Debug.LogError($"GetRankData succ");
                 callback?.Invoke(rankData);
             }, (msg) =>
             {
-                Debug.LogError($"TT.GetUserMaxScore Fail msg:{msg} ");
+                Debug.LogError($"GetRankData Fail msg:{msg} ");
+            });
+        }
+
+        public void GetRankData(Action<int> callback)
+        {
+            JsonData jd = new JsonData();
+            jd["dataType"] = 0;
+            jd["relationType"] = "all";
+            jd["pageSize"] = 30;//(0,40)
+            jd["rankType"] = "week";
+            jd["pageNum"] = 1;
+            jd["zoneId"] = "default";
+            TT.GetImRankData(jd, (ref RankData rankData) =>
+            {
+                Debug.LogError($"GetRankData succ");
+                int vaule = 0;
+                if (!string.IsNullOrEmpty(rankData?.SelfItem?.Item?.Value))
+                {
+                    vaule = int.Parse(rankData.SelfItem.Item.Value);
+                }
+                callback?.Invoke(vaule);
+            }, (msg) =>
+            {
+                Debug.LogError($"GetRankData Fail msg:{msg} ");
             });
         }
 

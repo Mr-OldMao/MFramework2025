@@ -60,25 +60,46 @@ namespace GameMain
                 Debug.LogError("-----CreateAdvBanner advID is null or empty");
                 return;
             }
+            Debug.LogError($"----- CreateAdvBanner A");
+
+            if (m_DicAdvBannerData.ContainsKey(advID))
+            {
+                Debug.Log("---- CreateAdvBanner 已存在");
+                return;
+                //Debug.LogError($"-----Adv Destroy A");
+                ////m_DicAdvBannerData[advID].adBanner.Destroy();
+                //m_DicAdvBannerData[advID] = null;
+                //m_DicAdvBannerData.Remove(advID);
+                //Debug.LogError($"-----Adv Destroy B");
+            }
+
+            TTBannerStyle style = new TTBannerStyle
+            {
+                top = 0,
+                left = 0,//Screen.width / 2,
+                width = 208,//150
+            };
             AdvBannerData advData = new AdvBannerData
             {
                 adBanner = TT.CreateBannerAd(new CreateBannerAdParam()
                 {
                     BannerAdId = AdvBannerID,
-                    Style = new TTBannerStyle
-                    {
-                        top = 0,
-                        left = 0,
-                        width = 320
-                    },
+                    Style = style,
                     AdIntervals = 30
                 }),
+                advEventInfo = new AdvEventInfo()
             };
+            //Debug.LogError($"BannerAdv style.top:{style.top},style.left:{style.left}");
+
             advData.adBanner.OnClose += () =>
             {
-                Debug.Log($"-----Adv OnClose Banner广告关闭");
+                Debug.LogError($"-----Adv OnClose Banner广告关闭");
                 m_TargetAdvEventInfo?.closeCallback?.Invoke();
                 m_TargetAdvEventInfo = null;
+
+                Debug.LogError($"-----Adv OnClose Banner广告关闭 创建新实例A");
+                //CreateAdvBanner(AdvBannerID);
+                Debug.LogError($"-----Adv OnClose Banner广告关闭 创建新实例B");
             };
             advData.adBanner.OnError += (errorCode, msg) =>
             {
@@ -88,9 +109,23 @@ namespace GameMain
             };
             advData.adBanner.OnLoad += () =>
             {
-                Debug.Log($"-----Adv OnError Banner广告加载");
+                Debug.LogError($"-----Adv OnError Banner广告加载");
                 advData.advEventInfo?.loadCallback?.Invoke();
             };
+            //advData.adBanner.OnResize += (int width, int height) =>
+            //{
+            //    Debug.LogError($"-----Adv OnResize Banner,Screen.width:{Screen.width},Screen.height:{Screen.height}, width:{width},height:{height}");
+
+            //    int left = Screen.width - width;
+            //    int top = (Screen.height - height)/2;
+            //    advData.adBanner.ReSize(new TTBannerStyle
+            //    {
+            //        left = left,
+            //        top = top,
+            //        width = 208,
+            //    });
+            //};
+            
             m_DicAdvBannerData.Add(advID, advData);
         }
 
@@ -181,6 +216,7 @@ namespace GameMain
 
         public void ShowAdvBanner(Action closeCallback = null, Action<int, string> loadFailCallback = null, Action loadCallback = null, string advID = "")
         {
+            Debug.LogError("---- ShowAdvBanner A");
 #if UNITY_EDITOR
             closeCallback?.Invoke();
             return;
@@ -191,14 +227,36 @@ namespace GameMain
                 errorCallback = loadFailCallback,
                 loadCallback = loadCallback
             };
+            Debug.LogError("---- ShowAdvBanner B");
 
             if (!m_DicAdvBannerData.ContainsKey(AdvBannerID))
             {
-                CreateAdvBanner(advID);
+                Debug.LogError("---- ShowAdvBanner CreateAdvBanner A");
+                CreateAdvBanner(AdvBannerID);
+                Debug.LogError("---- ShowAdvBanner CreateAdvBanner B");
             }
+            else
+            {
+                HideAdvBanner();
+            }
+            Debug.LogError("---- ShowAdvBanner C");
+
             m_DicAdvBannerData[AdvBannerID]?.adBanner.Show();
+            Debug.LogError("---- ShowAdvBanner D");
+
         }
 
+        public void HideAdvBanner()
+        {
+#if UNITY_EDITOR
+            return;
+#endif
+            Debug.LogError("---- HideAdvBanner A");
+
+            m_DicAdvBannerData[AdvBannerID]?.adBanner.Hide();
+            Debug.LogError("---- HideAdvBanner B");
+
+        }
 
         public void ShowAdvVideo(Action<bool, int> closeCallback, Action loadCallback = null,
             Action<int, string> loadFailCallback = null, string advID = "")

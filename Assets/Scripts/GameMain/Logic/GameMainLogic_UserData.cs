@@ -60,6 +60,14 @@ namespace GameMain
             userData_Base.addUpDestroyEnemyCount += destroyEnemyCount;
             SaveData(USERDATA_BASE, userData_Base);
         }
+        public void SetUserDataBaseScore(int score)
+        {
+            if (score > userData_Base.topScore)
+            {
+                userData_Base.topScore = score;
+            }
+            SaveData(USERDATA_BASE, userData_Base);
+        }
 
         public UserData_Base GetUserDataBase()
         {

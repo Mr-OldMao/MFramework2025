@@ -61,8 +61,12 @@ namespace GameMain
         private RectTransform rectP2PlayName;
         private Button btnClose;
 
+        private Button btnAdvScoreReward;
+
 
         private bool m_IsClickedClose;
+
+        private int m_CurStageScore;
         public override async UniTask Init()
         {
             await base.Init();
@@ -115,14 +119,15 @@ namespace GameMain
             await UniTask.Delay(500);
             int score4 = await DalayShowTxt(p1KillCountEnemy4, DataTools.GetTankEnemy(203).Score, txtP1KillTankCount4, txtP1Score4);
             await UniTask.Delay(500);
-            int p1TotalScore = _model.LastTotalScore + score1 + score2 + score3 + score4;
+            m_CurStageScore = score1 + score2 + score3 + score4;
+            int p1TotalScore = _model.LastTotalScore + m_CurStageScore;
             txtP1TotalScore.text = $"{p1TotalScore}";
             txtP1KillTotalCount.text = $"{p1KillTotalCount}";
-            TTSDKManager.Instance.GetRankData(rankData =>
+
+            TTSDKManager.Instance.GetRankData((int topSelfScore) =>
             {
-                int maxScore = int.Parse(rankData.SelfItem.Item.Value);
-                Debug.LogError($"当前分数:{p1TotalScore},排行榜最高分：{maxScore}");
-                if (p1TotalScore > maxScore)
+                Debug.LogError($"当前分数:{p1TotalScore},排行榜最高分：{topSelfScore}");
+                if (p1TotalScore > topSelfScore)
                 {
                     TTSDKManager.Instance.SetRankListData(p1TotalScore);
                 }
@@ -173,6 +178,7 @@ namespace GameMain
             _model.LastTotalScore = p1TotalScore;
 
             btnClose.gameObject.SetActive(true);
+            btnAdvScoreReward.interactable = true;
         }
 
 
@@ -182,11 +188,20 @@ namespace GameMain
             (Controller as UIControlSettlement).CurGameStateType = GameMainLogic.Instance.GameStateType;
             GameMainLogic.Instance.GameStateType = GameStateType.GameSettlement;
             GameEntry.Audio.StopBGM();
+            btnAdvScoreReward.interactable = false;
 
+            //TTSDKManager.Instance.ShowAdvBanner(() =>
+            //{
+            //    TTSDKManager.Instance.HideAdvBanner();
+            //});
+
+            TTSDKManager.Instance.ShowAdvInsert();
             await RefreshUILayoutAsync();
 
             (Controller as UIControlSettlement).ResetScore();
             //return UniTask.CompletedTask;
+
+
         }
 
         private async UniTask ProcessNextStage()
@@ -219,7 +234,7 @@ namespace GameMain
                     var gameoverPanel = await GameEntry.UI.ShowViewAsync<UIPanelGameOver>();
                     gameoverPanel.ShowPanelFull();
                     GameMainLogic.Instance.StageID = 1;
-                    HidePanel();
+                    //HidePanel();
                     break;
             }
         }
@@ -227,6 +242,9 @@ namespace GameMain
         public override UniTask HidePanel()
         {
             base.HidePanel();
+
+            //TTSDKManager.Instance.HideAdvBanner();
+
             return UniTask.CompletedTask;
         }
 
@@ -242,11 +260,52 @@ namespace GameMain
                 await ProcessNextStage();
                 HidePanel();
             });
+
+            //当前关卡分数追加+50%
+            btnAdvScoreReward.onClick.AddListener(() =>
+            {
+                btnAdvScoreReward.interactable = false;
+                TTSDKManager.Instance.ShowAdvVideo(async (isPlayed, count) =>
+                {
+                    btnAdvScoreReward.interactable = !isPlayed;
+                    if (isPlayed)
+                    {
+                        await UniTask.Delay(500);
+
+                        UIModelSettlement _model = Controller.Model as UIModelSettlement;
+                        int newTotalScore = _model.LastTotalScore + (int)(m_CurStageScore * 0.5f);
+                        _model.LastTotalScore = newTotalScore;
+                        txtP1TotalScore.text = $"{newTotalScore}";
+
+                        if (newTotalScore > GameMainLogic.Instance.GetUserDataBase().topScore)
+                        {
+                            txtTopScore.text = $"{newTotalScore}";
+                        }
+                        GameMainLogic.Instance.SetUserDataBaseScore(newTotalScore);
+
+                        GameEntry.Audio.PlaySound("settlement_txt.mp3");
+
+                        TTSDKManager.Instance.GetRankData((int topSelfScore) =>
+                        {
+                            Debug.LogError($"当前分数:{newTotalScore},排行榜最高分：{topSelfScore}");
+                            if (newTotalScore > topSelfScore)
+                            {
+                                TTSDKManager.Instance.SetRankListData(newTotalScore);
+                            }
+                        });
+                    }
+                }, loadFailCallback: (errorCode, msg) =>
+                {
+                    TTSDKManager.Instance.ShotToast("分数追加失败");
+                    btnAdvScoreReward.interactable = true;
+                });
+            });
         }
 
         protected override void UnRegisterEvent()
         {
             btnClose.onClick.RemoveAllListeners();
+            btnAdvScoreReward.onClick.RemoveAllListeners();
         }
 
         private async UniTask RefreshUILayoutAsync()

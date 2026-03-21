@@ -36,9 +36,12 @@ namespace GameMain
         {
             base.ShowPanel();
 
-            int topScore = GameMainLogic.Instance.GetUserDataBase().topScore;
-            txtTopScore.text = $"HI- {topScore}";
-
+            //int topScore = GameMainLogic.Instance.GetUserDataBase().topScore;
+            //txtTopScore.text = $"HI- {topScore}";
+            TTSDKManager.Instance.GetRankData((int topSelfScore) =>
+            {
+                txtTopScore.text = $"HI- {topSelfScore}";
+            });
 
             if (GameMainLogic.Instance.GameStateType == GameStateType.GameSettlement)
             {
