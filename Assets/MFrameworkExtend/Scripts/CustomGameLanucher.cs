@@ -27,6 +27,16 @@ namespace GameMain
             GameEntry.UI.GetModel<UIModelSettlement>().InitData();
 
             TTSDKManager.Instance.Init();
+            GameEntry.Timer.AddDelayTimer(3f, () =>
+            {
+                Debug.LogError("--showAdvBanner 3f");
+                TTSDKManager.Instance.ShowAdvBanner();
+            });
+            GameEntry.Timer.AddDelayTimer(31f, () =>
+            {
+                Debug.LogError("--showAdvInsert 31f");
+                TTSDKManager.Instance.ShowAdvInsert();
+            });
 
             GameEntry.Scene.LoadSceneAsync(sceneName, LoadSceneMode.Single, (p) =>
             {

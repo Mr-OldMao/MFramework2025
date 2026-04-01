@@ -1,3 +1,4 @@
+using MFramework.Runtime;
 using System;
 using TTSDK;
 using TTSDK.UNBridgeLib.LitJson;
@@ -23,9 +24,17 @@ namespace GameMain
 
         public void Init()
         {
-            Debug.Log("-------TTSDKManager Init CheckScene");
-            TT.Login(SuccCallback, FailCallback);
+            Debug.Log("-------TTSDKManager Init");
 
+            InitAdv();
+
+            TT.InitSDK((_, _) =>
+            {
+                MMPOceanEngine.OceanPostback(MMPOceanEngine.active_event);
+                Debug.LogError("-------TTSDKManager InitSDK callback succ");
+            });
+
+            TT.Login(SuccCallback, FailCallback);
 
 
             TT.CheckScene(TTSideBar.SceneEnum.SideBar,
@@ -42,8 +51,6 @@ namespace GameMain
                 {
                     Debug.Log($"TT.CheckScene Fail p1:{p1},p2:{p2}");
                 });
-
-            InitAdv();
         }
 
         private void FailCallback(string errMsg)

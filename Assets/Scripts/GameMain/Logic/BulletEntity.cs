@@ -63,7 +63,7 @@ namespace GameMain
             }
         }
 
-        void Update()
+        void FixedUpdate()
         {
             if (isCanMove)
             {

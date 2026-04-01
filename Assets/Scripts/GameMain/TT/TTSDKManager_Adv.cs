@@ -109,7 +109,7 @@ namespace GameMain
             };
             advData.adBanner.OnLoad += () =>
             {
-                Debug.LogError($"-----Adv OnError Banner广告加载");
+                Debug.LogError($"-----Adv OnLoad Banner广告加载");
                 advData.advEventInfo?.loadCallback?.Invoke();
             };
             //advData.adBanner.OnResize += (int width, int height) =>
@@ -152,19 +152,23 @@ namespace GameMain
 
             advData.adVideo.OnClose += (bool isEnded, int count) =>
             {
-                Debug.Log($"-----Adv OnClose 视频广告关闭");
+                Debug.Log($"-----Adv OnClose 激励广告关闭 isEnded:{isEnded},count:{count}");
+                if (isEnded)
+                {
+                    MMPOceanEngine.OceanPostback(MMPOceanEngine.game_addiction_event);
+                }
                 m_TargetAdvEventInfo?.closeVideoCallback?.Invoke(isEnded, count);
                 m_TargetAdvEventInfo = null;
             };
             advData.adVideo.OnError += (errorCode, msg) =>
             {
-                Debug.LogError($"-----Adv OnError 视频广告出错 errorCode:{errorCode},msg:{msg}");
+                Debug.LogError($"-----Adv OnError 激励广告出错 errorCode:{errorCode},msg:{msg}");
                 m_TargetAdvEventInfo?.errorCallback?.Invoke(errorCode, msg);
                 m_TargetAdvEventInfo = null;
             };
             advData.adVideo.OnLoad += () =>
             {
-                Debug.Log($"-----Adv OnError 视频广告加载");
+                Debug.Log($"-----Adv OnError 激励广告加载");
                 m_TargetAdvEventInfo?.loadCallback?.Invoke();
             };
             m_DicAdvVideoData.Add(advID, advData);
@@ -190,6 +194,7 @@ namespace GameMain
             advData.adInterstitial.OnClose += () =>
             {
                 Debug.Log($"-----Adv OnClose 插屏广告关闭");
+                MMPOceanEngine.OceanPostback(MMPOceanEngine.game_addiction_event);
                 m_TargetAdvEventInfo.closeCallback?.Invoke();
                 m_TargetAdvEventInfo = null;
             };

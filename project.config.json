@@ -3,7 +3,7 @@
   "projectname": "MFrameWork",
   "unity": {
     "build": {
-      "webgl": "F:\\PrivateProject\\MFrameWork\\MFrameWork\\tt-minigame\\webgl_package-20260321_200448.zip",
+      "webgl": "F:\\PrivateProject\\MFrameWork\\MFrameWork\\tt-minigame\\webgl_split\\webgl_split-a0f1d038.zip",
       "native": {
         "il2cpp": "",
         "apk": "",
