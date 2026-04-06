@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using MiniGameSDK;
 
 namespace GameMain
 {
@@ -124,12 +125,12 @@ namespace GameMain
             txtP1TotalScore.text = $"{p1TotalScore}";
             txtP1KillTotalCount.text = $"{p1KillTotalCount}";
 
-            TTSDKManager.Instance.GetRankData((int topSelfScore) =>
+            SDKManager.GetSpecial<DouyinSDK>().GetRankData((int topSelfScore) =>
             {
                 Debug.LogError($"当前分数:{p1TotalScore},排行榜最高分：{topSelfScore}");
                 if (p1TotalScore > topSelfScore)
                 {
-                    TTSDKManager.Instance.SetRankListData(p1TotalScore);
+                    SDKManager.GetSpecial<DouyinSDK>().SetRankListData(p1TotalScore);
                 }
             });
 
@@ -195,7 +196,7 @@ namespace GameMain
             //    TTSDKManager.Instance.HideAdvBanner();
             //});
 
-            TTSDKManager.Instance.ShowAdvInsert();
+            SDKManager.Instance.ShowAdvInsert();
             await RefreshUILayoutAsync();
 
             (Controller as UIControlSettlement).ResetScore();
@@ -265,7 +266,7 @@ namespace GameMain
             btnAdvScoreReward.onClick.AddListener(() =>
             {
                 btnAdvScoreReward.interactable = false;
-                TTSDKManager.Instance.ShowAdvVideo(async (isPlayed, count) =>
+                SDKManager.Instance.ShowAdvReward(async (isPlayed) =>
                 {
                     btnAdvScoreReward.interactable = !isPlayed;
                     if (isPlayed)
@@ -285,18 +286,18 @@ namespace GameMain
 
                         GameEntry.Audio.PlaySound("settlement_txt.mp3");
 
-                        TTSDKManager.Instance.GetRankData((int topSelfScore) =>
+                        SDKManager.GetSpecial<DouyinSDK>().GetRankData((int topSelfScore) =>
                         {
                             Debug.LogError($"当前分数:{newTotalScore},排行榜最高分：{topSelfScore}");
                             if (newTotalScore > topSelfScore)
                             {
-                                TTSDKManager.Instance.SetRankListData(newTotalScore);
+                                SDKManager.GetSpecial<DouyinSDK>().SetRankListData(newTotalScore);
                             }
                         });
                     }
-                }, loadFailCallback: (errorCode, msg) =>
+                }, (msg) =>
                 {
-                    TTSDKManager.Instance.ShotToast("分数追加失败");
+                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("分数追加失败");
                     btnAdvScoreReward.interactable = true;
                 });
             });

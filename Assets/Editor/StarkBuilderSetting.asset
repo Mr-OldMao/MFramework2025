@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1677285531, guid: 349caa61723b07542aaafdd2bb363727, type: 3}
+  m_Script: {fileID: 1677285531, guid: 95a948a80943c9f4aac95725ac1d2104, type: 3}
   m_Name: StarkBuilderSetting
   m_EditorClassIdentifier: 
   tag: 0
   wasmResourceUrl: http://
-  OutputDir: F:\PrivateProject\MFrameWork\MFrameWork\tt-minigame
+  OutputDir: D:\_20260119\MFramework2025\tt-minigame
   useByteAudioAPI: 0
   wasmMemorySize: 128
   isWebGL2: 0
@@ -34,6 +34,8 @@ MonoBehaviour:
   preloadFiles: 
   CDN: 
   preloadDataListUrl: 
+  dataLoadType: 1
+  dataFileSubPrefix: 
   iOSDevicePixelRatio: 0
   urlCacheList: []
   dontCacheFileNames: []
@@ -52,7 +54,7 @@ MonoBehaviour:
   _appId: tt4fb7390ad1d5287c07
   version: 
   autoVersion: 0
-  _webglPackagePath: F:\PrivateProject\MFrameWork\MFrameWork\tt-minigame\webgl_package-20260327_122939.zip
+  _webglPackagePath: 
   _orientation: 0
   _iOSPerformancePlus: 1
   _menuButtonStyle: 0

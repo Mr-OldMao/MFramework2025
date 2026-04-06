@@ -1,4 +1,5 @@
 using MFramework.Runtime;
+using MiniGameSDK;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,17 +26,29 @@ namespace GameMain
             uiPanelLoad.ShowLoadSlider();
 
             GameEntry.UI.GetModel<UIModelSettlement>().InitData();
-
-            TTSDKManager.Instance.Init();
+            SDKManager.Instance.InitSDK(p =>
+            {
+                SDKManager.GetSpecial<DouyinSDK>().OnInitCompletedCallback();
+            });
             GameEntry.Timer.AddDelayTimer(3f, () =>
             {
                 Debug.LogError("--showAdvBanner 3f");
-                TTSDKManager.Instance.ShowAdvBanner();
+                SDKManager.Instance.ShowAdvBanner();
+            });
+            GameEntry.Timer.AddDelayTimer(10f, () =>
+            {
+                Debug.LogError("--showAdvBanner 10f");
+                SDKManager.Instance.ShowAdvBanner();
+            });
+            GameEntry.Timer.AddDelayTimer(20f, () =>
+            {
+                Debug.LogError("--showAdvBanner 20f");
+                SDKManager.Instance.ShowAdvBanner();
             });
             GameEntry.Timer.AddDelayTimer(31f, () =>
             {
                 Debug.LogError("--showAdvInsert 31f");
-                TTSDKManager.Instance.ShowAdvInsert();
+                SDKManager.Instance.ShowAdvInsert();
             });
 
             GameEntry.Scene.LoadSceneAsync(sceneName, LoadSceneMode.Single, (p) =>

@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
+using MiniGameSDK;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,7 +39,7 @@ namespace GameMain
 
             //int topScore = GameMainLogic.Instance.GetUserDataBase().topScore;
             //txtTopScore.text = $"HI- {topScore}";
-            TTSDKManager.Instance.GetRankData((int topSelfScore) =>
+            SDKManager.GetSpecial<DouyinSDK>().GetRankData((int topSelfScore) =>
             {
                 txtTopScore.text = $"HI- {topSelfScore}";
             });
@@ -85,7 +86,7 @@ namespace GameMain
 
             btnRankList.onClick.AddListener(() =>
             {
-                TTSDKManager.Instance.ShowRankList();
+                SDKManager.GetSpecial<DouyinSDK>().ShowRankList();
             });
         }
 

@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
+using MiniGameSDK;
 using System;
 using TMPro;
 using Unity.VisualScripting;
@@ -103,51 +104,51 @@ namespace GameMain
                 //    return;
                 //}
                 ShowMask(true);
-                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                SDKManager.Instance.ShowAdvReward((isPlayed) =>
                 {
                     if (isPlayed)
                     {
                         GameMainLogic.Instance.Player1Entity.AddLevel();
                     }                    
                     ShowMask(false);
-                }, loadFailCallback: (errorCode, msg) =>
+                }, (msg) =>
                 {
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("奖励正在准备中......");
+                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励正在准备中......");
                 });
             });
             btnAddLife.onClick.AddListener(() =>
             {
                 ShowMask(true);
-                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                SDKManager.Instance.ShowAdvReward((isPlayed) =>
                 {
                     if (isPlayed)
                     {
                         GameMainLogic.Instance.Player1Entity.AddLife();
                     }
                     ShowMask(false);
-                }, loadFailCallback: (errorCode, msg) =>
+                }, (msg) =>
                 {
                     GameMainLogic.Instance.Player1Entity.AddLife();
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("奖励已发放");
+                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励已发放");
                 });
             });
             btnPlayerUnbeatable.onClick.AddListener(() =>
             {
                 ShowMask(true);
-                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                SDKManager.Instance.ShowAdvReward((isPlayed) =>
                 {
                     if (isPlayed)
                     {
                         GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
                         {
                             tankEntityBase = GameMainLogic.Instance.Player1Entity,
-                            durationTime = 10f * count
+                            durationTime = 10f * 1
                         });
                     }
                     ShowMask(false);
-                }, loadFailCallback: (errorCode, msg) =>
+                }, ( msg) =>
                 {
                     GameEntry.Event.DispatchEvent<TankUnbeatableInfo>(GameEventType.TankUnbeatable, new TankUnbeatableInfo
                     {
@@ -155,25 +156,25 @@ namespace GameMain
                         durationTime = 10f
                     });
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("奖励已发放");
+                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励已发放");
                 });
             });
 
             btnRandomReward.onClick.AddListener(() =>
             {
                 ShowMask(true);
-                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                SDKManager.Instance.ShowAdvReward((isPlayed) =>
                 {
                     if (isPlayed)
                     {
                         GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
                     }
                     ShowMask(false);
-                }, loadFailCallback: (errorCode, msg) =>
+                }, (msg) =>
                 {
                     GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
                     ShowMask(false);
-                    TTSDKManager.Instance.ShotToast("奖励已发放");
+                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励已发放");
                 });
             });
         }

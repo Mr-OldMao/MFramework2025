@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using MFramework.Runtime;
+using MiniGameSDK;
 using TMPro;
 using TTSDK;
 using TTSDK.UNBridgeLib.LitJson;
@@ -59,7 +60,7 @@ namespace GameMain
         {
             btnClose.onClick.AddListener(() =>
             {
-                TTSDKManager.Instance.ShowRevisitGuide();
+                SDKManager.GetSpecial<DouyinSDK>().ShowRevisitGuide();
                 HidePanel();
             });
 
@@ -75,7 +76,7 @@ namespace GameMain
 
             btnJumpSidebar.onClick.AddListener(() =>
             {
-                TTSDKManager.Instance.GuideClickSidebar((isSucc) =>
+                SDKManager.GetSpecial<DouyinSDK>().ShowSideBar((isSucc) =>
                 {
                     if (isSucc)
                     {

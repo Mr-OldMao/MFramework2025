@@ -1,0 +1,16 @@
+{
+    "name": "com.bytedance.ttsdk.ref",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SDK_DY"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

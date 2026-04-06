@@ -263,7 +263,8 @@ namespace GameMain
 
         }
 
-        public void ShowAdvVideo(Action<bool, int> closeCallback, Action loadCallback = null,
+        //ShowAdvVideo
+        public void ShowAdvReward(Action<bool, int> closeCallback, Action loadCallback = null,
             Action<int, string> loadFailCallback = null, string advID = "")
         {
 #if UNITY_EDITOR

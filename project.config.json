@@ -1,23 +1,23 @@
 {
-  "appid": "tt4fb7390ad1d5287c07",
-  "projectname": "MFrameWork",
-  "unity": {
-    "build": {
-      "webgl": "F:\\PrivateProject\\MFrameWork\\MFrameWork\\tt-minigame\\webgl_split\\webgl_split-a0f1d038.zip",
-      "native": {
-        "il2cpp": "",
-        "apk": "",
-        "fullApk": ""
-      },
-      "instantGame": ""
+    "appid": "tt4fb7390ad1d5287c07",
+    "projectname": "MFrameWork",
+    "unity": {
+        "build": {
+            "webgl": "D:\\_20260119\\MFramework2025\\tt-minigame\\webgl_package-20260406_172059.zip",
+            "native": {
+                "il2cpp": "",
+                "apk": "",
+                "fullApk": ""
+            },
+            "instantGame": ""
+        },
+        "publishType": "2",
+        "starkSdkVersion": "Without StarkSDK",
+        "unityToolsVersion": null,
+        "unityEngineVersion": "2022.3.17f1c1",
+        "arch": "both"
     },
-    "publishType": "2",
-    "starkSdkVersion": "Without StarkSDK",
-    "unityToolsVersion": null,
-    "unityEngineVersion": "2022.3.17f1c1",
-    "arch": "both"
-  },
-  "setting": {
-    "urlCheck": true
-  }
+    "setting": {
+        "urlCheck": true
+    }
 }

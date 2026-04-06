@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using MiniGameSDK;
 
 namespace GameMain
 {
@@ -68,7 +69,7 @@ namespace GameMain
 
             btnRestartCurStage.onClick.AddListener(() =>
             {
-                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                SDKManager.Instance.ShowAdvReward((isPlayed) =>
                 {
                     if (isPlayed)
                     {
@@ -82,9 +83,9 @@ namespace GameMain
                         HidePanel();
                     }
 
-                }, loadFailCallback: (errorCode, msg) =>
+                }, (msg) =>
                 {
-                    Debugger.Log($"btnRestartCurStage loadFailCallback.errorCode:{errorCode},msg:{msg}");
+                    Debugger.Log($"btnRestartCurStage loadFailCallback,msg:{msg}");
 
                     GameMainLogic.Instance.Player1Entity.PlayerRestartByAdv();
                     GameMainLogic.Instance.IsCurStageReward = true;
@@ -99,16 +100,16 @@ namespace GameMain
 
             btnRevive.onClick.AddListener(() =>
             {
-                TTSDKManager.Instance.ShowAdvVideo((isPlayed, count) =>
+                SDKManager.Instance.ShowAdvReward((isPlayed) =>
                 {
                     if (isPlayed)
                     {
                         GameMainLogic.Instance.Player1Entity.PlayerReviveByAdv();
                         HidePanel();
                     }
-                }, loadFailCallback: (errorCode, msg) =>
+                }, (msg) =>
                 {
-                    Debugger.Log($"btnRevive loadFailCallback.errorCode:{errorCode},msg:{msg}");
+                    Debugger.Log($"btnRevive loadFailCallback,msg:{msg}");
                     GameMainLogic.Instance.Player1Entity.PlayerReviveByAdv();
                     HidePanel();
                 });
