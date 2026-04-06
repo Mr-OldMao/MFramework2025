@@ -29,13 +29,18 @@ namespace MiniGameSDK
             LoadedFail,
         }
 
-        public void InitSDK(Action<bool> callback = null)
+        public bool IsCanUseAdv { get; set; } = true;
+
+        public void InitSDK(Action<bool> callback = null,bool isAutoInitAdv = true)
         {
             WX.InitSDK((num) =>
             {
-                InitADReward();
-                InitADInsert();
-                InitADBanner();
+                if (isAutoInitAdv)
+                {
+                    InitADReward();
+                    InitADInsert();
+                    InitADBanner(); 
+                }
                 callback?.Invoke(true);
             });
         }
@@ -79,10 +84,10 @@ namespace MiniGameSDK
                         userData = p.userInfo
                     });
                 },
-                 fail = (p) =>
-                 {
-                     onFail?.Invoke($"[WX] 获取用户数据失败 errMsg:{p.errMsg}");
-                 }
+                fail = (p) =>
+                {
+                    onFail?.Invoke($"[WX] 获取用户数据失败 errMsg:{p.errMsg}");
+                }
             };
         }
 
@@ -91,6 +96,10 @@ namespace MiniGameSDK
         #region Adv Init
         private void InitADReward(Action<bool> loadCallback = null)
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             if (m_AdvRewardState == AdvState.Unload || m_AdvRewardState == AdvState.LoadedFail)
             {
                 m_AdvRewardState = AdvState.Loading;
@@ -114,6 +123,10 @@ namespace MiniGameSDK
 
         private void InitADInsert(Action<bool> loadCallback = null)
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             if (m_AdvInterState == AdvState.Unload || m_AdvInterState == AdvState.LoadedFail)
             {
                 m_AdvInterState = AdvState.Loading;
@@ -136,6 +149,10 @@ namespace MiniGameSDK
 
         private void InitADBanner(Action<bool> loadCallback = null)
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             if (m_AdvBannerState == AdvState.Unload || m_AdvBannerState == AdvState.LoadedFail)
             {
                 m_AdvBannerState = AdvState.Loading;
@@ -164,6 +181,11 @@ namespace MiniGameSDK
 
         public void ShowAdvReward(Action<bool> onClose, Action<string> onError = null)
         {
+            if (!IsCanUseAdv)
+            {
+                onClose?.Invoke(true);
+                return;
+            }
             switch (m_AdvRewardState)
             {
                 case AdvState.Unload:
@@ -197,6 +219,11 @@ namespace MiniGameSDK
 
         public void ShowAdvInsert(Action onClose = null, Action<string> onError = null)
         {
+            if (!IsCanUseAdv)
+            {
+                onClose?.Invoke();
+                return;
+            }
             switch (m_AdvInterState)
             {
                 case AdvState.Unload:
@@ -230,6 +257,10 @@ namespace MiniGameSDK
 
         public void ShowAdvBanner(int position = 0, Action onClose = null, Action<string> onError = null)
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             switch (m_AdvBannerState)
             {
                 case AdvState.Unload:
@@ -258,6 +289,10 @@ namespace MiniGameSDK
 
         public void HideAdvBanner()
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             m_AdvBanner?.Hide();
 
             m_AdvBanner.Destroy();
@@ -266,7 +301,17 @@ namespace MiniGameSDK
         }
         #endregion
 
-
+        public void ShotToast(string title, string icon = "", Action completeCallback = null, int durationMS = 1500)
+        {
+            WX.ShowToast(new ShowToastOption
+            {
+                title = title,
+                mask = true,
+                icon = string.IsNullOrEmpty(icon) ? "success" : icon,//success.fail
+                duration = durationMS,
+                complete = _ => completeCallback?.Invoke(),
+            });
+        }
 
         public void PrivacyAuthorizeResolve()
         {
@@ -276,6 +321,8 @@ namespace MiniGameSDK
             };
             WX.PrivacyAuthorizeResolve(p);
         }
+
+
     }
 #endif
 }

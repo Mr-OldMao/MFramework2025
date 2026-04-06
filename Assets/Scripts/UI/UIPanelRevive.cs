@@ -73,28 +73,13 @@ namespace GameMain
                 {
                     if (isPlayed)
                     {
-                        GameMainLogic.Instance.Player1Entity.PlayerRestartByAdv();
-                        GameMainLogic.Instance.IsCurStageReward = true;
-                        GameEntry.Event.DispatchEvent(GameEventType.CancelStopAllEnemyMove);
-                        GameEntry.UI.GetController<UIControlMap>().RecycleMapEntity();
-                        GameEntry.UI.GetController<UIControlMap>().GenerateMapCurrentStage();
-                        GameEntry.UI.GetModel<UIModelSettlement>().ResetScore();
-                        GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
-                        HidePanel();
+                        OnBtnRestartCurStage();
                     }
 
                 }, (msg) =>
                 {
                     Debugger.Log($"btnRestartCurStage loadFailCallback,msg:{msg}");
-
-                    GameMainLogic.Instance.Player1Entity.PlayerRestartByAdv();
-                    GameMainLogic.Instance.IsCurStageReward = true;
-                    GameEntry.Event.DispatchEvent(GameEventType.CancelStopAllEnemyMove);
-                    GameEntry.UI.GetController<UIControlMap>().RecycleMapEntity();
-                    GameEntry.UI.GetController<UIControlMap>().GenerateMapCurrentStage();
-                    GameEntry.UI.GetModel<UIModelSettlement>().ResetScore();
-                    GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
-                    HidePanel();
+                    OnBtnRestartCurStage();
                 });
             });
 
@@ -121,6 +106,18 @@ namespace GameMain
             btnNotRevive.onClick.RemoveAllListeners();
             btnRestartCurStage.onClick.RemoveAllListeners();
             btnRevive.onClick.RemoveAllListeners();
+        }
+
+        private void OnBtnRestartCurStage()
+        {
+            GameMainLogic.Instance.Player1Entity.PlayerRestartByAdv();
+            GameMainLogic.Instance.IsCurStageReward = true;
+            GameEntry.Event.DispatchEvent(GameEventType.CancelStopAllEnemyMove);
+            GameEntry.UI.GetController<UIControlMap>().RecycleMapEntity();
+            GameEntry.UI.GetController<UIControlMap>().GenerateMapCurrentStage();
+            GameEntry.UI.GetModel<UIModelSettlement>().ResetScore();
+            GameMainLogic.Instance.GameStateType = GameStateType.GameStart;
+            HidePanel();
         }
     }
 }

@@ -26,23 +26,16 @@ namespace GameMain
             uiPanelLoad.ShowLoadSlider();
 
             GameEntry.UI.GetModel<UIModelSettlement>().InitData();
+#if SDK_DY
+            SDKManager.Instance.IsCanUseAdv = true;
             SDKManager.Instance.InitSDK(p =>
             {
+
                 SDKManager.GetSpecial<DouyinSDK>().OnInitCompletedCallback();
-            });
+            },true);
             GameEntry.Timer.AddDelayTimer(3f, () =>
             {
                 Debug.LogError("--showAdvBanner 3f");
-                SDKManager.Instance.ShowAdvBanner();
-            });
-            GameEntry.Timer.AddDelayTimer(10f, () =>
-            {
-                Debug.LogError("--showAdvBanner 10f");
-                SDKManager.Instance.ShowAdvBanner();
-            });
-            GameEntry.Timer.AddDelayTimer(20f, () =>
-            {
-                Debug.LogError("--showAdvBanner 20f");
                 SDKManager.Instance.ShowAdvBanner();
             });
             GameEntry.Timer.AddDelayTimer(31f, () =>
@@ -50,6 +43,10 @@ namespace GameMain
                 Debug.LogError("--showAdvInsert 31f");
                 SDKManager.Instance.ShowAdvInsert();
             });
+#else
+            SDKManager.Instance.IsCanUseAdv = false;
+            SDKManager.Instance.InitSDK(null, false);
+#endif
 
             GameEntry.Scene.LoadSceneAsync(sceneName, LoadSceneMode.Single, (p) =>
             {

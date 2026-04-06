@@ -125,14 +125,16 @@ namespace GameMain
             txtP1TotalScore.text = $"{p1TotalScore}";
             txtP1KillTotalCount.text = $"{p1KillTotalCount}";
 
+#if SDK_DY
             SDKManager.GetSpecial<DouyinSDK>().GetRankData((int topSelfScore) =>
-            {
-                Debug.LogError($"当前分数:{p1TotalScore},排行榜最高分：{topSelfScore}");
-                if (p1TotalScore > topSelfScore)
-                {
-                    SDKManager.GetSpecial<DouyinSDK>().SetRankListData(p1TotalScore);
-                }
-            });
+               {
+                   Debug.LogError($"当前分数:{p1TotalScore},排行榜最高分：{topSelfScore}");
+                   if (p1TotalScore > topSelfScore)
+                   {
+                       SDKManager.GetSpecial<DouyinSDK>().SetRankListData(p1TotalScore);
+                   }
+               }); 
+#endif
 
             GameEntry.Audio.PlaySound(txtAudio);
 
@@ -190,6 +192,12 @@ namespace GameMain
             GameMainLogic.Instance.GameStateType = GameStateType.GameSettlement;
             GameEntry.Audio.StopBGM();
             btnAdvScoreReward.interactable = false;
+
+#if SDK_DY
+            rectNode1.gameObject.SetActive(true);
+#else
+            rectNode1.gameObject.SetActive(false);
+#endif
 
             //TTSDKManager.Instance.ShowAdvBanner(() =>
             //{
@@ -286,18 +294,20 @@ namespace GameMain
 
                         GameEntry.Audio.PlaySound("settlement_txt.mp3");
 
+#if SDK_DY
                         SDKManager.GetSpecial<DouyinSDK>().GetRankData((int topSelfScore) =>
-                        {
-                            Debug.LogError($"当前分数:{newTotalScore},排行榜最高分：{topSelfScore}");
-                            if (newTotalScore > topSelfScore)
-                            {
-                                SDKManager.GetSpecial<DouyinSDK>().SetRankListData(newTotalScore);
-                            }
-                        });
+                                        {
+                                            Debug.LogError($"当前分数:{newTotalScore},排行榜最高分：{topSelfScore}");
+                                            if (newTotalScore > topSelfScore)
+                                            {
+                                                SDKManager.GetSpecial<DouyinSDK>().SetRankListData(newTotalScore);
+                                            }
+                                        }); 
+#endif
                     }
                 }, (msg) =>
                 {
-                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("分数追加失败");
+                    SDKManager.Instance.ShotToast("分数追加失败");
                     btnAdvScoreReward.interactable = true;
                 });
             });

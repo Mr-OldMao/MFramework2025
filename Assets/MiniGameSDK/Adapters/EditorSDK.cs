@@ -5,7 +5,9 @@ namespace MiniGameSDK
 {
     public class EditorSDK : IGameSDK
     {
-        public void InitSDK(Action<bool> callback = null) { }
+        public bool IsCanUseAdv { get; set; } = true;
+
+        public void InitSDK(Action<bool> callback = null, bool isAutoInitAdv = true) { }
 
         public void Login(Action<bool> callback) { }
 
@@ -21,5 +23,10 @@ namespace MiniGameSDK
         public void ShowAdvInsert(Action onClose = null, Action<string> onError = null) => onClose?.Invoke();
         public void ShowAdvBanner(int position = 0, Action onClose = null, Action<string> onError = null) { }
         public void HideAdvBanner() { }
+
+        public void ShotToast(string title, string icon = "", Action completeCallback = null, int durationMS = 1500)
+        {
+
+        }
     }
 }

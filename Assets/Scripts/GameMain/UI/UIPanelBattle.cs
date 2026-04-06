@@ -39,6 +39,16 @@ namespace GameMain
         public override UniTask ShowPanel()
         {
             imgMask.gameObject.SetActive(false);
+            bool isShowAdvBtn = false;
+#if SDK_DY
+            isShowAdvBtn = true;
+#else
+            isShowAdvBtn = false;
+#endif
+            btnTankLevelAdd.gameObject.SetActive(isShowAdvBtn);
+            btnAddLife.gameObject.SetActive(isShowAdvBtn);
+            btnPlayerUnbeatable.gameObject.SetActive(isShowAdvBtn);
+            btnRandomReward.gameObject.SetActive(isShowAdvBtn);
 
             return base.ShowPanel();
         }
@@ -114,7 +124,7 @@ namespace GameMain
                 }, (msg) =>
                 {
                     ShowMask(false);
-                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励正在准备中......");
+                    SDKManager.Instance.ShotToast("奖励正在准备中......");
                 });
             });
             btnAddLife.onClick.AddListener(() =>
@@ -131,7 +141,7 @@ namespace GameMain
                 {
                     GameMainLogic.Instance.Player1Entity.AddLife();
                     ShowMask(false);
-                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励已发放");
+                    SDKManager.Instance.ShotToast("奖励已发放");
                 });
             });
             btnPlayerUnbeatable.onClick.AddListener(() =>
@@ -156,7 +166,7 @@ namespace GameMain
                         durationTime = 10f
                     });
                     ShowMask(false);
-                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励已发放");
+                    SDKManager.Instance.ShotToast("奖励已发放");
                 });
             });
 
@@ -174,7 +184,7 @@ namespace GameMain
                 {
                     GameEntry.Pool.GetPool(GameMainLogic.Instance.PoolIdReward).GetEntity();
                     ShowMask(false);
-                    SDKManager.GetSpecial<DouyinSDK>().ShotToast("奖励已发放");
+                    SDKManager.Instance.ShotToast("奖励已发放");
                 });
             });
         }

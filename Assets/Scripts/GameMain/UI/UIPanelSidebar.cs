@@ -58,11 +58,24 @@ namespace GameMain
 
         protected override void RegisterEvent()
         {
+#if SDK_DY
             btnClose.onClick.AddListener(() =>
+                {
+                    SDKManager.GetSpecial<DouyinSDK>().ShowRevisitGuide();
+                    HidePanel();
+                });
+            btnJumpSidebar.onClick.AddListener(() =>
             {
-                SDKManager.GetSpecial<DouyinSDK>().ShowRevisitGuide();
-                HidePanel();
-            });
+                SDKManager.GetSpecial<DouyinSDK>().ShowSideBar((isSucc) =>
+                {
+                    if (isSucc)
+                    {
+                        GameMainLogic.Instance.SetLastEnterGameDateTime();
+                    }
+                    UpdateReceiveRewardState();
+                });
+            }); 
+#endif
 
             btnReceiveReward.onClick.AddListener(() =>
             {
@@ -74,17 +87,7 @@ namespace GameMain
                 }
             });
 
-            btnJumpSidebar.onClick.AddListener(() =>
-            {
-                SDKManager.GetSpecial<DouyinSDK>().ShowSideBar((isSucc) =>
-                {
-                    if (isSucc)
-                    {
-                        GameMainLogic.Instance.SetLastEnterGameDateTime();
-                    }
-                    UpdateReceiveRewardState();
-                });
-            });
+            
         }
 
         protected override void UnRegisterEvent()

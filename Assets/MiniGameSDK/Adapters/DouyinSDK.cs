@@ -3,7 +3,6 @@ using UnityEngine;
 namespace MiniGameSDK
 {
 #if SDK_DY
-
     using TTSDK;
     using TTSDK.UNBridgeLib.LitJson;
     using static TTSDK.TTRank;
@@ -31,13 +30,15 @@ namespace MiniGameSDK
         private Action _onBannerClose;
         private Action<string> _onBannerError;
 
-        public void InitSDK(Action<bool> callback = null)
+        public bool IsCanUseAdv { get; set; } = true;
+
+        public void InitSDK(Action<bool> callback = null, bool isAutoInitAdv = true)
         {
             TT.InitSDK((int code, ContainerEnv env) =>
             {
                 Debug.LogError($"[DouyinSDK] InitSDK: {code} {env}");
                 bool isInitSucc = code == 0;
-                if (isInitSucc)
+                if (isInitSucc && isAutoInitAdv)
                 {
                     InitBannerAd();
                     InitInterAd();
@@ -107,6 +108,10 @@ namespace MiniGameSDK
         #region 激励广告
         private void InitRewardAd()
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             if (_rewardAd != null)
             {
                 return;
@@ -144,6 +149,11 @@ namespace MiniGameSDK
 
         public void ShowAdvReward(Action<bool> onClose, Action<string> onError = null)
         {
+            if (!IsCanUseAdv)
+            {
+                onClose?.Invoke(true);
+                return;
+            }
             _onRewardClose = onClose;
             _onRewardError = onError;
 
@@ -179,6 +189,10 @@ namespace MiniGameSDK
         #region 插屏广告
         private void InitInterAd()
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             if (_interAd != null)
             {
                 return;
@@ -230,6 +244,11 @@ namespace MiniGameSDK
 
         public void ShowAdvInsert(Action onClose = null, Action<string> onError = null)
         {
+            if (!IsCanUseAdv)
+            {
+                onClose?.Invoke();
+                return;
+            }
             _onInterClose = onClose;
             _onInterError = onError;
 
@@ -265,6 +284,10 @@ namespace MiniGameSDK
         #region Banner 广告
         private void InitBannerAd()
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             if (_bannerAd != null)
             {
                 return;
@@ -303,6 +326,10 @@ namespace MiniGameSDK
 
         public void ShowAdvBanner(int position = 0, Action onClose = null, Action<string> onError = null)
         {
+            if (!IsCanUseAdv)
+            {
+                return;
+            }
             _onBannerClose = onClose;
             _onBannerError = onError;
 
@@ -333,6 +360,20 @@ namespace MiniGameSDK
         }
         #endregion
 
+        #region Toast
+        public void ShotToast(string title, string icon = "", Action completeCallback = null, int durationMS = 1500)
+        {
+            TT.ShowToast(new TTShowToastParam
+            {
+                duration = durationMS,
+                title = title,
+                complete = _ => completeCallback?.Invoke(),
+                icon = string.IsNullOrEmpty(icon) ? "success" : icon //success, loading, none, fail
+            });
+        } 
+        #endregion
+
+
         #region 特有接口
 
         public void ShowSideBar(Action<bool> callback)
@@ -355,17 +396,6 @@ namespace MiniGameSDK
                  Debug.LogError($"[DouyinSDK] NavigateToScene Fail p1:{p1},p2:{p2}");
                  callback?.Invoke(false);
              });
-        }
-
-        public void ShotToast(string title, string icon = "", Action complete = null, int durationMS = 1000)
-        {
-            TT.ShowToast(new TTShowToastParam
-            {
-                duration = durationMS,
-                title = title,
-                complete = _ => complete?.Invoke(),
-                icon = icon //success, loading, none, fail
-            });
         }
 
         public void ShowRankList()
@@ -468,7 +498,6 @@ namespace MiniGameSDK
             Login(null);
             CheckScene();
         }
-
         #endregion
 
         //#region 其他功能

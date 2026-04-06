@@ -16,8 +16,6 @@ namespace MiniGameSDK
         void GetRankData(Action<TTSDK.TTRank.RankData> callback);
         void GetRankData(Action<int> callback);
 
-        //tosat
-        void ShotToast(string title, string icon = "", Action complete = null, int durationMS = 1000);
 
         void ShowRevisitGuide(Action<bool> callback = null);
 

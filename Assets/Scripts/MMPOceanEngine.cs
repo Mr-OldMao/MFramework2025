@@ -1,3 +1,4 @@
+#if SDK_DY
 using System;
 using System.Collections;
 using TTSDK;
@@ -8,7 +9,7 @@ public static class MMPOceanEngine
 {
     public const string active_event = "active";
     public const string game_addiction_event = "game_addiction";
-    
+
     [Serializable]
     private class OceanEvent
     {
@@ -82,4 +83,5 @@ public static class MMPOceanEngine
             Debug.LogError("request.error: " + request.error);
         }
     }
-}
+} 
+#endif

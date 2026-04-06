@@ -20,6 +20,7 @@ namespace GameMain
         private TextMeshProUGUI txtTopScore;
         private Button btnRankList;
 
+        private RectTransform rectRankList;
         public override async UniTask Init()
         {
             await base.Init();
@@ -39,10 +40,16 @@ namespace GameMain
 
             //int topScore = GameMainLogic.Instance.GetUserDataBase().topScore;
             //txtTopScore.text = $"HI- {topScore}";
+#if SDK_DY
+            txtTopScore.gameObject.SetActive(true);
             SDKManager.GetSpecial<DouyinSDK>().GetRankData((int topSelfScore) =>
             {
                 txtTopScore.text = $"HI- {topSelfScore}";
             });
+#else
+            txtTopScore.gameObject.SetActive(false);
+#endif
+
 
             if (GameMainLogic.Instance.GameStateType == GameStateType.GameSettlement)
             {
@@ -84,10 +91,19 @@ namespace GameMain
                 GameEntry.UI.ShowView<UIPanelSidebar>();
             });
 
+#if SDK_DY
+            rectRankList.gameObject.SetActive(true);
+            rectSidebar.gameObject.SetActive(true);
             btnRankList.onClick.AddListener(() =>
             {
                 SDKManager.GetSpecial<DouyinSDK>().ShowRankList();
             });
+#else
+            rectRankList.gameObject.SetActive(false);
+            rectSidebar.gameObject.SetActive(false);
+#endif
+
+
         }
 
         public class NavigateToSceneInfo

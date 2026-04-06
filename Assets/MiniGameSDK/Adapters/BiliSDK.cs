@@ -6,7 +6,8 @@ namespace MiniGameSDK
 #if SDK_BL
     public class BiliSDK : IGameSDK, IBiliSpecial
     {
-        public void InitSDK(Action<bool> callback = null) { }
+        public bool IsCanUseAdv { get; set; } = true;
+        public void InitSDK(Action<bool> callback = null, bool isAutoInitAdv = true) { }
         public void Login(Action<bool> callback) { }
         public string GetPlatformName() => "Bilibili";
         public bool IsLoggedIn { get; private set; } = false;
@@ -19,6 +20,11 @@ namespace MiniGameSDK
 
         public void ShowTaskCenter() { }
         public void OpenGameCenter() { }
+
+        public void ShotToast(string title, string icon = "", Action completeCallback = null, int durationMS = 1500)
+        {
+
+        }
     }
 #endif
 }
