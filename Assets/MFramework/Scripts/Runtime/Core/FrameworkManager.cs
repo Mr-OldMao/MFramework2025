@@ -10,6 +10,7 @@ namespace MFramework.Runtime
     {
         private readonly Dictionary<Type, IGameBase> _modules = new();
         private readonly List<IUpdatableModule> _updateModules = new();
+        private readonly List<IUpdateModule> m_UpdateModules = new();
 
         public static FrameworkManager Instance { get; private set; }
 
@@ -36,6 +37,11 @@ namespace MFramework.Runtime
             {
                 _updateModules.Add(updatable);
             }
+            if (module is IUpdateModule update)
+            {
+                m_UpdateModules.Add(update);
+            }
+            
 
             Debugger.Log($"模块 {module.GetType()} 注册成功", LogType.FrameCore);
         }
@@ -80,12 +86,11 @@ namespace MFramework.Runtime
 
         public void Update()
         {
-            var deltaTime = Time.deltaTime;
             foreach (var module in _updateModules)
             {
                 try
                 {
-                    (module as IUpdatableModule)?.OnUpdate(deltaTime);
+                    (module as IUpdatableModule)?.OnUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                 }
                 catch (Exception e)
                 {

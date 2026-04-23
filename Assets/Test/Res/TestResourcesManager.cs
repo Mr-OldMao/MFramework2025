@@ -284,7 +284,7 @@ namespace MFramework.Runtime
 
                 for (int i = 0; i < 1000000; i++)
                 {
-                    await Addressables.LoadAssetAsync<GameObject>(Entity_Sphere).Task;
+                    await Addressables.LoadAssetAsync<GameObject>(Entity_Sphere).ToUniTask();
                 }
                 Debugger.Log("time3:" + System.DateTime.Now.ToString());
 
