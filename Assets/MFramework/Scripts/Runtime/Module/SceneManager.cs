@@ -379,8 +379,14 @@ namespace MFramework.Runtime
             {
                 Debugger.Log($"Unload scene start: {sceneName}", LogType.FrameNormal);
 
-                //是否卸载唯一单一场景
-                int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;
+                Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName);
+                if (!scene.IsValid() || !scene.isLoaded)
+                {
+                    Debugger.Log($"Skip unload for unloaded/invalid scene: {sceneName}", LogType.FrameNormal);
+                    return;
+                }
+
+                // 是否卸载唯一单一场景
                 if (UnityEngine.SceneManagement.SceneManager.sceneCount == 1
                     && UnityEngine.SceneManagement.SceneManager.GetSceneAt(0).name == sceneName)
                 {
@@ -388,7 +394,7 @@ namespace MFramework.Runtime
                     return;
                 }
 
-                AsyncOperation asyncOp = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(sceneName);
+                AsyncOperation asyncOp = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
                 if (asyncOp != null)
                 {
                     // 更新卸载进度
