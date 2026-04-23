@@ -332,6 +332,10 @@ namespace MFramework.Runtime
                 var state = m_DicSceneStateData.ElementAt(i).Value.state;
                 if (name != sceneName && state == ESceneStateType.Loaded)
                 {
+                    if (GetLoadedSceneCount() <= 1)
+                    {
+                        break;
+                    }
                     await ProcessUnloadQueue(name);
                 }
             }
@@ -379,16 +383,21 @@ namespace MFramework.Runtime
             {
                 Debugger.Log($"Unload scene start: {sceneName}", LogType.FrameNormal);
 
-                //是否卸载唯一单一场景
-                int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;
-                if (UnityEngine.SceneManagement.SceneManager.sceneCount == 1
-                    && UnityEngine.SceneManagement.SceneManager.GetSceneAt(0).name == sceneName)
+                // 是否卸载唯一单一场景
+                if (GetLoadedSceneCount() <= 1)
                 {
-                    Debugger.LogError($"当前场景为唯一，无法卸载 sceneName:{sceneName}");
+                    Debugger.Log($"Skip unload because only one loaded scene remains: {sceneName}", LogType.FrameNormal);
                     return;
                 }
 
-                AsyncOperation asyncOp = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(sceneName);
+                Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName);
+                if (!scene.IsValid() || !scene.isLoaded)
+                {
+                    Debugger.Log($"Skip unload for unloaded/invalid scene: {sceneName}", LogType.FrameNormal);
+                    return;
+                }
+
+                AsyncOperation asyncOp = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
                 if (asyncOp != null)
                 {
                     // 更新卸载进度
@@ -481,6 +490,20 @@ namespace MFramework.Runtime
 
             // 如果没有加载任何场景
             m_CurrentScene = null;
+        }
+
+        private int GetLoadedSceneCount()
+        {
+            int count = 0;
+            int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;
+            for (int i = 0; i < sceneCount; i++)
+            {
+                if (UnityEngine.SceneManagement.SceneManager.GetSceneAt(i).isLoaded)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
         #endregion
 
